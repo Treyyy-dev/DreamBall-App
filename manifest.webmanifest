@@ -1,0 +1,40 @@
+{
+  "name": "Dream Ball",
+  "short_name": "Dream Ball",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "description": "A hi-bit pixel 3-on-3 basketball card game: build your squad, pull banners and play a story-mode season.",
+  "display": "standalone",
+  "display_override": [
+    "fullscreen",
+    "standalone"
+  ],
+  "orientation": "portrait",
+  "background_color": "#12152c",
+  "theme_color": "#12152c",
+  "categories": [
+    "games",
+    "sports"
+  ],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
