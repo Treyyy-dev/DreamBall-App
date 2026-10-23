@@ -591,6 +591,19 @@ html,body{height:100dvh}
   .app{max-width:min(620px, calc(100dvh * .62))}
   body{background:radial-gradient(90% 120% at 50% 40%,#1c2350,#0a0c1c 70%)}
 }
+
+/* no browser "link" look when tapping: no blue tap flash, no long-press callout, no focus ring on taps */
+*{-webkit-tap-highlight-color:transparent}
+html,body{-webkit-touch-callout:none}
+img,canvas,video{-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
+:focus:not(:focus-visible){outline:none}
+.start,.intro{outline:none}
+
+/* feel like an app, not a web page: no blue tap flash, focus boxes or long-press menus */
+*,*::before,*::after{-webkit-tap-highlight-color:transparent}
+html,body{-webkit-touch-callout:none;overscroll-behavior:none}
+:focus:not(:focus-visible){outline:none}
+img,canvas,video{-webkit-user-drag:none;user-select:none}
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0;-webkit-text-size-adjust:100%;overscroll-behavior:none;touch-action:manipulation}
 img{max-width:100%}
