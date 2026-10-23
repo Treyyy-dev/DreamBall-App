@@ -1,0 +1,77 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-apk
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Prepare the game for the app
+        run: |
+          mkdir -p app/www
+          cp index.html manifest.webmanifest app/www/
+          cp -r icons app/www/
+          pip install --quiet pillow
+
+      - name: Create the Capacitor Android project
+        working-directory: app
+        run: |
+          npm init -y > /dev/null
+          npm install --no-audit --no-fund @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
+          cat > capacitor.config.json <<'JSON'
+          {
+            "appId": "com.treyyyverse.dreamball",
+            "appName": "Dream Ball",
+            "webDir": "www",
+            "backgroundColor": "#12152c",
+            "android": { "backgroundColor": "#12152c" }
+          }
+          JSON
+          npx cap add android
+          npx cap sync android
+
+      - name: Make it Dream Ball (icons, splash, portrait, full screen, signing)
+        run: python3 android-build/customize.py app/android ${{ github.run_number }}
+
+      - name: Build the APK
+        working-directory: app/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon --stacktrace
+
+      - name: Publish it as a download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/android/app/build/outputs/apk/release/app-release.apk DreamBall.apk
+          ls -la DreamBall.apk
+          gh release create "android-${{ github.run_number }}" DreamBall.apk \
+            --title "Dream Ball for Android (build ${{ github.run_number }})" \
+            --notes "On your Android phone, tap DreamBall.apk to download it, then open it and tap Install. If Android asks, allow installs from Chrome (or your browser) for this one app." \
+            --latest
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DreamBall-apk
+          path: DreamBall.apk
