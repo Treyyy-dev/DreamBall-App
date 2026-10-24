@@ -1006,7 +1006,7 @@ const SHARDS = [0, 2, 3, 5, 8];
 const STAR_COST = [0, 50, 120, 250, 500];
 const ODDS = [.55, .3, .12, .03];
 const SEASON_GAMES = 12;
-const DECK_MAX = 50, DECK_MIN = 8, HAND = 8, STAM_MAX = 50;
+const DECK_MAX = 50, DECK_MIN = 8, HAND = 4, STAM_MAX = 50;
 // the old training gym's prices, kept only to refund saves that bought equipment
 const STATIONS = {treadmill:{cost:80}, ladder:{cost:90}, bench:{cost:120}, machine:{cost:150}, squat:{cost:220}, bike:{cost:180}, plyo:{cost:200}};
 const UNIT_UP = [0, 60, 140, 280, 520];
@@ -4320,7 +4320,7 @@ function keySteer() {
 window.addEventListener('keydown', e => {
   if (mode !== 'match' || e.repeat) return;
   const k = (e.key || '').toLowerCase();
-  if (k >= '1' && k <= '8') { e.preventDefault(); playCard(+k - 1, 'down'); }
+  if (k >= '1' && k <= String(HAND)) { e.preventDefault(); playCard(+k - 1, 'down'); }
   else if (k === 'a') act('auto', {});
   else if (k === ' ' || k === 'c') { e.preventDefault(); if (G.oppShot) userContest(); else userHandsUp(); }
   else if (k === 's') act('subs', {});
