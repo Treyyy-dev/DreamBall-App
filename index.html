@@ -948,30 +948,16 @@ const CARDS = [
   {id:'mamba',    n:'Mamba Fadeaway',   t:'sht', r:3, cost:10, shot:'meter', win:2,    fade:true, art:'fade'},
   {id:'dunk360',  n:'360 Dunk',         t:'sht', r:3, cost:12, shot:'drive', fin:'dunk',    bonus:.25, poster:true, art:'windmill'},
 
-  {id:'chest',    n:'Chest Pass',       t:'pas', r:0, cost:2,  pass:'best',  steal:1,  art:'chest'},
-  {id:'bounce',   n:'Bounce Pass',      t:'pas', r:0, cost:3,  pass:'best',  steal:.4, art:'bounce'},
-  {id:'outlet',   n:'Outlet Pass',      t:'pas', r:1, cost:3,  pass:'ahead', steal:.8, art:'chest', burst:true},
-  {id:'skip',     n:'Skip Pass',        t:'pas', r:1, cost:4,  pass:'three', steal:.8, art:'skip', hot:2.5},
-  {id:'nolook',   n:'No-Look Pass',     t:'pas', r:2, cost:5,  pass:'best',  steal:0,  art:'nolook', hot:3},
-  {id:'lob',      n:'Alley-Oop',        t:'pas', r:2, cost:7,  pass:'lob',   steal:.5, art:'lob'},
-  {id:'kickout',  n:'Kick-Out',         t:'pas', r:0, cost:3,  pass:'three', steal:.7, art:'chest', hot:1.5},
-  {id:'btbpass',  n:'Behind-the-Back Pass', t:'pas', r:1, cost:4, pass:'best', steal:.3, art:'nolook', hot:2},
-  {id:'heave',    n:'Full-Court Heave', t:'pas', r:2, cost:5,  pass:'ahead', steal:.5, art:'lob', burst:true, hot:2},
-  {id:'dime',     n:'Dime',             t:'pas', r:3, cost:6,  pass:'best',  steal:0,  art:'nolook', hot:4.5},
 
   {id:'poke',     n:'Poke Steal',       t:'def', r:0, cost:4,  d:'steal',  p:.35, art:'steal'},
   {id:'lockdown', n:'Lockdown',         t:'def', r:0, cost:5,  d:'lock',   dur:6, art:'stance'},
   {id:'intercept',n:'Jump the Lane',    t:'def', r:1, cost:5,  d:'lane',   dur:6, art:'lane'},
-  {id:'block',    n:'Block Party',      t:'def', r:1, cost:6,  d:'block',  p:.45, dur:6, art:'block'},
   {id:'press',    n:'Full-Court Press', t:'def', r:2, cost:7,  d:'press',  dur:6, art:'stance'},
   {id:'charge',   n:'Take the Charge',  t:'def', r:2, cost:7,  d:'charge', dur:6, art:'charge'},
-  {id:'chase',    n:'Chase-Down Block', t:'def', r:3, cost:9,  d:'block',  p:.75, dur:6, art:'block'},
   {id:'pickpocket',n:'Pickpocket',      t:'def', r:3, cost:8,  d:'steal',  p:.7, art:'steal'},
   {id:'handsup',  n:'Hands Up',         t:'def', r:0, cost:3,  d:'lock',   dur:4, art:'block'},
-  {id:'help',     n:'Help Defense',     t:'def', r:0, cost:4,  d:'block',  p:.3, dur:5, art:'stance'},
   {id:'deny',     n:'Deny the Ball',    t:'def', r:1, cost:5,  d:'lane',   dur:6, art:'lane'},
   {id:'trap',     n:'Double Team',      t:'def', r:2, cost:7,  d:'trap',   p:.5, art:'trap'},
-  {id:'rimprot',  n:'Rim Protector',    t:'def', r:2, cost:7,  d:'block',  p:.6, dur:6, art:'block'},
   {id:'clamps',   n:'Clamps',           t:'def', r:3, cost:9,  d:'lock',   dur:9, art:'stance'},
 
   {id:'pnr',      n:'Pick and Roll',    t:'ply', r:0, cost:5,  play:'pnr',       art:'pnr'},
@@ -1218,7 +1204,7 @@ document.querySelectorAll('.pxi[data-i]').forEach(e => { e.innerHTML = PXI(PX_IC
 // ================= save =================
 const KEY = 'dreamball-save-v3', OLD_KEY = 'dreamball-save-v2';
 let S = null;
-const STARTER_CARDS = {hesi:3, cross:3, btl:2, inout:2, jumper:4, layup:4, chest:4, bounce:2, poke:3, lockdown:1, pnr:2, givego:2};
+const STARTER_CARDS = {hesi:4, cross:4, btl:2, inout:2, jumper:5, layup:5, poke:4, lockdown:2, pnr:2, givego:2};
 function starterDeck(cards) { const d = []; for (const id in cards) for (let i = 0; i < cards[id].n && d.length < DECK_MAX; i++) d.push(id); return d; }
 function load() {
   try {
@@ -1244,7 +1230,17 @@ function fixSave(s) {
     delete s.gym;
   }
   for (const id in s.owned) s.owned[id].tr = s.owned[id].tr || {sht:0, drb:0, spd:0, def:0};
+  // pass and block cards were removed (tap a teammate to pass, CONTEST to block): pay back 15 Basket Bucks a copy, refill the deck
+  const deckWas = (s.deck || []).length;
+  let gone = 0; for (const id in s.cards || {}) if (!CARD[id]) { gone += s.cards[id].n || 0; delete s.cards[id]; }
+  if (gone) { s.gems = (s.gems || 0) + gone * 15; s.cardRefund = (s.cardRefund || 0) + gone * 15; }
   s.deck = (s.deck || []).filter(id => CARD[id]);
+  if (gone && s.cards) {
+    const spare = []; for (const id in s.cards) { const n = s.cards[id].n - s.deck.filter(x => x === id).length; for (let k = 0; k < n; k++) spare.push(id); }
+    spare.sort((x, y) => CARD[y].r - CARD[x].r || CARD[x].cost - CARD[y].cost);
+    while (s.deck.length < Math.min(deckWas, DECK_MAX) && spare.length) s.deck.push(spare.shift());
+    for (const id of ['jumper', 'layup', 'hesi', 'poke']) while (s.deck.length < DECK_MIN + 8) { s.cards[id] = s.cards[id] || {n:0}; s.cards[id].n++; s.deck.push(id); if (s.deck.filter(x => x === id).length >= 4) break; }
+  }
   if (s.lineup && s.lineup.length > TEAM_N * 2) s.lineup = [...s.lineup.slice(0, TEAM_N), ...s.lineup.slice(5, 5 + TEAM_N)];   // 5-on-5 saves -> 3-on-3
   s.auto = !!s.auto;
   if (s.coins != null) { s.gems = (s.gems || 0) + Math.floor(s.coins / 10); delete s.coins; }   // coins became Basket Bucks
@@ -3646,12 +3642,12 @@ function teamHTML() {
       return `<button class="dcard ${inD >= o.n ? 'full' : ''}" data-act="deckadd" data-id="${c.id}" aria-label="Add ${c.n}">${cardFace(c.id, {lv})}<span class="own">${inD}/${o.n} in deck · ${nxt}</span><span class="desc">${cardDesc(c)}</span></button>`;
     }).join('');
     const b = deckBoost();
-    return tabs + `<div class="deckhead"><div><b>${S.deck.length}</b><span>/ ${DECK_MAX} CARDS</span></div><div class="mix">${['ply','drb','sht','pas','def'].map(t => `<span style="--tc:${TYPES[t].a}">${TYPES[t].n} ${byType(t)}</span>`).join('')}</div><div class="avg">AVG COST<b>${avg}</b></div></div>
+    return tabs + `<div class="deckhead"><div><b>${S.deck.length}</b><span>/ ${DECK_MAX} CARDS</span></div><div class="mix">${['ply','drb','sht','def'].map(t => `<span style="--tc:${TYPES[t].a}">${TYPES[t].n} ${byType(t)}</span>`).join('')}</div><div class="avg">AVG COST<b>${avg}</b></div></div>
       <div class="mrow"><button class="mbtn sec" data-act="deckfill">Fill with my cards</button><button class="mbtn sec" data-act="deckclear">Clear</button></div>
       <p class="hint">In a game you hold ${HAND} cards. Playing one sends it to the bottom and draws the next. Each different card in your deck also gives a small team boost: ${STATS.map(k => `${STATN[k]} +${b[k]}`).join(', ')}.</p>
       <div class="sect"><h3>YOUR DECK <em>Tap to remove one</em></h3><div class="dgrid">${deck || '<p class="hint">Your deck is empty. Add cards from your collection below.</p>'}</div></div>
       <div class="sect"><h3>COLLECTION <em>Tap to add a copy</em></h3>
-      <div class="chips">${['all','ply','drb','sht','pas','def'].map(t => `<button class="fchip ${deckFilter === t ? 'on' : ''}" data-act="dfilter" data-t="${t}" style="--tc:${t === 'all' ? 'var(--gold)' : TYPES[t].a}">${t === 'all' ? 'ALL' : TYPES[t].n}</button>`).join('')}</div>
+      <div class="chips">${['all','ply','drb','sht','def'].map(t => `<button class="fchip ${deckFilter === t ? 'on' : ''}" data-act="dfilter" data-t="${t}" style="--tc:${t === 'all' ? 'var(--gold)' : TYPES[t].a}">${t === 'all' ? 'ALL' : TYPES[t].n}</button>`).join('')}</div>
       <div class="dgrid big">${coll}</div></div>`;
   }
   const wear = {}; for (const id in S.owned) if (S.owned[id].shoe != null) wear[S.owned[id].shoe] = CHARS[id].last;
@@ -4339,6 +4335,7 @@ function hideStart() {
   el.classList.add('out');
   setTimeout(() => { el.hidden = true; el.innerHTML = ''; }, 380);
   if (!S) renderSetup();
+  else if (S.cardRefund) { const n = S.cardRefund; delete S.cardRefund; save(); renderTop(); setTimeout(() => toast(`Pass and block cards are gone. You got ${n} Basket Bucks back`), 500); }
   else if (S.gymRefund) { const n = S.gymRefund; delete S.gymRefund; save(); renderTop(); setTimeout(() => toast(`The gym is closed. You got back ${n} Basket Bucks for its equipment`), 500); }
 }
 
