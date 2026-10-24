@@ -37,7 +37,7 @@ button{font-family:inherit;color:inherit}
 .app{height:100%;width:100%;max-width:none;
   margin:0 auto;display:flex;flex-direction:column;gap:8px;padding-block:10px}
 .home .board,.home .hud{display:none}
-.match .topbar,.match .nav,.match .gymtag{display:none}
+.match .topbar,.match .nav,.match .road{display:none}
 .home .autobtn,.home .effbar{display:none}
 svg.ic{width:18px;height:18px;flex:none}
 
@@ -302,8 +302,6 @@ svg.ic{width:18px;height:18px;flex:none}
 @media (prefers-reduced-motion:reduce){ #rotate .phone{animation:none} }
 
 /* ---- v3: training gym, cards, matchup, viewer ---- */
-.gymtag{position:absolute;left:10px;top:10px;max-width:calc(100% - 20px);background:rgba(18,21,44,.82);border:1px solid var(--rule);border-radius:9px;padding:6px 10px;font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--gold);cursor:pointer;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gymtag span{color:var(--ink);letter-spacing:.02em;font-weight:600}
 .autobtn{position:absolute;left:8px;top:8px;height:36px;border-radius:10px;border:1px solid var(--rule);background:rgba(18,21,44,.85);display:flex;align-items:center;gap:7px;padding:0 11px;font-weight:700;font-size:13px;letter-spacing:.1em;cursor:pointer}
 .autobtn i{width:28px;height:16px;border-radius:999px;background:var(--rule);position:relative;transition:background .2s}
 .autobtn i::after{content:"";position:absolute;left:2px;top:2px;width:12px;height:12px;border-radius:50%;background:var(--ink);transition:transform .2s}
@@ -604,6 +602,29 @@ img,canvas,video{-webkit-user-drag:none;user-select:none;-webkit-user-select:non
 html,body{-webkit-touch-callout:none;overscroll-behavior:none}
 :focus:not(:focus-visible){outline:none}
 img,canvas,video{-webkit-user-drag:none;user-select:none}
+
+/* Baller Road (locked) */
+.road{position:absolute;left:50%;top:15%;transform:translateX(-50%);z-index:2;display:flex;align-items:center;gap:10px;padding:10px 14px 9px;border:0;cursor:pointer;
+  background:linear-gradient(180deg,#3a2a7a,#1b1645);color:#ffc94d;box-shadow:inset 0 0 0 3px #ffc94d,inset 0 0 0 5px #120e18,0 5px 0 #0a0820;
+  clip-path:polygon(0 6px,6px 6px,6px 0,calc(100% - 6px) 0,calc(100% - 6px) 6px,100% 6px,100% calc(100% - 6px),calc(100% - 6px) calc(100% - 6px),calc(100% - 6px) 100%,6px 100%,6px calc(100% - 6px),0 calc(100% - 6px))}
+.road:active{transform:translateX(-50%) translateY(2px)}
+.road .rd-ic{width:34px;height:auto;image-rendering:pixelated;flex:none;filter:saturate(.75)}
+.road .rd-t{display:flex;flex-direction:column;align-items:center;gap:3px}
+.road b{font-family:'Silkscreen',var(--display),monospace;font-weight:700;font-size:clamp(17px,5vw,24px);letter-spacing:.04em;line-height:1;text-shadow:2px 2px 0 #120e18;white-space:nowrap}
+.road small{display:flex;align-items:center;gap:4px;font-family:'Silkscreen',var(--num),monospace;font-size:11px;color:#cfc6ff;letter-spacing:.12em}
+.road .rd-lock{width:11px;height:auto;image-rendering:pixelated}
+
+/* legend glow */
+@keyframes legglow{0%,100%{filter:drop-shadow(0 0 2px rgba(255,201,77,.55))}50%{filter:drop-shadow(0 0 8px rgba(255,214,110,1)) drop-shadow(0 0 2px #fff3b0)}}
+@keyframes legshine{0%{background-position:160% 0}60%,100%{background-position:-60% 0}}
+.hcard:has(>.cframe.leg),.dcard:has(>.cframe.leg),.bi-c:has(>.cframe.leg),.mini:has(>.cframe.leg),.cardfill:has(>.cframe.leg){animation:legglow 1.8s ease-in-out infinite}
+.cframe.leg::after,.chip.leg::after,.mcard.leg::after,.bi-p.leg::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:3;border-radius:inherit;
+  background:linear-gradient(115deg,transparent 38%,rgba(255,244,200,.6) 50%,transparent 62%);background-size:260% 100%;animation:legshine 2.8s ease-in-out infinite}
+.chip.leg,.mcard.leg,.bi-p.leg{position:relative;overflow:hidden;border-color:#ffc94d;animation:legbox 1.8s ease-in-out infinite}
+.mcard.leg{animation:pop .4s cubic-bezier(.2,1.4,.4,1) both,legbox 1.8s ease-in-out infinite;animation-delay:var(--d),0s}
+@keyframes legbox{0%,100%{box-shadow:0 0 0 1px rgba(255,201,77,.4),0 0 6px rgba(255,201,77,.35)}50%{box-shadow:0 0 0 1px #ffe08a,0 0 14px rgba(255,214,110,.95)}}
+@media (prefers-reduced-motion:reduce){.cframe.leg::after,.chip.leg::after,.mcard.leg::after,.bi-p.leg::after{animation:none}}
+.stage:has(.panel:not([hidden])) .road,.stage:has(.overlay:not([hidden])) .road{display:none}
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0;-webkit-text-size-adjust:100%;overscroll-behavior:none;touch-action:manipulation}
 img{max-width:100%}
@@ -627,7 +648,7 @@ img{max-width:100%}
     <canvas id="cv" aria-label="3D view"></canvas>
     <div id="fx"></div>
     <div class="fpsbox" id="fpsbox" hidden></div>
-    <button class="gymtag" data-act="tab" data-tab="team">STARTING 3 · <span>Tap a player to see them</span></button>
+    <button class="road" id="road" data-act="road" aria-label="Baller Road, locked"></button>
     <button class="autobtn" id="autoBtn" data-act="auto" aria-pressed="false"><i></i>AUTOPLAY</button>
     <div class="effbar" id="effbar"></div>
     <button class="pausebtn" data-act="pause" aria-label="Pause"><svg viewBox="0 0 20 20" class="ic"><rect x="5" y="4" width="3.5" height="12" rx="1" fill="currentColor"/><rect x="11.5" y="4" width="3.5" height="12" rx="1" fill="currentColor"/></svg></button>
@@ -1017,7 +1038,7 @@ function cardArt(c) {
 }
 function cardFace(id, opts) {
   const c = CARD[id], o = opts || {};
-  return `<span class="cframe t-${c.t}" style="--rc:${RAR[c.r].c}">${cardArt(c)}<span class="ccost">${BOLT}${c.cost}</span><span class="ctype">${TYPES[c.t].n}</span>${o.lv ? `<span class="clv">LV ${o.lv}</span>` : ''}<span class="cname">${c.n}</span></span>`;
+  return `<span class="cframe t-${c.t}${c.r === 3 ? ' leg' : ''}" style="--rc:${RAR[c.r].c}">${cardArt(c)}<span class="ccost">${BOLT}${c.cost}</span><span class="ctype">${TYPES[c.t].n}</span>${o.lv ? `<span class="clv">LV ${o.lv}</span>` : ''}<span class="cname">${c.n}</span></span>`;
 }
 document.querySelectorAll('.gemic').forEach(e => e.innerHTML = GEM);
 
@@ -1136,6 +1157,7 @@ for (let t = 0; t < 2; t++) for (let i = 0; i < TEAM_N; i++) {
   players[t].push(p); all.push(p);
 }
 const REF = {x:48.5, y:47, vx:0, vy:0, yaw:-Math.PI / 2, ph:0, fall:0, stun:0, shootT:0, celebT:0, signal:0, speed:15, isRef:true};
+const REF2 = {x:1.5, y:47, vx:0, vy:0, yaw:Math.PI / 2, ph:2, fall:0, stun:0, shootT:0, celebT:0, signal:0, speed:15, isRef:true};   // second official, far sideline
 const G = {
   T:[null,null], score:[0,0], q:1, clock:QLEN, shot:SC, poss:0, phase:'idle', timer:0, time:0, clockOut:false,
   firstPoss:0, banner:null, chasers:new Set(), inbounder:null, popups:[], cheer:0, paused:false,
@@ -1208,7 +1230,7 @@ function placeForTip() {
     Object.assign(p, {vx:0, vy:0, stun:0, burst:0, mode:'set', hot:0, shootT:0, celebT:0, move:null, lockT:0, gather:false, finish:null, attack:null, screen:0, cut:0, lobRun:null});
     p.yaw = p.t === 0 ? Math.PI : 0;
   }
-  Object.assign(REF, {x:48.5, y:47, vx:0, vy:0, signal:0});
+  Object.assign(REF, {x:48.5, y:47, vx:0, vy:0, signal:0}); Object.assign(REF2, {x:1.5, y:47, vx:0, vy:0, signal:0});
 }
 function startQuarter() {
   G.q++;
@@ -1622,14 +1644,22 @@ function update(dt) {
 }
 function moveRef(dt) {
   const b = G.ball, dir = dirOf(G.poss);
-  let tx = 48.6, ty = clamp(b.y - dir * 9, 4, 90);
-  if (G.phase === 'ftset' || G.phase === 'ft') { const h = HOOPS[G.ft.p.t]; tx = 47; ty = h.y + dirOf(G.ft.p.t) * 3; }
-  if (REF.signal > 0) { tx = REF.x; ty = REF.y; }
-  const dx = tx - REF.x, dy = ty - REF.y, d = Math.hypot(dx, dy), sp = Math.min(REF.speed, d * 2.2);
-  const k = Math.min(1, dt * 5);
-  REF.vx += ((d > .1 ? dx / d * sp : 0) - REF.vx) * k; REF.vy += ((d > .1 ? dy / d * sp : 0) - REF.vy) * k;
-  REF.x += REF.vx * dt; REF.y += REF.vy * dt;
-  REF.faceX = b.x; REF.faceY = b.y; REF.lookX = b.x; REF.lookY = b.y;
+  REF2.signal = REF.signal;
+  for (const R of [REF, REF2]) {
+    const lead = R === REF2;                                   // REF trails the play, REF2 runs ahead of it on the other sideline
+    let tx = lead ? 1.4 : 48.6, ty = clamp(b.y + dir * (lead ? 11 : -9), 4, 90);
+    if (G.phase === 'ftset' || G.phase === 'ft') { const h = HOOPS[G.ft.p.t]; tx = lead ? 3 : 47; ty = h.y + dirOf(G.ft.p.t) * (lead ? 1.5 : 3); }
+    if (R.signal > 0) { tx = R.x; ty = R.y; }
+    const dx = tx - R.x, dy = ty - R.y, d = Math.hypot(dx, dy), sp = Math.min(R.speed, d * 2.2);
+    const k = Math.min(1, dt * 5);
+    R.vx += ((d > .1 ? dx / d * sp : 0) - R.vx) * k; R.vy += ((d > .1 ? dy / d * sp : 0) - R.vy) * k;
+    R.x += R.vx * dt; R.y += R.vy * dt;
+    R.faceX = b.x; R.faceY = b.y; R.lookX = b.x; R.lookY = b.y;
+    for (const p of all) {                                     // players bump off the officials too
+      const ox = p.x - R.x, oy = p.y - R.y, od = Math.hypot(ox, oy);
+      if (od < BODY && od > .001 && !p.finish) { p.x += ox / od * (BODY - od); p.y += oy / od * (BODY - od); }
+    }
+  }
 }
 function scored(p, pts) {
   G.score[p.t] += pts; p.d.gpts = (p.d.gpts || 0) + pts;
@@ -1899,11 +1929,14 @@ const cam = {x:25, y:47, k:3.4};
 const camF = {x:0, z:0};
 const arenaG = {visible:false, userData:{nets:[{userData:{sw:0}}, {userData:{sw:0}}]}};
 const crowd = {fans:[1], on:true};
-let arenaPeople = [], refP = null;
+let arenaPeople = [], refP = null, refP2 = null;
 const OUT = '#120e18';
 const wx = x => x - 25, wz = y => y - 47;
 function darkInk(f) { return f.numc === '#1d2433' || f.numc === '#2a1240'; }
-const PX = (x, y, h) => [Math.round((x - cam.x) * cam.k + IW / 2), Math.round((y - cam.y) * cam.k * FS + IH / 2 - (h || 0) * cam.k * HS)];
+let CAM_FLIP = 0;                                       // 1 = camera at the other end (team 1 attacks up the screen)
+const fxw = x => CAM_FLIP ? 50 - x : x, fyw = y => CAM_FLIP ? 94 - y : y;
+const PX = (x, y, h) => [Math.round((fxw(x) - fxw(cam.x)) * cam.k + IW / 2), Math.round((fyw(y) - fyw(cam.y)) * cam.k * FS + IH / 2 - (h || 0) * cam.k * HS)];
+const depthOf = y => fyw(y);
 const toCss = (sx, sy) => [sx * CSSPX + OFFX, sy * CSSPX + OFFY];
 const hx2 = n => '#' + (n >>> 0).toString(16).padStart(6, '0').slice(-6);
 function mixHex(a, b, t) { const A = hexN(a), B = hexN(b), m = (s) => Math.round(((A >> s) & 255) * (1 - t) + ((B >> s) & 255) * t); return '#' + [16, 8, 0].map(s => m(s).toString(16).padStart(2, '0')).join(''); }
@@ -2102,7 +2135,7 @@ function poseOf(a, dt) {
   a.yaw = lerpAngle(a.yaw || 0, yawT, Math.min(1, dt * 9));
   let yaw = a.yaw;
   if (a.move && a.move.anim === 'spin') { const u = clamp(a.move.t / a.move.dur, 0, 1); yaw += u * Math.PI * 2 * (a.spinDir || 1); }
-  const fx = Math.sin(yaw), fy = Math.cos(yaw);
+  const fl2 = CAM_FLIP && a.t != null || CAM_FLIP && a.isRef ? -1 : 1, fx = Math.sin(yaw) * fl2, fy = Math.cos(yaw) * fl2;
   const P = {dir:Math.abs(fx) > Math.abs(fy) * 1.15 ? 'side' : fy > 0 ? 'down' : 'up', flip:fx >= 0 ? 1 : -1, lift:a.lift || 0, crouch:0, bob:0, arms:null, legs:{mode:'stand'}};
   a.ph = (a.ph || 0) + dt * Math.PI * sp / (3 + sp * .25);
   const amp = Math.min(1, sp / 10);
@@ -2202,9 +2235,10 @@ function worldCanvas(x0, y0, x1, y1, hTop) {
   return c;
 }
 // paint the arena: stands, apron, wooden court, lines; fans in two poses for cheering
-function paintArena(A, B, cheer) {
+function paintArena(A, B, cheer, flip) {
   const k = cam.k, X0 = -AP - ST, Y0 = -AP - ST, X1 = 50 + AP + ST, Y1 = 94 + AP + ST;
-  const c = worldCanvas(X0, Y0, X1, Y1), g = c.getContext('2d');
+  const c = worldCanvas(X0, Y0, X1, Y1), cg = c.getContext('2d');
+  let g = cg;
   const X = x => Math.round((x - X0) * k), Y = y => Math.round((y - Y0) * k * FS);
   g.fillStyle = '#0d0f22'; g.fillRect(0, 0, c.width, c.height);
   // crowd rows (procedural), optionally replaced by Higgsfield art on hosts that can load it
@@ -2240,6 +2274,8 @@ function paintArena(A, B, cheer) {
   const art = (im, x, y, w, h) => drawCover(g, im, x, y, w, h, true);
   if (ART.stands) { const w = X(50 + AP + 4) - X(-AP - 4), h = Y(-AP) - 2; art(ART.stands, X(-AP - 4), 0, w, h); g.fillStyle = 'rgba(13,15,34,.25)'; g.fillRect(X(-AP - 4), 0, w, h); }
   if (ART.side) for (const sd of [0, 1]) { const x = sd ? X(50 + AP + 1) : 0, w = sd ? c.width - x : X(-AP - 1); art(ART.side, x, Y(-AP), w, Y(94 + AP) - Y(-AP)); }
+  // floor layer (apron, wood, lines, benches): flat, so the far-end view is this layer turned 180 degrees
+  const fl = document.createElement('canvas'); fl.width = c.width; fl.height = c.height; g = fl.getContext('2d');
   // apron
   g.fillStyle = A.d; g.fillRect(X(-AP), Y(-AP), X(50 + AP) - X(-AP), Y(94 + AP) - Y(-AP));
   g.fillStyle = OUT; g.fillRect(X(-AP), Y(-AP) - 2, X(50 + AP) - X(-AP), 2); g.fillRect(X(-AP), Y(94 + AP), X(50 + AP) - X(-AP), 3);
@@ -2299,8 +2335,6 @@ function paintArena(A, B, cheer) {
   // boundary + half court
   g.fillStyle = ink; g.fillRect(X(0) - 1, Y(0) - 1, X(50) - X(0) + 3, 2); g.fillRect(X(0) - 1, Y(94), X(50) - X(0) + 3, 2); g.fillRect(X(0) - 1, Y(0), 2, Y(94) - Y(0)); g.fillRect(X(50), Y(0), 2, Y(94) - Y(0) + 1);
   hl(0, 50, 47);
-  ptext(g, 'DREAM', X(10), Y(-3), 8, '#ffffff', 'center'); ptext(g, 'BALL', X(40), Y(-3), 8, '#ffffff', 'center');
-  ptext(g, A.n.toUpperCase(), X(10), Y(97.2), 8, A.trim, 'center'); ptext(g, A.n.toUpperCase(), X(40), Y(97.2), 8, A.trim, 'center');
   // scorer's table and team benches on the left apron
   g.fillStyle = OUT; g.fillRect(X(-5.4) - 1, Y(39) - 6, X(-2) - X(-5.4) + 2, Y(55) - Y(39) + 8);
   g.fillStyle = '#14172e'; g.fillRect(X(-5.4), Y(39) - 5, X(-2) - X(-5.4), Y(55) - Y(39) + 6);
@@ -2309,35 +2343,52 @@ function paintArena(A, B, cheer) {
     const y = Y(47 + (t ? -1 : 1) * (12 + i * 2.2));
     g.fillStyle = OUT; g.fillRect(X(-4.6) - 1, y - 4, 7, 6); g.fillStyle = t ? B.c : A.c; g.fillRect(X(-4.6), y - 3, 5, 4);
   }
+  if (flip) { cg.save(); cg.translate(c.width, c.height); cg.rotate(Math.PI); cg.drawImage(fl, 0, 0); cg.restore(); }
+  else cg.drawImage(fl, 0, 0);
+  // apron lettering, always upright
+  const Xs = x => X(flip ? 50 - x : x), Ys = y => Y(flip ? 94 - y : y);
+  const wl = Math.min(Xs(10), Xs(40)), wr = Math.max(Xs(10), Xs(40));
+  ptext(cg, 'DREAM', wl, Ys(-3), 8, '#ffffff', 'center'); ptext(cg, 'BALL', wr, Ys(-3), 8, '#ffffff', 'center');
+  ptext(cg, A.n.toUpperCase(), wl, Ys(97.2), 8, A.trim, 'center'); ptext(cg, A.n.toUpperCase(), wr, Ys(97.2), 8, A.trim, 'center');
   return c;
 }
 const arenaK = () => Math.max(2.4, IW / 46);   // zoomed so the court fits the hi-bit players
 const arenaKeyNow = () => G.T[0].fr.n + G.T[1].fr.n + arenaK().toFixed(3) + (ART.stands ? 1 : 0) + (ART.side ? 1 : 0) + SET.q;
+let arenaCache = {};
 function repaintArena() {
   if (!renderer || !G.T[0]) return;
-  const A = G.T[0].fr, B = G.T[1].fr;
-  cam.k = arenaK(); arenaKey = arenaKeyNow();
-  arenaCv = paintArena(A, B, false);
-  arenaCv2 = SET.q === 'low' ? arenaCv : paintArena(A, B, true);
+  cam.k = arenaK(); arenaKey = arenaKeyNow(); arenaCache = {};
+  ensureArenaCanvas();
+}
+function ensureArenaCanvas() {
+  const f = CAM_FLIP ? 1 : 0;
+  if (!arenaCache[f]) {
+    const A = G.T[0].fr, B = G.T[1].fr, a = paintArena(A, B, false, f);
+    arenaCache[f] = {a, b:SET.q === 'low' ? a : paintArena(A, B, true, f)};
+  }
+  arenaCv = arenaCache[f].a; arenaCv2 = arenaCache[f].b;
 }
 function buildArenaPeople() {
   if (!renderer) return;
   arenaPeople = all.map(p => buildPerson(p.d, G.T[p.t].fr));
   if (!refP) refP = buildPerson({last:'', num:'', look:{skin:3, hair:0, h:.94, w:1, shoe:[0x111111, 0x111111], v:0}}, REF_FR);
+  if (!refP2) refP2 = buildPerson({last:'', num:'', look:{skin:1, hair:2, h:.94, w:1.02, shoe:[0x111111, 0x111111], v:3}}, REF_FR);
 }
 function poseCrowd() {} function colorCrowd() {}
 
 // ---------- hoops ----------
+const hoopOnTop = t => (t === 0) !== !!CAM_FLIP;     // which hoop is at the top of the screen right now
 function drawHoopBack(g, t) {
-  const H = HOOPS[t], top = t === 0, by = top ? H.y - 1.25 : H.y + 1.25, sy = top ? -2.6 : 96.6;
-  const fr = (top ? G.T[1] : G.T[0]).fr, pad = fr.c;
+  const H = HOOPS[t], top = hoopOnTop(t), by = t === 0 ? H.y - 1.25 : H.y + 1.25, sy = t === 0 ? -2.6 : 96.6;
+  const fr = (t === 0 ? G.T[1] : G.T[0]).fr, pad = fr.c;
   // padded stanchion base with team colour, highlight and shadow side
-  const b0 = PX(22.4, sy - 1.2, 0), b1 = PX(27.6, sy + 1.2, 2.4), bf = PX(25, sy + 1.2, 0)[1];
-  R(g, b0[0] - 1, b1[1] - 1, b1[0] - b0[0] + 2, bf - b1[1] + 2, OUT);
-  R(g, b0[0], b1[1], b1[0] - b0[0], bf - b1[1], pad);
-  R(g, b0[0], b1[1], b1[0] - b0[0], 2, shadeHex(pad, 1.25));
-  R(g, b1[0] - 3, b1[1] + 2, 3, bf - b1[1] - 2, shadeHex(pad, .72));
-  R(g, b0[0], b1[1] + Math.round((bf - b1[1]) * .55), b1[0] - b0[0] - 3, 1, fr.trim);
+  const pA = PX(22.4, sy - 1.2, 0), pB = PX(27.6, sy + 1.2, 0), pT = PX(25, sy, 2.4);
+  const xl = Math.min(pA[0], pB[0]), xr = Math.max(pA[0], pB[0]), bf = Math.max(pA[1], pB[1]), bt = Math.min(pA[1], pB[1]) - (PX(25, sy, 0)[1] - pT[1]);
+  R(g, xl - 1, bt - 1, xr - xl + 2, bf - bt + 2, OUT);
+  R(g, xl, bt, xr - xl, bf - bt, pad);
+  R(g, xl, bt, xr - xl, 2, shadeHex(pad, 1.25));
+  R(g, xr - 3, bt + 2, 3, bf - bt - 2, shadeHex(pad, .72));
+  R(g, xl, bt + Math.round((bf - bt) * .55), xr - xl - 3, 1, fr.trim);
   // pole + arm
   const pole = PX(25, sy, 12.6), pb = PX(25, sy, 3)[1];
   R(g, pole[0] - 3, pole[1], 6, pb - pole[1], OUT); R(g, pole[0] - 2, pole[1], 4, pb - pole[1], '#3a3f5c'); R(g, pole[0] - 2, pole[1], 1, pb - pole[1], '#5a6086'); R(g, pole[0] + 1, pole[1], 1, pb - pole[1], '#262a3e');
@@ -2347,7 +2398,7 @@ function drawHoopBack(g, t) {
 }
 function drawBoard(g, t) {
   const H = HOOPS[t], by = t === 0 ? H.y - 1.25 : H.y + 1.25, fr = (t === 0 ? G.T[1] : G.T[0]).fr;
-  const a = PX(22, by, 13.6), b = PX(28, by, 9.7), w = b[0] - a[0], h = b[1] - a[1];
+  const q1 = PX(22, by, 13.6), q2 = PX(28, by, 9.7), a = [Math.min(q1[0], q2[0]), q1[1]], b = [Math.max(q1[0], q2[0]), q2[1]], w = b[0] - a[0], h = b[1] - a[1];
   // shot clock on top
   const sc = Math.max(0, Math.ceil(G.shot)), cx = Math.round((a[0] + b[0]) / 2);
   R(g, cx - 6, a[1] - 9, 12, 8, OUT); R(g, cx - 5, a[1] - 8, 10, 6, '#120e18');
@@ -2357,7 +2408,7 @@ function drawBoard(g, t) {
   g.fillStyle = 'rgba(200,225,255,.38)'; g.fillRect(a[0], a[1], w, h);
   g.fillStyle = 'rgba(255,255,255,.35)'; for (let k = 0; k < h; k++) { g.fillRect(a[0] + 3 + k, a[1] + k, 2, 1); g.fillRect(a[0] + 9 + k, a[1] + k, 1, 1); }
   g.fillStyle = '#ffffff'; g.fillRect(a[0], a[1], w, 1); g.fillRect(a[0], b[1] - 1, w, 1); g.fillRect(a[0], a[1], 1, h); g.fillRect(b[0] - 1, a[1], 1, h);
-  const s0 = PX(24, by, 11.6), s1 = PX(26, by, 10.05);
+  const t0 = PX(24, by, 11.6), t1 = PX(26, by, 10.05), s0 = [Math.min(t0[0], t1[0]), t0[1]], s1 = [Math.max(t0[0], t1[0]), t1[1]];
   g.fillStyle = '#ffffff'; g.fillRect(s0[0], s0[1], s1[0] - s0[0], 1); g.fillRect(s0[0], s1[1], s1[0] - s0[0], 1); g.fillRect(s0[0], s0[1], 1, s1[1] - s0[1]); g.fillRect(s1[0], s0[1], 1, s1[1] - s0[1] + 1);
   R(g, a[0] - 1, b[1] + 1, w + 2, 2, fr.c);                                            // bottom padding
 }
@@ -2384,8 +2435,28 @@ function drawRim(g, t) {
 function animateNets(dt) { for (const n of arenaG.userData.nets) if (n.userData.sw > 0) n.userData.sw = Math.max(0, n.userData.sw - dt * 1.6); }
 
 // ---------- arena frame ----------
+// camera spins to the other end so the team with the ball always attacks up the screen
+const SPIN = {on:false, t:0, to:0};
+function resetCamSpin() { SPIN.on = false; CAM_FLIP = 0; if (cv.style.transform) cv.style.transform = ''; }
+function updateCamSpin(dt) {
+  const want = G.game && G.poss === 1 ? 1 : 0;
+  if (!SPIN.on && want !== CAM_FLIP) {
+    if (G.phase === 'pre' || G.phase === 'idle') CAM_FLIP = want;
+    else { SPIN.on = true; SPIN.t = 0; SPIN.to = want; }
+  }
+  let ang = 0, sc = 1;
+  if (SPIN.on) {
+    SPIN.t += dt; const u = Math.min(1, SPIN.t / .7);
+    if (u >= .5 && CAM_FLIP !== SPIN.to) CAM_FLIP = SPIN.to;
+    ang = u < .5 ? u * 180 : -90 + (u - .5) * 180; sc = 1 - Math.sin(u * Math.PI) * .2;
+    if (u >= 1) { SPIN.on = false; ang = 0; sc = 1; }
+  }
+  const tf = SPIN.on ? `rotate(${ang.toFixed(1)}deg) scale(${sc.toFixed(3)})` : '';
+  if (cv.style.transform !== tf) cv.style.transform = tf;
+}
 function renderArena(dt) {
   if (!ctx) return;
+  updateCamSpin(dt);
   cam.k = arenaK(); if (arenaKey !== arenaKeyNow()) repaintArena();
   animateNets(dt);
   const b = G.ball, live = G.phase === 'live' || G.phase === 'dead';
@@ -2402,8 +2473,9 @@ function renderArena(dt) {
   const g = ctx;
   g.fillStyle = '#0d0f22'; g.fillRect(0, 0, IW, IH);
   const cheer = G.cheer > 0 && (Math.floor(CLK * 7) % 2 === 0);
+  ensureArenaCanvas();
   const bg = cheer && arenaCv2 ? arenaCv2 : arenaCv;
-  if (bg) { const o = PX(-AP - ST, -AP - ST, 0); g.drawImage(bg, o[0], o[1]); }
+  if (bg) g.drawImage(bg, Math.round((-AP - ST - fxw(cam.x)) * cam.k + IW / 2), Math.round((-AP - ST - fyw(cam.y)) * cam.k * FS + IH / 2));
   // depth-sorted drawables
   const items = [];
   all.forEach((p, i) => {
@@ -2415,9 +2487,12 @@ function renderArena(dt) {
     const pose = poseOf(p, dt);
     items.push({y:p.y, f:() => { const s = PX(p.x, p.y, pose.lift); return drawPerson(g, P, p, pose, s[0], s[1]); }, p, pose});
   });
-  if (refP) { REF.ballZ = 0; const pose = poseOf(REF, dt); items.push({y:REF.y, f:() => { const s = PX(REF.x, REF.y, pose.lift); drawPerson(g, refP, REF, pose, s[0], s[1]); }}); }
-  items.push({y:-1.5, f:() => drawHoopBack(g, 0)}, {y:HOOPS[0].y + .01, f:() => drawRim(g, 0)});
-  items.push({y:96, f:() => drawHoopBack(g, 1)}, {y:HOOPS[1].y + .01, f:() => drawRim(g, 1)}, {y:HOOPS[1].y + 1.3, f:() => drawBoard(g, 1)});
+  if (refP) for (const [R2, RP] of [[REF, refP], [REF2, refP2 || refP]]) { R2.ballZ = 0; const pose = poseOf(R2, dt); items.push({y:R2.y, f:() => { const s = PX(R2.x, R2.y, pose.lift); drawPerson(g, RP, R2, pose, s[0], s[1]); }}); }
+  for (const t of [0, 1]) {
+    const H = HOOPS[t], by = t === 0 ? H.y - 1.25 : H.y + 1.25;
+    items.push({y:t === 0 ? -1.5 : 96, f:() => drawHoopBack(g, t)}, {y:H.y, bias:.01, f:() => drawRim(g, t)});
+    if (!hoopOnTop(t)) items.push({y:by, bias:.05, f:() => drawBoard(g, t)});
+  }
   // ball height (feet)
   let h = .55;
   if (b.state === 'held') h = (b.owner && b.owner.gather ? 6.9 + (b.owner.gv || 0) * 1.1 : .55 + b.z * 1.05) * 1.1;
@@ -2430,8 +2505,9 @@ function renderArena(dt) {
   if (live) { const s = PX(b.x, b.y, 0); shadowAt(g, s[0], s[1], 2); }
   if (owner && G.phase === 'live') { const s = PX(owner.x, owner.y, 0); pring(g, s[0], s[1] + 1, 10, 5, owner.t === 0 ? '#ffc94d' : '#ffffff'); }
   const ballAir = live && (b.state === 'shot' || b.state === 'rim' || b.state === 'pass' || h > 8);
-  if (live && !ballAir) items.push({y:b.y + .4, f:() => { const s = PX(b.x, b.y, h); drawBall(g, s[0], s[1]); }});
-  items.sort((p, q) => p.y - q.y);
+  if (live && !ballAir) items.push({y:b.y, bias:.4, f:() => { const s = PX(b.x, b.y, h); drawBall(g, s[0], s[1]); }});
+  for (const it of items) it.d = depthOf(it.y) + (it.bias || 0);
+  items.sort((p, q) => p.d - q.d);
   for (const it of items) { const r2 = it.f(); if (it.p && r2) it.p._scr = r2; }
   if (ballAir) { const s = PX(b.x, b.y, h); drawBall(g, s[0], s[1], h > 12); }
   if (owner && owner.t === 0 && G.phase === 'live' && owner._scr) { const tp = owner._scr.top - 4 + Math.round(Math.sin(CLK * 6)); const s = PX(owner.x, owner.y, 0); g.fillStyle = OUT; g.fillRect(s[0] - 3, tp - 1, 7, 4); g.fillStyle = '#ffc94d'; g.fillRect(s[0] - 2, tp, 5, 1); g.fillRect(s[0] - 1, tp + 1, 3, 1); g.fillRect(s[0], tp + 2, 1, 1); }
@@ -2693,7 +2769,7 @@ function hiColors(look, f) {
     hair:hr, hairD:shadeHex(hr, .55), hairL:mixHex(hr, '#b89a7a', .42), fade:mixHex(hr, sk, .5),
     jersey:jer, jerseyS:shadeHex(jer, .74), jerseyD:shadeHex(jer, .56), jerseyL:shadeHex(jer, 1.18), jerseyR:mixHex(jer, RIMC, .38),
     shorts:sho, shortsS:shadeHex(sho, .72), shortsR:mixHex(sho, RIMC, .35),
-    trim:f.trim, num:f.numc, shoe, shoeS:shadeHex(shoe, .72), shoeA:mixHex(shoe, f.trim, .65), sole, ref:!!f.ref,
+    trim:f.trim, num:f.numc, shoe, shoeS:shadeHex(shoe, .72), shoeA:sole, shoeL:mixHex(shoe, '#ffffff', .35), sole:shadeHex(sole, .82), lace:mixHex(shoe, '#ffffff', .7), ref:!!f.ref,
     sleeve:hx2(look.sleeveC || 0x15171f), lip:mixHex(shadeHex(sk, .66), '#7a3a34', .3), eye:'#f4f1ea', pupil:'#1a1420',
     sock:'#f4f1ea', sockS:'#c3c1d2', pants:'#16181f', pantsS:'#0c0d12'
   };
@@ -2722,16 +2798,19 @@ function drawDoll(g, x0, y0, look, f, num, P) {
       if (lg.mode === 'run') up = Math.round(Math.max(0, Math.sin(ph + (sd > 0 ? Math.PI : 0))) * 3 * amp);
       if (lg.mode === 'tuck') up = 3;
       if (lg.mode === 'sit') up = Math.round((Math.sin(ph + (sd > 0 ? Math.PI : 0)) + 1) * 2);
-      const x = sd < 0 ? -4 - sp : 1 + sp, top = yHip, len = Math.max(3, -3 - up - top);
+      const x = sd < 0 ? -4 - sp : 1 + sp, top = yHip, len = Math.max(3, -4 - up - top);
       r(x, top, 3, len, legC);
       d(x + 2, top, 1, len, sd > 0 ? legR : legS);
       d(x, top + 1, 1, len - 1, legL);
       const knee = top + Math.round(len * .55); d(x + 1, knee, 1, 1, legL); d(x, knee + 1, 2, 1, legS);
-      if (!C.ref) { r(x, -5 - up, 3, 2, C.sock); d(x, -5 - up, 3, 1, C.trim); d(x + 2, -4 - up, 1, 1, C.sockS); }
-      const sx = sd < 0 ? x - 1 : x;
-      r(sx, -3 - up, 4, 3, C.shoe);
-      d(sx, -1 - up, 4, 1, C.sole); d(sx + (sd < 0 ? 0 : 1), -2 - up, 3, 1, C.shoeA); d(sx + 1, -3 - up, 2, 1, C.shoeS);
-      d(sd < 0 ? sx : sx + 3, -3 - up, 1, 2, sd > 0 ? mixHex(C.shoe, RIMC, .4) : C.shoe);
+      if (!C.ref) { r(x, -6 - up, 3, 2, C.sock); d(x, -6 - up, 3, 1, C.trim); d(x + 2, -5 - up, 1, 1, C.sockS); }
+      const sx = sd < 0 ? x - 2 : x;                                    // sneaker: 5 wide x 4 tall in the shoe's colours
+      r(sx, -4 - up, 5, 4, C.shoe);
+      d(sx + 1, -4 - up, 3, 1, C.shoeS); d(sx + 2, -4 - up, 1, 1, C.lace);
+      d(sx, -3 - up, 1, 1, C.shoeL);
+      d(sd < 0 ? sx : sx + 1, -2 - up, 4, 1, C.shoeA);                  // accent stripe
+      d(sx, -1 - up, 5, 1, C.sole);
+      d(sd < 0 ? sx : sx + 4, -3 - up, 1, 1, sd > 0 ? mixHex(C.shoe, RIMC, .4) : C.shoeL);
     }
   } else {
     for (const sd of [-1, 1]) {          // -1 = far leg (behind), 1 = near leg
@@ -2740,12 +2819,13 @@ function drawDoll(g, x0, y0, look, f, num, P) {
       if (lg.mode === 'wide') fx = sd * 3;
       if (lg.mode === 'tuck') { fx = sd > 0 ? 2 : -1; up = 3; }
       if (lg.mode === 'sit') { fx = 3; up = Math.round((Math.sin(ph + (sd > 0 ? Math.PI : 0)) + 1) * 2); }
-      const far = sd < 0, c = far ? (C.ref ? C.pantsS : C.skinS) : legC, top = yHip + 1, foot = -4 - up;
+      const far = sd < 0, c = far ? (C.ref ? C.pantsS : C.skinS) : legC, top = yHip + 1, foot = -5 - up;
       const kx = Math.round(fx * .35 + (lg.mode === 'run' ? Math.max(0, fx) * .3 : 0)), ky = top + Math.round((foot - top) * .5);
       seg(-1, top, kx - 1, ky, c, 3, true); seg(kx - 1, ky, fx - 1, foot, c, 3, true);
       if (!far) d(fx + 1, ky, 1, foot - ky, legR);
       if (!C.ref) { r(fx - 1, foot - 1, 3, 2, far ? C.sockS : C.sock); d(fx - 1, foot - 1, 3, 1, C.trim); }
-      r(fx - 1, -3 - up, 5, 3, far ? C.shoeS : C.shoe); d(fx - 1, -1 - up, 5, 1, C.sole); d(fx, -2 - up, 3, 1, far ? C.shoeS : C.shoeA);
+      r(fx - 1, -4 - up, 6, 4, far ? C.shoeS : C.shoe); d(fx - 1, -1 - up, 6, 1, C.sole);
+      if (!far) { d(fx, -2 - up, 4, 1, C.shoeA); d(fx + 3, -4 - up, 1, 1, C.lace); d(fx - 1, -4 - up, 2, 1, C.shoeS); }
     }
   }
   // thick line of squares (silhouette) from a to b
@@ -3054,6 +3134,7 @@ let meterHide = 0, meterP = null, meterV = 0;
 function setMode(m) {
   mode = m; app.classList.toggle('home', m === 'home'); app.classList.toggle('match', m === 'match');
   arenaG.visible = m === 'match';
+  if (m !== 'match' && typeof resetCamSpin === 'function') resetCamSpin();
 }
 function renderTop() {
   if (!S) return;
@@ -3091,9 +3172,9 @@ function renderPanel() {
 function plainLook(c) { return {skin:c.skin, hair:c.hair, band:c.r >= 2, beard:c.beard, v:c.id, pid:c.id}; }
 function chipHTML(id, extra, act) {
   const c = CHARS[id], o = S.owned[id], f = FR[S.fr];
-  if (!o) return `<div class="chip locked" style="--rc:${RAR[c.r].c}" aria-label="${esc(c.name)}, locked">${portraitSVG(plainLook(c), f, c.num)}<span class="nm">${esc(c.last)}</span><span class="st">${RAR[c.r].n.toUpperCase()}</span></div>`;
+  if (!o) return `<div class="chip locked${c.r === 3 ? ' leg' : ''}" style="--rc:${RAR[c.r].c}" aria-label="${esc(c.name)}, locked">${portraitSVG(plainLook(c), f, c.num)}<span class="nm">${esc(c.last)}</span><span class="st">${RAR[c.r].n.toUpperCase()}</span></div>`;
   const ov = ovrOf(eff(id)), canStar = o.st < 5 && o.sh >= SHARDS[o.st];
-  return `<button class="chip ${extra || ''}" style="--rc:${RAR[c.r].c}" ${act || `data-act="char" data-id="${id}"`}><span class="ov">${ov}</span><span class="ps">${c.pos}</span>${portraitSVG(lookOf(id), f, c.num)}<span class="nm">${esc(c.last)}</span><span class="st">${'★'.repeat(o.st)}</span>${canStar ? '<span class="tag">★ UP</span>' : ''}</button>`;
+  return `<button class="chip ${extra || ''}${c.r === 3 ? ' leg' : ''}" style="--rc:${RAR[c.r].c}" ${act || `data-act="char" data-id="${id}"`}><span class="ov">${ov}</span><span class="ps">${c.pos}</span>${portraitSVG(lookOf(id), f, c.num)}<span class="nm">${esc(c.last)}</span><span class="st">${'★'.repeat(o.st)}</span>${canStar ? '<span class="tag">★ UP</span>' : ''}</button>`;
 }
 function teamHTML() {
   const tabs = `<div class="subtabs">${['lineup','deck','shoes'].map(s => `<button class="${teamSub === s ? 'on' : ''}" data-act="sub" data-sub="${s}">${s.toUpperCase()}</button>`).join('')}</div>`;
@@ -3248,7 +3329,7 @@ function openBannerInfo(bid) {
   const P = bannerPool(B), od = bannerOdds(B), f = FR[S.fr];
   const rar = RAR.map((r, i) => od[i] ? `<span style="color:${r.c}">${r.n} ${Math.round(od[i] * 1000) / 10}%</span>` : '').join('');
   const kinds = [B.mix.p && `Players ${Math.round(B.mix.p * 100)}%`, B.mix.c && `Cards ${Math.round(B.mix.c * 100)}%`, B.mix.s && `Shoes ${Math.round(B.mix.s * 100)}%`].filter(Boolean).join(' · ');
-  const pl = P.players.map(c => `<div class="bi-p" style="--rc:${RAR[c.r].c}">${portraitSVG(plainLook(c), f, c.num)}<b>${esc(c.last)}</b><small>${c.pos}${S.owned[c.id] ? ' · OWNED' : ''}</small></div>`).join('');
+  const pl = P.players.map(c => `<div class="bi-p${c.r === 3 ? ' leg' : ''}" style="--rc:${RAR[c.r].c}">${portraitSVG(plainLook(c), f, c.num)}<b>${esc(c.last)}</b><small>${c.pos}${S.owned[c.id] ? ' · OWNED' : ''}</small></div>`).join('');
   const cd = P.cards.map(c => `<div class="bi-c">${cardFace(c.id)}</div>`).join('');
   const sh = P.shoes.map(x => `<div class="bi-s" style="--rc:${RAR[x.m.r].c}">${shoeSVG(x.m)}<b>${x.m.n}</b></div>`).join('');
   modal.innerHTML = `<div class="sheet binfo-sheet"><div class="mhead2"><h2>${esc(B.n)} Banner</h2><button class="mx" data-act="mclose" aria-label="Close">${XIC}</button></div>
@@ -3439,7 +3520,7 @@ function createTeam() {
 
 // ---------- match flow ----------
 function mcard(d, f, k) {
-  return `<div class="mcard" style="--rc:${RAR[d.r || 0].c};--d:${k * 70}ms">${portraitSVG(d.look, f, d.num)}<span class="mo">${ovrOf(d.st)}</span><span class="mp">${d.pos}</span><b>${esc(d.last)}</b></div>`;
+  return `<div class="mcard${d.r === 3 ? ' leg' : ''}" style="--rc:${RAR[d.r || 0].c};--d:${k * 70}ms">${portraitSVG(d.look, f, d.num)}<span class="mo">${ovrOf(d.st)}</span><span class="mp">${d.pos}</span><b>${esc(d.last)}</b></div>`;
 }
 function showMatchup() {
   const A = G.T[0], B = G.T[1], ov = T => Math.round(T.starters.reduce((a, d) => a + ovrOf(d.st), 0) / T.starters.length);
@@ -3572,6 +3653,7 @@ function act(a, d) {
     } else openPlayer(id);
   }
   else if (a === 'binfo') openBannerInfo(d.b);
+  else if (a === 'road') toast('Baller Road is locked for now. Coming soon!');
   else if (a === 'dfilter') { deckFilter = d.t; renderPanel(); }
   else if (a === 'deckadd') {
     const id = d.id, have = S.cards[id] ? S.cards[id].n : 0, inD = S.deck.filter(x => x === id).length;
@@ -3591,7 +3673,7 @@ function act(a, d) {
     if (o.st < 5 && o.sh >= need && S.gems >= cost) { o.sh -= need; S.gems -= cost; o.st++; save(); renderTop(); renderPlayer(); renderPanel(); toast(`${CHARS[id].last} is now ${o.st}★`); }
   }
   else if (a === 'shoes') { sheetShoes = true; renderPlayer(); }
-  else if (a === 'equip') { const u = +d.shoe; for (const k in S.owned) if (S.owned[k].shoe === u) S.owned[k].shoe = null; S.owned[sheetId].shoe = u; sheetShoes = false; save(); renderTop(); renderPlayer(); renderPanel(); }
+  else if (a === 'equip') { const u = +d.shoe; for (const k in S.owned) if (S.owned[k].shoe === u) S.owned[k].shoe = null; S.owned[sheetId].shoe = u; sheetShoes = false; save(); renderTop(); renderPlayer(); renderPanel(); const sm = S.shoes.find(x => x.u === u); if (sm) toast(`${CHARS[sheetId].last} laced up ${SHOES[sm.m].n}`); }
   else if (a === 'unequip') { S.owned[sheetId].shoe = null; sheetShoes = false; save(); renderTop(); renderPlayer(); renderPanel(); }
   else if (a === 'vpose') { VW.anim = d.k; if (VW.a) VW.a.t = 0; document.querySelectorAll('.vposes .fchip').forEach(b => b.classList.toggle('on', b.dataset.k === d.k)); }
   else if (a === 'mclose') closeModal();
@@ -3642,6 +3724,14 @@ window.addEventListener('keydown', e => {
   else if (k === 'a') act('auto', {});
 });
 window.addEventListener('keyup', e => { const k = (e.key || '').toLowerCase(); if (mode === 'match' && k >= '1' && k <= '8') relMeter(); });
+
+// ---------- Baller Road button (locked) ----------
+const TROPHY_MAP = ['.ooooooo.', 'oyyyyyyyo', 'oyYyyyyyo', '.oyyyyyo.', '..oyyyo..', '...oyo...', '...oyo...', '..ooooo..', '..oyyyo..', '..ooooo..'];
+const LOCK_MAP = ['..ooo..', '.o...o.', '.o...o.', 'ooooooo', 'olllllo', 'oll.llo', 'olllllo', 'ooooooo'];
+function renderRoad() {
+  const el = $('road'); if (!el) return;
+  el.innerHTML = `${pixSVG(BALL_MAP, {o:'#120e18', a:'#e2702c', x:'#3a1606'}, 'rd-ic')}<span class="rd-t"><b>BALLER ROAD</b><small>${pixSVG(LOCK_MAP, {o:'#120e18', l:'#ffc94d'}, 'rd-lock')}LOCKED</small></span>${pixSVG(TROPHY_MAP, {o:'#120e18', y:'#ffc94d', Y:'#fff3b0'}, 'rd-ic')}`;
+}
 
 // ---------- start screen ----------
 const BALL_MAP = ['..ooooo..', '.oaaxaao.', 'oaaaxaaao', 'oaaaxaaao', 'oxxxxxxxo', 'oaaaxaaao', 'oaaaxaaao', '.oaaxaao.', '..ooooo..'];
@@ -3753,6 +3843,7 @@ showStart(); showIntro();
 (() => { // painted portraits: switch on only if this host can actually load them
   const im = new Image(); im.onload = () => { PHOTO_OK = true; if (BUCK_ART) document.querySelectorAll('.gemic').forEach(e => { e.innerHTML = `<img class="hfbuck" src="${PH_BASE + BUCK_ART}_min.webp" alt="" onerror="this.parentNode.innerHTML=GEM_SVG_FALLBACK">`; }); if (S && !panel.hidden) renderPanel(); }; im.src = photoURL(0);
 })();
+renderRoad();
 if (S) { homeSetup(); renderTop(); save(); }
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => {
   home.bgKey = ''; if (mode === 'match') { repaintArena(); buildArenaPeople(); }
