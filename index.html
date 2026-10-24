@@ -778,6 +778,8 @@ svg.ic.bolt{width:7px;height:auto}
 .rp b{font-size:8px}
 .rp i{width:64px;height:4px}
 
+.match #cv{touch-action:none}
+
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0;-webkit-text-size-adjust:100%;overscroll-behavior:none;touch-action:manipulation}
 img{max-width:100%}
@@ -1659,6 +1661,7 @@ function roleTarget(p) {
   if (p.stun > 0 || p.gather || p.shootT > 0 || p.lockT > 0 || p.finish) return null;
   if (G.phase === 'break' || G.phase === 'final' || G.phase === 'pre') return null;
   if (G.phase === 'ftset' || G.phase === 'ft') { const s = ftSpot(p); return {x:s.x, y:s.y, sp:.6}; }
+  if (p.uDrive && G.phase === 'live') return {x:p.uDrive.x, y:p.uDrive.y, sp:p.uDrive.rim ? 1.32 : 1.18};
   if ((b.state === 'loose' || b.state === 'rim') && G.chasers.has(p)) return b.state === 'rim' ? {x:b.rx, y:b.ry, sp:1.08} : {x:b.x, y:b.y, sp:1.08};
   if (G.phase === 'dead' && p === G.inbounder) return {x:G.inbPt.x, y:G.inbPt.y, sp:.85};
   if (p.t === G.poss) {
@@ -1730,6 +1733,7 @@ function update(dt) {
   if (G.phase === 'ftset') { G.timer -= dt; if (G.timer <= 0) { G.phase = 'ft'; G.timer = .6; } }
   else if (G.phase === 'ft' && b.state === 'held') { G.timer -= dt; if (G.timer <= 0) ftShoot(); }
   if (G.oppShot) stepOppShot(dt);
+  if (G.steer) stepSteer(dt);
   if (G.phase === 'live') {
     drainEnergy(dt);
     if (!G.clockOut) { G.clock -= dt; if (G.clock <= 0) { G.clock = 0; G.clockOut = true; } }
@@ -1795,7 +1799,7 @@ function update(dt) {
     const isH = b.owner === p && b.state === 'held';
     if (isH && G.phase === 'live' && !p.gather && !p.finish) { p.decide -= dt; if (p.decide <= 0) { p.decide = rand(.45, .9); aiDecide(p); } }
     if (p.finish) continue;
-    const t = roleTarget(p);
+    const t = roleTarget(p), steered = !!(p.uDrive && p.uDrive.steer && t);
     let dvx = 0, dvy = 0;
     if (t) {
       const dx = t.x - p.x, dy = t.y - p.y, d = Math.hypot(dx, dy);
@@ -1806,20 +1810,20 @@ function update(dt) {
         for (const df of players[1 - p.t]) {
           if (df.stun > 0) continue;
           const ox = df.x - p.x, oy = df.y - p.y, od = Math.hypot(ox, oy);
-          if (od < BODY + 1 && (ox * ux + oy * uy) / (od || 1) > .55) { sp *= p.burst > 0 ? .85 : .4; break; }
+          if (od < BODY + 1 && (ox * ux + oy * uy) / (od || 1) > .55) { sp *= steered ? .8 : p.burst > 0 ? .85 : .4; break; }
         }
       }
-      sp = Math.min(sp, d * 2.5);
+      if (!steered) sp = Math.min(sp, d * 2.5);
       if (d > .05) { dvx = dx / d * sp; dvy = dy / d * sp; }
     }
     // personal space: ease away from anyone inside the comfort radius
-    for (const o of all) {
+    if (!steered) for (const o of all) {
       if (o === p || o.finish) continue;
       const ox = p.x - o.x, oy = p.y - o.y, od = Math.hypot(ox, oy), want = o.t === p.t ? SPACE_MATE : SPACE_ANY;
       if (od < want && od > .001) { const f = (want - od) / want * (o.t === p.t ? 9 : 6); dvx += ox / od * f; dvy += oy / od * f; }
     }
     if (p.fadeT > 0) { p.fadeT -= dt; const hh = HOOPS[p.t], hd2 = dist(p, hh) || 1; dvx = -(hh.x - p.x) / hd2 * 5; dvy = -(hh.y - p.y) / hd2 * 5; }
-    const k = Math.min(1, dt * (p.stun > 0 || p.lockT > 0 ? 3 : 7));
+    const k = Math.min(1, dt * (p.stun > 0 || p.lockT > 0 ? 3 : steered ? 13 : 7));
     p.vx += (dvx - p.vx) * k; p.vy += (dvy - p.vy) * k;
     p.x += p.vx * dt; p.y += p.vy * dt;
   }
@@ -1828,7 +1832,7 @@ function update(dt) {
     let dx = c.x - a.x, dy = c.y - a.y, d = Math.hypot(dx, dy);
     if (d < .001) { dx = (i % 2 ? 1 : -1) * .01; dy = .01; d = Math.hypot(dx, dy); }
     if (d < BODY) {
-      const over = BODY - d, nx = dx / d, ny = dy / d, wa = a.finish ? 0 : c.finish ? 1 : .5, wc = 1 - wa;
+      const over = BODY - d, nx = dx / d, ny = dy / d, wa = a.finish ? 0 : c.finish ? 1 : a.uDrive && a.uDrive.steer ? .2 : c.uDrive && c.uDrive.steer ? .8 : .5, wc = 1 - wa;
       a.x -= nx * over * wa; a.y -= ny * over * wa; c.x += nx * over * wc; c.y += ny * over * wc;
     }
   }
@@ -2288,7 +2292,31 @@ function userDrive(cx, cy) {                       // direction in court feet
   if (rim) popup(h.x, h.y, 'DRIVE!', '#ffc94d', 1.1);
   return true;
 }
-function stepDrive(p, dt) { const u = p.uDrive; if (!u) return; u.t -= dt; if (u.t <= 0 || dist(p, u) < 1.4 || G.ball.owner !== p) p.uDrive = null; }
+// joystick steering: while a finger is down the player runs exactly the way it points
+function steerWho() {
+  const b = G.ball, h = userHandler(); if (h) return h;
+  if (!G.game || G.auto || G.phase !== 'live') return null;
+  const tx = b.owner ? b.owner.x : b.x, ty = b.owner ? b.owner.y : b.y;
+  return players[0].filter(p => p.stun <= 0).sort((a, c) => Math.hypot(a.x - tx, a.y - ty) - Math.hypot(c.x - tx, c.y - ty))[0] || null;
+}
+function userSteer(cx, cy, hold) {
+  const l = Math.hypot(cx, cy); if (l < .01) return false;
+  G.steer = {ux:cx / l, uy:cy / l, hold:!!hold};
+  return stepSteer(0);
+}
+function stepSteer(dt) {
+  const s = G.steer; if (!s) return false;
+  const p = steerWho(); if (!p || p.gather || p.finish) return false;
+  if (s.p && s.p !== p) s.p.uDrive = null;
+  s.p = p;
+  const hh = HOOPS[0], rl = dist(p, hh) || 1, rim = p.t === G.poss && (s.ux * (hh.x - p.x) + s.uy * (hh.y - p.y)) / rl > .8;
+  p.uDrive = {x:clamp(p.x + s.ux * 9, 1, 49), y:clamp(p.y + s.uy * 9, 1, 93), t:s.hold ? .25 : .45, rim, steer:true};
+  if (p === G.ball.owner) p.attack = null;
+  if (!s.hold) G.steer = null;
+  return true;
+}
+function endSteer() { const s = G.steer; G.steer = null; if (s && s.p && s.p.uDrive) s.p.uDrive.t = .3; }
+function stepDrive(p, dt) { const u = p.uDrive; if (!u) return; u.t -= dt; if (u.t <= 0 || (!u.steer && (dist(p, u) < 1.4 || G.ball.owner !== p))) p.uDrive = null; }
 function userHandsUp() {                           // on defense, no shot yet: closest man closes out with hands up
   const b = G.ball; if (!userDefends() || G.poss !== 1 || !b.owner) return false;
   const d = players[0].slice().sort((a, c) => dist(a, b.owner) - dist(c, b.owner))[0]; if (!d || d.stun > 0) return false;
@@ -3968,7 +3996,7 @@ function showMatchup() {
   el.innerHTML = `<div class="mside" style="--tc:${A.fr.c}"><div class="mhead">${crestSVG(A.fr)}<div><b>${esc(A.short)}</b><span>OVR ${ov(A)}</span></div></div>${A.starters.map((d, k) => mcard(d, A.fr, k)).join('')}</div>
     <div class="mvs"><b>VS</b></div>
     <div class="mside away" style="--tc:${B.fr.c}"><div class="mhead">${crestSVG(B.fr)}<div><b>${esc(B.short)}</b><span>OVR ${ov(B)}</span></div></div>${B.starters.map((d, k) => mcard(d, B.fr, k + TEAM_N)).join('')}</div>
-    <div class="mfoot"><p class="hint">${diff().n} · ${(QLENS.find(x => x[0] === qLen()) || [0, "Normal"])[1]} quarters. Tap a teammate to pass, swipe to drive.</p><button class="mbtn pri" data-act="tipoff">Tip off</button></div>`;
+    <div class="mfoot"><p class="hint">${diff().n} · ${(QLENS.find(x => x[0] === qLen()) || [0, "Normal"])[1]} quarters. Tap a teammate to pass, swipe or hold and drag to move.</p><button class="mbtn pri" data-act="tipoff">Tip off</button></div>`;
   el.hidden = false; app.classList.add('pre');
 }
 function startStory() {
@@ -4033,7 +4061,7 @@ function updateMatchHud() {
   const els = $('hand').querySelectorAll('.hcard[data-k]');
   els.forEach((el, k) => { const id = G.queue[k], ok = cardUsable(id), afford = id && G.stam >= CARD[id].cost; el.classList.toggle('off', !ok); el.classList.toggle('poor', !afford); sig += ok ? 1 : 0; });
   const h = userHandler();
-  $('handhint').textContent = G.auto ? 'Autoplay is on. Your team plays itself.' : G.meter ? 'Let go on green!' : h ? 'Your ball. Tap a teammate to pass, swipe to drive, or play a card.' : G.oppShot ? 'Hit CONTEST as he rises!' : G.poss === 1 && G.phase === 'live' ? 'On defense. CONTEST his shot or play a defense card.' : 'Wait for the next play.';
+  $('handhint').textContent = G.auto ? 'Autoplay is on. Your team plays itself.' : G.meter ? 'Let go on green!' : h ? 'Your ball. Drag to move, tap a teammate to pass, or play a card.' : G.oppShot ? 'Hit CONTEST as he rises!' : G.poss === 1 && G.phase === 'live' ? 'On defense. CONTEST his shot or play a defense card.' : 'Wait for the next play.';
   $('s0').textContent = G.score[0]; $('s1').textContent = G.score[1];
   $('qtr').textContent = G.q > 4 ? (G.q === 5 ? 'OVERTIME' : `${G.q - 4}OT`) : (QNAMES[G.q - 1] || '');
   const c = G.clock; $('clock').textContent = c < 10 ? c.toFixed(1) : `${Math.floor(Math.ceil(c) / 60)}:${String(Math.ceil(c) % 60).padStart(2, '0')}`;
@@ -4252,18 +4280,28 @@ cv.addEventListener('pointerdown', e => {
   if (mode !== 'match' || !G.game || G.done || G.paused || G.auto) return;
   if (RP.play) { endReplay(); return; }
   if (G.oppShot) { if (userContest()) buzz(15); return; }
-  swipe = {x:e.clientX, y:e.clientY};
+  swipe = {x:e.clientX, y:e.clientY, moved:false, id:e.pointerId};
+  try { cv.setPointerCapture(e.pointerId); } catch (er) {}
+});
+function steerFrom(dx, dy, hold) { const p = steerWho(); if (!p) return; const d = courtDir(p, dx, dy); if (d) userSteer(d[0], d[1], hold); }
+cv.addEventListener('pointermove', e => {
+  const s0 = swipe; if (!s0 || s0.id !== e.pointerId || mode !== 'match' || G.paused || G.auto) return;
+  const dx = e.clientX - s0.x, dy = e.clientY - s0.y;
+  if (!s0.moved && Math.hypot(dx, dy) < 16) return;
+  s0.moved = true; e.preventDefault();
+  if (Math.hypot(dx, dy) > 70) { const k = 70 / Math.hypot(dx, dy); s0.x = e.clientX - dx * k; s0.y = e.clientY - dy * k; }   // anchor trails the finger
+  steerFrom(dx, dy, true);
 });
 cv.addEventListener('pointerup', e => {
   const s0 = swipe; swipe = null;
   if (!s0 || mode !== 'match' || !G.game || G.paused || G.auto) return;
   const dx = e.clientX - s0.x, dy = e.clientY - s0.y, h = userHandler();
-  if (Math.hypot(dx, dy) > 26) { if (h) { const d = courtDir(h, dx, dy); if (d) userDrive(d[0], d[1]); } return; }
+  if (s0.moved || Math.hypot(dx, dy) > 16) { if (!s0.moved) steerFrom(dx, dy, false); endSteer(); return; }
   const r = wrap.getBoundingClientRect(), p = tapPlayer(e.clientX - r.left, e.clientY - r.top);
   if (h && p && p.t === 0 && p !== h) { if (userPassTo(p)) buzz(10); }
   else if (G.poss === 1) userHandsUp();
 });
-cv.addEventListener('pointercancel', () => { swipe = null; });
+cv.addEventListener('pointercancel', () => { swipe = null; endSteer(); });
 $('contest').addEventListener('pointerdown', e => {
   e.preventDefault(); if (G.auto || !G.game) return;
   if (G.oppShot) { if (userContest()) buzz(15); } else userHandsUp();
@@ -4273,6 +4311,12 @@ cv.addEventListener('click', e => {
   const id = pickHomeActor(e.clientX, e.clientY);
   if (id != null) openPlayer(id);
 });
+const KEYDIR = {arrowup:[0, -1], arrowdown:[0, 1], arrowleft:[-1, 0], arrowright:[1, 0]}, keysDown = new Set();
+function keySteer() {
+  let x = 0, y = 0; for (const k of keysDown) { x += KEYDIR[k][0]; y += KEYDIR[k][1]; }
+  if (!x && !y) { endSteer(); return; }
+  steerFrom(x * 40, y * 40, true);
+}
 window.addEventListener('keydown', e => {
   if (mode !== 'match' || e.repeat) return;
   const k = (e.key || '').toLowerCase();
@@ -4280,9 +4324,9 @@ window.addEventListener('keydown', e => {
   else if (k === 'a') act('auto', {});
   else if (k === ' ' || k === 'c') { e.preventDefault(); if (G.oppShot) userContest(); else userHandsUp(); }
   else if (k === 's') act('subs', {});
-  else if (k.startsWith('arrow')) { const h = userHandler(); if (h) { const v = {arrowup:[0, -1], arrowdown:[0, 1], arrowleft:[-1, 0], arrowright:[1, 0]}[k], d = courtDir(h, v[0] * 40, v[1] * 40); if (d) userDrive(d[0], d[1]); } }
+  if (KEYDIR[k]) { e.preventDefault(); keysDown.add(k); keySteer(); }
 });
-window.addEventListener('keyup', e => { const k = (e.key || '').toLowerCase(); if (mode === 'match' && k >= '1' && k <= '8') relMeter(); });
+window.addEventListener('keyup', e => { const k = (e.key || '').toLowerCase(); if (KEYDIR[k]) { keysDown.delete(k); keySteer(); } if (mode === 'match' && k >= '1' && k <= '8') relMeter(); });
 
 // ---------- Baller Road button (locked) ----------
 const TROPHY_MAP = ['.ooooooo.', 'oyyyyyyyo', 'oyYyyyyyo', '.oyyyyyo.', '..oyyyo..', '...oyo...', '...oyo...', '..ooooo..', '..oyyyo..', '..ooooo..'];

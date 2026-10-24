@@ -1,5 +1,5 @@
 // Dream Ball service worker: app shell precache + runtime cache for fonts and pixel art.
-const VERSION = 'dreamball-app-v6';
+const VERSION = 'dreamball-app-v7';
 const SHELL = ['./', './index.html', './manifest.webmanifest?v=2', './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png', './icons/favicon.png'];
 
 self.addEventListener('install', e => {
