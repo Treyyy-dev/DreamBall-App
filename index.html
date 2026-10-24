@@ -625,6 +625,23 @@ img,canvas,video{-webkit-user-drag:none;user-select:none}
 @keyframes legbox{0%,100%{box-shadow:0 0 0 1px rgba(255,201,77,.4),0 0 6px rgba(255,201,77,.35)}50%{box-shadow:0 0 0 1px #ffe08a,0 0 14px rgba(255,214,110,.95)}}
 @media (prefers-reduced-motion:reduce){.cframe.leg::after,.chip.leg::after,.mcard.leg::after,.bi-p.leg::after{animation:none}}
 .stage:has(.panel:not([hidden])) .road,.stage:has(.overlay:not([hidden])) .road{display:none}
+
+/* instant replay */
+.replay{position:absolute;inset:0;z-index:4;cursor:pointer}
+.stage.replaying #fx{visibility:hidden}
+.stage.replaying canvas{filter:saturate(.8) contrast(1.06) brightness(1.04)}
+.stage.replaying::before,.stage.replaying::after{content:"";position:absolute;left:0;right:0;height:9%;background:#06070f;z-index:3;pointer-events:none}
+.stage.replaying::before{top:0;animation:rpbar .3s ease-out both}
+.stage.replaying::after{bottom:0;animation:rpbar .3s ease-out both}
+@keyframes rpbar{from{transform:scaleY(0)}}
+.replay::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(180deg,rgba(255,255,255,.035) 0 1px,transparent 1px 3px)}
+.rp-badge{position:absolute;left:10px;top:calc(9% + 8px);display:flex;align-items:center;gap:7px;padding:5px 9px 4px;background:#e2453a;color:#fff;font-family:'Silkscreen',var(--num),monospace;font-size:13px;letter-spacing:.08em;box-shadow:3px 3px 0 #120e18}
+.rp-badge i{width:8px;height:8px;background:#fff;animation:rpblink 1s steps(1) infinite}
+@keyframes rpblink{50%{opacity:0}}
+.rp-kind{position:absolute;left:0;right:0;bottom:calc(9% + 12px);text-align:center;font-family:'Silkscreen',var(--display),monospace;font-weight:700;font-size:clamp(22px,7vw,34px);color:#ffc94d;text-shadow:3px 0 0 #120e18,-3px 0 0 #120e18,0 3px 0 #120e18,0 -3px 0 #120e18,3px 3px 0 #120e18;animation:rpkind .5s steps(4) both}
+.rp-kind small{display:block;font-size:13px;color:#fff;letter-spacing:.12em;margin-top:4px;text-shadow:2px 2px 0 #120e18}
+@keyframes rpkind{from{transform:scale(1.6);opacity:0}}
+.rp-skip{position:absolute;right:10px;top:calc(9% + 12px);font-family:'Silkscreen',var(--num),monospace;font-size:10px;color:#cfd6ff;letter-spacing:.1em;opacity:.8}
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0;-webkit-text-size-adjust:100%;overscroll-behavior:none;touch-action:manipulation}
 img{max-width:100%}
@@ -657,6 +674,7 @@ img{max-width:100%}
     <div class="overlay" id="pause" hidden><h2>PAUSED</h2><div class="mrow" style="width:100%;max-width:300px"><button class="mbtn sec" data-act="forfeit">Forfeit</button><button class="mbtn pri" data-act="resume">Resume</button></div><button class="mbtn sec" data-act="settings" style="width:100%;max-width:300px">Settings</button><p class="hint">Forfeiting counts as a loss.</p></div>
     <div class="overlay" id="result" hidden></div>
     <div class="matchup" id="matchup" hidden></div>
+    <div class="replay" id="replay" data-act="skipreplay" hidden></div>
   </div>
 
   <div class="hud">
@@ -1727,6 +1745,7 @@ function updateBall(dt) {
       const t = p.t, foul = G.foul; G.foul = null;
       if (b.make) {
         scored(p, b.pts); G.cheer = b.kind === 'dunk' ? 2 : 1.4; p.celebT = 1.1; p.celebKind = Math.floor(Math.random() * 3);
+        if (b.kind === 'dunk' || b.pts === 3) G.replayReq = {kind:b.kind === 'dunk' ? 'dunk' : 'three', t:p.t, name:nm(p)};
         { const nn = arenaG && arenaG.userData.nets; if (nn && nn[t]) nn[t].userData.sw = 1; }
         popup(h.x, h.y + (t === 0 ? 3 : -3), '+' + b.pts, G.T[t].fr.c, 2.4);
         if (b.poster) { b.poster.stun = 1.4; popup(b.poster.x, b.poster.y, 'POSTERIZED!', '#ffc94d', 1.8); b.poster = null; }
@@ -2435,28 +2454,9 @@ function drawRim(g, t) {
 function animateNets(dt) { for (const n of arenaG.userData.nets) if (n.userData.sw > 0) n.userData.sw = Math.max(0, n.userData.sw - dt * 1.6); }
 
 // ---------- arena frame ----------
-// camera spins to the other end so the team with the ball always attacks up the screen
-const SPIN = {on:false, t:0, to:0};
-function resetCamSpin() { SPIN.on = false; CAM_FLIP = 0; if (cv.style.transform) cv.style.transform = ''; }
-function updateCamSpin(dt) {
-  const want = G.game && G.poss === 1 ? 1 : 0;
-  if (!SPIN.on && want !== CAM_FLIP) {
-    if (G.phase === 'pre' || G.phase === 'idle') CAM_FLIP = want;
-    else { SPIN.on = true; SPIN.t = 0; SPIN.to = want; }
-  }
-  let ang = 0, sc = 1;
-  if (SPIN.on) {
-    SPIN.t += dt; const u = Math.min(1, SPIN.t / .7);
-    if (u >= .5 && CAM_FLIP !== SPIN.to) CAM_FLIP = SPIN.to;
-    ang = u < .5 ? u * 180 : -90 + (u - .5) * 180; sc = 1 - Math.sin(u * Math.PI) * .2;
-    if (u >= 1) { SPIN.on = false; ang = 0; sc = 1; }
-  }
-  const tf = SPIN.on ? `rotate(${ang.toFixed(1)}deg) scale(${sc.toFixed(3)})` : '';
-  if (cv.style.transform !== tf) cv.style.transform = tf;
-}
+function resetCamSpin() { CAM_FLIP = 0; if (cv.style.transform) cv.style.transform = ''; }
 function renderArena(dt) {
   if (!ctx) return;
-  updateCamSpin(dt);
   cam.k = arenaK(); if (arenaKey !== arenaKeyNow()) repaintArena();
   animateNets(dt);
   const b = G.ball, live = G.phase === 'live' || G.phase === 'dead';
@@ -3124,6 +3124,69 @@ function drawPlayArt(g, T, D, W, H) {
   g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(0, H - 1, W, 1);
 }
 
+// ================= instant replay =================
+// The last few seconds of play are recorded every frame. After a dunk or a made three the
+// highlight plays back in slow motion with an INSTANT REPLAY banner; tap to skip.
+const RP = {buf:[], t:0, req:null, play:null};
+const RP_KEYS = ['x', 'y', 'vx', 'vy', 'yaw', 'ph', 'fall', 'stun', 'shootT', 'celebT', 'celebKind', 'gather', 'gv', 'lockT', 'burst', 'lift',
+  'runInPlace', 'fixYaw', 'spinDir', 'signal', 'mode', 'aimYaw', 'side', 'ballSide'];
+function rpSnapActor(a) {
+  const o = {}; for (const k of RP_KEYS) o[k] = a[k];
+  o.finish = a.finish ? Object.assign({}, a.finish) : null; o.move = a.move ? Object.assign({}, a.move) : null;
+  return o;
+}
+function rpApplyActor(a, o) {
+  for (const k of RP_KEYS) a[k] = o[k];
+  a.finish = o.finish ? Object.assign({}, o.finish) : null; a.move = o.move ? Object.assign({}, o.move) : null;
+}
+const rpIdx = p => p ? all.indexOf(p) : -1;
+function rpCapture() {
+  const b = G.ball, bo = Object.assign({}, b);
+  bo.owner = rpIdx(b.owner); bo.shooter = rpIdx(b.shooter); bo.to = rpIdx(b.to);
+  return {t:RP.t, p:all.map(rpSnapActor), r:[rpSnapActor(REF), rpSnapActor(REF2)], b:bo, phase:G.phase, poss:G.poss, cheer:G.cheer,
+    nets:arenaG.userData.nets.map(n => n.userData.sw || 0)};
+}
+function rpApply(s) {
+  all.forEach((p, i) => rpApplyActor(p, s.p[i])); rpApplyActor(REF, s.r[0]); rpApplyActor(REF2, s.r[1]);
+  const b = G.ball; Object.assign(b, s.b);
+  b.owner = s.b.owner >= 0 ? all[s.b.owner] : null; b.shooter = s.b.shooter >= 0 ? all[s.b.shooter] : null; b.to = s.b.to >= 0 ? all[s.b.to] : null;
+  G.phase = s.phase; G.poss = s.poss; G.cheer = s.cheer;
+  arenaG.userData.nets.forEach((n, i) => { n.userData.sw = s.nets[i]; });
+}
+function replayReset() { RP.buf = []; RP.req = null; G.replayReq = null; if (RP.play) endReplay(true); }
+function replayRecord(dt) {
+  RP.t += dt;
+  RP.buf.push(rpCapture());
+  while (RP.buf.length && RP.buf[0].t < RP.t - 5) RP.buf.shift();
+  if (G.replayReq && !RP.req) { RP.req = Object.assign({at:RP.t}, G.replayReq); G.replayReq = null; }
+  if (RP.req && RP.t - RP.req.at > .9) startReplay();
+}
+function startReplay() {
+  const r = RP.req; RP.req = null;
+  const frames = RP.buf.filter(f => f.t >= r.at - 2.7 && f.t <= r.at + .7);
+  if (frames.length < 20 || G.done) return;
+  RP.play = {frames, i:0, t:frames[0].t, live:rpCapture(), cam:{x:camF.x, z:camF.z}};
+  const st = $('wrap'); st.classList.add('replaying');
+  const el = $('replay');
+  el.innerHTML = `<div class="rp-badge"><i></i>INSTANT REPLAY</div><div class="rp-kind">${r.kind === 'dunk' ? 'SLAM DUNK' : 'FROM DOWNTOWN'}<small>${esc(r.name || '')}</small></div><div class="rp-skip">TAP TO SKIP</div>`;
+  el.hidden = false;
+}
+function replayFrame(dt) {                     // true while a replay is showing
+  const P = RP.play; if (!P) return false;
+  if (!G.paused) P.t += dt * .55;               // slow motion
+  while (P.i < P.frames.length - 1 && P.frames[P.i + 1].t <= P.t) P.i++;
+  if (P.i >= P.frames.length - 1) { endReplay(); return false; }
+  rpApply(P.frames[P.i]);
+  return true;
+}
+function endReplay(quiet) {
+  const P = RP.play; if (!P) return;
+  RP.play = null; rpApply(P.live); camF.x = P.cam.x; camF.z = P.cam.z;
+  RP.buf = [];
+  $('wrap').classList.remove('replaying'); const el = $('replay'); el.hidden = true; el.innerHTML = '';
+  void quiet;
+}
+
 // ================= UI =================
 const app = $('app'), panel = $('panel'), modal = $('modal');
 let mode = 'home', tab = null, teamSub = 'lineup', selSlot = -1, setupFr = 0, deckFilter = 'all', rosterSort = 'ovr';
@@ -3540,7 +3603,7 @@ function startStory() {
   G.score = [0, 0]; G.q = 0; G.firstPoss = Math.random() < .5 ? 0 : 1; G.done = false; G.paused = false; G.cheer = 0; G.auto = !!S.auto;
   for (const k in G.eff) G.eff[k] = 0;
   for (const pp of G.popups) pp.el.remove(); G.popups = [];
-  G.stam = 15;
+  G.stam = 15; replayReset();
   const q = S.deck.slice(); for (let i = q.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [q[i], q[j]] = [q[j], q[i]]; }
   G.queue = q;
   $('n0').textContent = G.T[0].short; $('n1').textContent = G.T[1].short;
@@ -3572,6 +3635,7 @@ function finishStory(win, forfeit) {
   setTimeout(() => { if (G.done && G.game) r.hidden = false; }, forfeit ? 0 : 1600);
 }
 function leaveMatch() {
+  replayReset();
   G.game = null; G.phase = 'idle'; app.classList.remove('pre'); $('result').hidden = true; $('pause').hidden = true; $('matchup').hidden = true; meterEl.hidden = true;
   for (const pp of G.popups) pp.el.remove(); G.popups = [];
   setMode('home'); renderTop(); resize(); openPanel('story');
@@ -3653,6 +3717,7 @@ function act(a, d) {
     } else openPlayer(id);
   }
   else if (a === 'binfo') openBannerInfo(d.b);
+  else if (a === 'skipreplay') endReplay();
   else if (a === 'road') toast('Baller Road is locked for now. Coming soon!');
   else if (a === 'dfilter') { deckFilter = d.t; renderPanel(); }
   else if (a === 'deckadd') {
@@ -3700,6 +3765,7 @@ modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 $('hand').addEventListener('pointerdown', e => {
   const el = e.target.closest && e.target.closest('.hcard[data-k]'); if (!el) return;
   e.preventDefault();
+  if (RP.play) { endReplay(); return; }
   const k = +el.dataset.k, id = G.queue[k];
   if (!cardUsable(id)) {
     const c = CARD[id];
@@ -3865,7 +3931,8 @@ function frame(now) {
     if (saveAcc > 15) { saveAcc = 0; save(); }
   }
   if (mode === 'match') {
-    if (!blocked && !G.paused) update(dt);
+    const inReplay = replayFrame(dt);
+    if (!inReplay && !blocked && !G.paused) { update(dt); if (G.game && !G.done) replayRecord(dt); }
     if (meterHide > 0 && !G.meter) { meterHide -= dt; if (meterHide <= 0) meterEl.hidden = true; }
     if (renderer) { renderArena(dt); placePopups(); }
     updateMatchHud();
@@ -3878,7 +3945,7 @@ function frame(now) {
 }
 requestAnimationFrame(frame);
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') save(); });
-window.__dream = {G, get S() { return S; }, act, update, homeUpdate, renderHome, drawDoll, drawBall, startLook, playCard, releaseMeter, cardUsable, players, CARDS, CHARS, buildPerson, lookOf, FR};
+window.__dream = {G, get S() { return S; }, act, update, endReplay, homeUpdate, renderHome, drawDoll, drawBall, startLook, playCard, releaseMeter, cardUsable, players, CARDS, CHARS, buildPerson, lookOf, FR};
 
 })();
 </script>
