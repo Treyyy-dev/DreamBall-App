@@ -808,6 +808,71 @@ svg.ic.bolt{width:7px;height:auto}
 .rp i{width:56px;height:3px}
 .roster{gap:2px}
 
+.subbtn i{font-style:normal;display:inline-block;margin-left:4px;padding:0 3px;background:#120e18;color:#ffc94d}
+.subbtn.off{filter:grayscale(1) brightness(.6)}
+
+/* ===================== RANK LEAGUE + BALLER ROAD + STYLE ===================== */
+.road{top:calc(15% + 74px)}
+.road.rank{top:15%;background:linear-gradient(180deg,#7a2a3a,#3a1220);color:#ffc94d}
+.road.rank .crown{width:30px}
+.road.rank b{color:#ffd8a8}
+.home .road.rank{filter:saturate(.85)}
+.match .rank{display:none}
+.stage:has(.panel:not([hidden])) .rank,.stage:has(.overlay:not([hidden])) .rank{display:none}
+.rd-dot{position:absolute;right:4px;top:4px;min-width:18px;height:18px;padding:0 4px;background:#e2453a;color:#fff;font-style:normal;font-family:var(--display);font-size:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #120e18;animation:conthot .6s steps(2) infinite}
+.rhead{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;margin:4px 0 10px;padding:12px;background:var(--panel2);box-shadow:0 -3px 0 0 var(--gold),0 3px 0 0 var(--gold),-3px 0 0 0 var(--gold),3px 0 0 0 var(--gold)}
+.rlvl{display:flex;flex-direction:column;align-items:center;line-height:1}
+.rlvl small{font-family:var(--display);font-size:9px;color:var(--muted);letter-spacing:.1em}
+.rlvl b{font-family:var(--display);font-size:38px;color:var(--gold)}
+.rlvl span{font-family:var(--num);font-size:12px;color:var(--muted)}
+.rbar{display:grid;grid-template-columns:repeat(10,1fr);gap:3px}
+.rbar i{height:12px;background:#24263f;box-shadow:0 0 0 2px #0a0b16}
+.rbar i.on{background:#5fd38a}
+.rprog p{margin:6px 0 0;font-family:var(--label);font-size:12px;color:var(--muted)}
+.rpass{display:flex;align-items:center;gap:10px;justify-content:space-between;margin:10px 0;padding:10px 12px;background:linear-gradient(90deg,#5a2a7a,#2a1a55);box-shadow:0 -3px 0 0 #ffc94d,0 3px 0 0 #ffc94d,-3px 0 0 0 #ffc94d,3px 0 0 0 #ffc94d}
+.rpass b{display:block;font-family:var(--display);font-size:14px;color:#ffc94d}
+.rpass small{display:block;font-size:11px;color:#e6dcff;margin-top:3px}
+.rpass.on{justify-content:center}
+.rpass .buy{flex:none;min-width:84px}
+.rcols{display:grid;grid-template-columns:1fr 44px 1fr;text-align:center;font-family:var(--display);font-size:10px;color:var(--muted);letter-spacing:.1em;margin:12px 0 6px}
+.rcols span:last-child{color:#ffc94d}
+.rlist{display:flex;flex-direction:column;gap:6px}
+.rrow{display:grid;grid-template-columns:1fr 44px 1fr;gap:6px;align-items:stretch}
+.rlv{display:flex;flex-direction:column;align-items:center;justify-content:center;background:#16182e;font-family:var(--display)}
+.rlv b{font-size:14px;color:var(--muted)}
+.rlv small{font-size:7px;color:#120e18;background:var(--gold);padding:1px 3px;margin-top:2px}
+.rrow.open .rlv b{color:#fff}
+.rrow.cur .rlv{background:var(--gold)}.rrow.cur .rlv b{color:#120e18}.rrow.cur .rlv small{background:#120e18;color:var(--gold)}
+.rtile{position:relative;display:flex;align-items:center;gap:8px;min-height:52px;padding:6px 8px;border:0;color:inherit;text-align:left;background:var(--panel2);box-shadow:0 -2px 0 0 var(--rule),0 2px 0 0 var(--rule),-2px 0 0 0 var(--rule),2px 0 0 0 var(--rule);cursor:default}
+.rtile small{font-size:11px;line-height:1.15;flex:1;min-width:0}
+.rtile.r1{--rr:#4fb8ff}.rtile.r2{--rr:#c46bff}.rtile.r3{--rr:#ffc94d}
+.rtile.r1,.rtile.r2,.rtile.r3{box-shadow:0 -2px 0 0 var(--rr),0 2px 0 0 var(--rr),-2px 0 0 0 var(--rr),2px 0 0 0 var(--rr)}
+.rtile.locked{opacity:.55}
+.rtile.done{opacity:.7}
+.rtile.ready{cursor:pointer;background:#2a3a2a;animation:legbox 1.4s ease-in-out infinite}
+.rtile .st{position:absolute;right:4px;top:4px;font-style:normal;font-family:var(--display);font-size:8px;padding:2px 4px;background:#5fd38a;color:#0a2a14}
+.rtile .st.lk{background:#5a2a7a;color:#ffc94d}
+.rtile .st.go{background:#ffc94d;color:#120e18}
+.rw-ic{flex:none;width:34px;height:34px;display:flex;align-items:center;justify-content:center}
+.rw-ic svg,.rw-ic .sh{width:34px;height:auto;max-height:34px;image-rendering:pixelated}
+.rw-ic.bucks{flex-direction:column;width:auto;min-width:34px;gap:1px}
+.rw-ic.bucks b{font-family:var(--display);font-size:11px;color:#5fd38a}
+.rw-ic.bucks .gemic,.rw-ic.bucks svg{width:20px;height:auto}
+.rgain{font-family:var(--display);font-size:11px;letter-spacing:.04em;padding:6px 10px;background:#24263f;color:#cfc6ff}
+.rgain.up{background:#ffc94d;color:#120e18;animation:conthot .5s steps(2) 4}
+.sgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stile{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px 8px;border:0;color:inherit;background:var(--panel2);cursor:pointer;box-shadow:0 -2px 0 0 var(--rc),0 2px 0 0 var(--rc),-2px 0 0 0 var(--rc),2px 0 0 0 var(--rc)}
+.stile.on{background:#2a3a2a;box-shadow:0 -3px 0 0 #5fd38a,0 3px 0 0 #5fd38a,-3px 0 0 0 #5fd38a,3px 0 0 0 #5fd38a}
+.stile.locked{opacity:.45;cursor:default;filter:grayscale(.6)}
+.stile b{font-family:var(--display);font-size:10px;text-align:center;line-height:1.2}
+.stile small{font-size:9px;color:var(--muted);text-align:center;line-height:1.2}
+.stile.on small{color:#5fd38a}
+.sic{height:46px;display:flex;align-items:center;justify-content:center}
+.sic svg{height:44px;width:auto;image-rendering:pixelated}
+svg.crest.px,.who svg.crest,.mhead svg.crest,.fr svg.crest{image-rendering:pixelated}
+.game .av{width:24px;height:24px;flex:none;display:block}
+.next .vs .av{width:48px;height:48px;flex:none;display:block;background:#1a1d3a}
+
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0;-webkit-text-size-adjust:100%;overscroll-behavior:none;touch-action:manipulation}
 img{max-width:100%}
@@ -832,7 +897,8 @@ img{max-width:100%}
     <canvas id="cv" aria-label="3D view"></canvas>
     <div id="fx"></div>
     <div class="fpsbox" id="fpsbox" hidden></div>
-    <button class="road" id="road" data-act="road" aria-label="Baller Road, locked"></button>
+    <button class="road rank" id="rank" data-act="rank" aria-label="Rank League, locked"></button>
+    <button class="road" id="road" data-act="road" aria-label="Baller Road"></button>
     <button class="autobtn" id="autoBtn" data-act="auto" aria-pressed="false"><i></i>AUTOPLAY</button>
     <div class="effbar" id="effbar"></div>
     <button class="pausebtn" data-act="pause" aria-label="Pause"><span class="pxi" data-i="pause"></span></button>
@@ -898,7 +964,7 @@ const FR = [
   {n:'Foxes',  city:'Emerald',   c:'#2fa85a', d:'#0f3d22', trim:'#f4f1ea', numc:'#f4f1ea'}
 ];
 const REF_FR = {n:'Ref', city:'', c:'#f2f2f2', d:'#16181f', trim:'#16181f', numc:'#16181f', ref:true};
-const TEAM_N = 5;          // players per side (5-on-5)
+const TEAM_N = 3;          // players per side (3-on-3)
 const POS_ORDER = ['PG','SG','SF','PF','C'];
 const POS_T = {
   PG:{sht:2,drb:8,spd:8,def:-6,h:.88,w:.95}, SG:{sht:8,drb:3,spd:4,def:-3,h:.91,w:.97}, SF:{sht:3,drb:0,spd:2,def:2,h:.94,w:1},
@@ -1232,6 +1298,128 @@ function cardFace(id, opts) {
 document.querySelectorAll('.gemic').forEach(e => e.innerHTML = GEM);
 document.querySelectorAll('.pxi[data-i]').forEach(e => { e.innerHTML = PXI(PX_ICONS[e.dataset.i] || PX_ICONS.lock, ''); });
 
+// ================= style: jerseys, courts, basketballs =================
+// A jersey has the same colour fields the sprites read: c (body), d (dark/side), trim, numc (number).
+const JERSEYS = [
+  {id:'red',      n:'Classic Red',     r:0, c:'#e2453a', d:'#7d1b14', trim:'#ffc94d', numc:'#fffaf2'},
+  {id:'teal',     n:'Teal Wave',       r:0, c:'#19a2b4', d:'#0b3f4a', trim:'#0b2340', numc:'#fffaf2'},
+  {id:'sunset',   n:'Sunset Orange',   r:0, c:'#f28c28', d:'#4b2370', trim:'#4b2370', numc:'#2a1240'},
+  {id:'silver',   n:'Silver Streak',   r:0, c:'#c3cad6', d:'#1d2433', trim:'#1d2433', numc:'#1d2433'},
+  {id:'royal',    n:'Royal Purple',    r:0, c:'#7b3fc4', d:'#2e1452', trim:'#ffc94d', numc:'#ffc94d'},
+  {id:'emerald',  n:'Emerald',         r:0, c:'#2fa85a', d:'#0f3d22', trim:'#f4f1ea', numc:'#f4f1ea'},
+  // free side of Baller Road
+  {id:'midnight', n:'Midnight',        r:1, c:'#22253a', d:'#0b0c14', trim:'#ffc94d', numc:'#ffc94d'},
+  {id:'snow',     n:'Snow White',      r:0, c:'#f4f1ea', d:'#2b3a67', trim:'#2b3a67', numc:'#2b3a67'},
+  {id:'powder',   n:'Powder Blue',     r:1, c:'#7fb8e6', d:'#1f4f8a', trim:'#ffffff', numc:'#ffffff'},
+  {id:'cream',    n:'Cream Throwback', r:1, c:'#efe3c2', d:'#7a2f1f', trim:'#7a2f1f', numc:'#7a2f1f'},
+  {id:'camo',     n:'Olive Camo',      r:1, c:'#5f6b3a', d:'#2c321a', trim:'#c9b27a', numc:'#f4f1ea'},
+  {id:'pink',     n:'Hot Pink',        r:1, c:'#ff5fa2', d:'#7a1f4e', trim:'#ffe066', numc:'#ffffff'},
+  {id:'ocean',    n:'Deep Ocean',      r:1, c:'#1e5fd6', d:'#0b2a66', trim:'#5fe0ff', numc:'#ffffff'},
+  {id:'lime',     n:'Lime Volt',       r:2, c:'#b6f23a', d:'#2d5a0c', trim:'#14210a', numc:'#14210a'},
+  {id:'rose',     n:'Rose Gold',       r:2, c:'#e8a798', d:'#6b3a33', trim:'#fff1e6', numc:'#fff1e6'},
+  {id:'maroon',   n:'Maroon Retro',    r:1, c:'#7a1f2b', d:'#3a0c13', trim:'#e8c46a', numc:'#e8c46a'},
+  // paid side of Baller Road
+  {id:'lava',     n:'Lava Flow',       r:2, c:'#2a1a16', d:'#120a08', trim:'#ff6a1f', numc:'#ff6a1f'},
+  {id:'gold',     n:'Gold Rush',       r:3, c:'#f2c230', d:'#6b4a06', trim:'#1a1a1a', numc:'#1a1a1a'},
+  {id:'galaxy',   n:'Galaxy',          r:3, c:'#3b1f7a', d:'#160a33', trim:'#ff7ad9', numc:'#9ef3ff'},
+  {id:'ice',      n:'Ice Cold',        r:2, c:'#bfe9ff', d:'#3a7bb0', trim:'#ffffff', numc:'#1d4f80'},
+  {id:'neon',     n:'Neon Night',      r:2, c:'#141428', d:'#08081a', trim:'#39ff88', numc:'#39ff88'},
+  {id:'sakura',   n:'Sakura',          r:2, c:'#ffc6dd', d:'#b04a7a', trim:'#ffffff', numc:'#b04a7a'},
+  {id:'jungle',   n:'Jungle',          r:2, c:'#1f6b3a', d:'#0b2a15', trim:'#ffb000', numc:'#ffb000'},
+  {id:'chrome',   n:'Chrome',          r:3, c:'#d8dee8', d:'#5a6478', trim:'#2a2f3a', numc:'#2a2f3a'},
+  {id:'fire',     n:'Fireball',        r:3, c:'#ff3b1f', d:'#7a0f05', trim:'#ffd84d', numc:'#ffd84d'},
+  {id:'mint',     n:'Mint Chip',       r:1, c:'#9df0c8', d:'#245a45', trim:'#3a2418', numc:'#245a45'},
+  {id:'royal2',   n:'Royal Blue',      r:1, c:'#2d4fd6', d:'#121f66', trim:'#e2453a', numc:'#ffffff'},
+  {id:'vapor',    n:'Vaporwave',       r:3, c:'#7a5cff', d:'#2a1a66', trim:'#36e6ff', numc:'#ff7ad9'}
+];
+const JERSEY = Object.fromEntries(JERSEYS.map(j => [j.id, j]));
+
+// Courts run from plain gyms to wild, vibrant venues. env = what surrounds the floor, floor = the playing surface.
+const COURTS = [
+  {id:'classic', n:'Home Arena',       r:0, env:'arena',   floor:'wood',     ink:'#fbf7ee', d:'Polished hardwood under the big lights'},
+  {id:'park',    n:'Park Blacktop',    r:0, env:'park',    floor:'blacktop', ink:'#f4f4f4', paint:'#2f6fd6', apron:'#3b4048', d:'Asphalt, chain-link and big shady trees'},
+  {id:'rec',     n:'Rec Center',       r:0, env:'gym',     floor:'maple',    ink:'#2a2a2a', paint:'#3a7d44', apron:'#c7b48a', d:'Your local gym with wooden bleachers'},
+  {id:'cage',    n:'Downtown Cage',    r:1, env:'street',  floor:'concrete', ink:'#ffffff', paint:'#c2402f', apron:'#6d7179', d:'Concrete court boxed in by brick and graffiti'},
+  {id:'beach',   n:'Beach Court',      r:1, env:'beach',   floor:'tiles',    ink:'#ffffff', paint:'#f2c94c', t1:'#2a8fd6', t2:'#2380c4', apron:'#e8cf96', d:'Sport tiles on the sand by the waves'},
+  {id:'lagoon',  n:'Lagoon Court',     r:2, env:'water',   floor:'glass',    ink:'#ffffff', paint:'#ff7a59', apron:'#8a5a32', d:'A floating court in the middle of the water'},
+  {id:'frozen',  n:'Frozen Lake',      r:2, env:'snow',    floor:'ice',      ink:'#2a5f9e', paint:'#7fc8ff', apron:'#e9f4ff', d:'Hoops on the ice with pine trees all around'},
+  {id:'neon',    n:'Neon Nights',      r:2, env:'city',    floor:'neon',     ink:'#39ff88', paint:'#ff3fd0', apron:'#0a0a18', d:'Glowing lines under a city that never sleeps'},
+  {id:'rooftop', n:'Rooftop Sunset',   r:2, env:'rooftop', floor:'tiles',    ink:'#ffffff', paint:'#ffcf4d', t1:'#d9572b', t2:'#c44a24', apron:'#4b2a5c', d:'Up above the city as the sun goes down'},
+  {id:'sakura',  n:'Cherry Blossom',   r:2, env:'sakura',  floor:'tiles',    ink:'#ffffff', paint:'#ff8ab8', t1:'#5aa36a', t2:'#4f965f', apron:'#c9a27a', d:'Pink petals drifting over a garden court'},
+  {id:'jungle',  n:'Jungle Temple',    r:2, env:'jungle',  floor:'stone',    ink:'#ffd36b', paint:'#3f8a4a', apron:'#4a4436', d:'Ancient stone hidden deep in the jungle'},
+  {id:'galaxy',  n:'Galaxy Court',     r:3, env:'space',   floor:'galaxy',   ink:'#9ef3ff', paint:'#ff7ad9', apron:'#120a2a', d:'Ball out among the stars'},
+  {id:'palace',  n:'Golden Palace',    r:3, env:'palace',  floor:'gold',     ink:'#fff6d8', paint:'#7b1f2b', apron:'#2a1a0c', d:'Gold floors and velvet seats'},
+  {id:'volcano', n:'Volcano Court',    r:3, env:'volcano', floor:'obsidian', ink:'#ffb347', paint:'#ff4a1f', apron:'#1c1416', d:'Black rock floating on rivers of lava'}
+];
+const COURT = Object.fromEntries(COURTS.map(c => [c.id, c]));
+
+// Basketballs: base / dark / light / seam colours and a panel pattern
+const BALLS = [
+  {id:'classic', n:'Classic',     r:0, base:'#e2702c', dark:'#b9531d', light:'#f08a3e', seam:'#3a1606', shine:'#ffd2a8'},
+  {id:'street',  n:'Street Worn', r:0, base:'#a8592a', dark:'#7a3f1c', light:'#bf6c38', seam:'#2a1206', shine:'#d9a07a', worn:true},
+  {id:'pink',    n:'Bubblegum',   r:1, base:'#ff7ab8', dark:'#d4508e', light:'#ff9fcd', seam:'#5a1036', shine:'#ffe0ef'},
+  {id:'aba',     n:'Red White Blue', r:1, base:'#e2453a', dark:'#b23028', light:'#ff6a5a', seam:'#1a1a2a', shine:'#ffffff', pat:'aba'},
+  {id:'gold',    n:'Solid Gold',  r:3, base:'#f2c230', dark:'#b8860b', light:'#ffe27a', seam:'#5a3d00', shine:'#fffbe0'},
+  {id:'glow',    n:'Glow Up',     r:2, base:'#39ff88', dark:'#1fbf5f', light:'#9dffc4', seam:'#0a3a1c', shine:'#ffffff'},
+  {id:'ice',     n:'Frostbite',   r:2, base:'#dff4ff', dark:'#9cc9ea', light:'#ffffff', seam:'#3a7bb0', shine:'#ffffff'},
+  {id:'lava',    n:'Magma',       r:2, base:'#2a1a16', dark:'#160c0a', light:'#4a2a20', seam:'#ff6a1f', shine:'#ffb070'},
+  {id:'galaxy',  n:'Galaxy',      r:3, base:'#3b1f7a', dark:'#22104a', light:'#5a3aa8', seam:'#ff7ad9', shine:'#9ef3ff', pat:'stars'},
+  {id:'rainbow', n:'Rainbow',     r:3, base:'#ff4d4d', dark:'#c43a3a', light:'#ff8a8a', seam:'#1a1a2a', shine:'#ffffff', pat:'rainbow'},
+  {id:'chrome',  n:'Chrome',      r:3, base:'#c9d1de', dark:'#8a95a8', light:'#f2f6fb', seam:'#3a4252', shine:'#ffffff'},
+  {id:'melon',   n:'Watermelon',  r:2, base:'#3fae4f', dark:'#2a7f38', light:'#6fd17a', seam:'#ff4f6a', shine:'#e7ffe9', pat:'stripes'},
+  {id:'beachb',  n:'Beach Ball',  r:1, base:'#ffffff', dark:'#d8d8d8', light:'#ffffff', seam:'#2a8fd6', shine:'#ffffff', pat:'beach'}
+];
+const BALL = Object.fromEntries(BALLS.map(b => [b.id, b]));
+
+function styleOf() { return (typeof S !== 'undefined' && S && S.style) || {jersey:'red', court:'classic', ball:'classic'}; }
+let kitMemo = {k:'', v:null};
+function myKit() {
+  const st = styleOf(), j = JERSEY[st.jersey] || JERSEYS[0], name = (typeof S !== 'undefined' && S && S.name) || 'DREAM BALL', key = j.id + '|' + name;
+  if (kitMemo.k !== key) kitMemo = {k:key, v:Object.assign({}, j, {n:name, city:'', jid:j.id})};
+  return kitMemo.v;
+}
+const curCourt = () => (typeof G !== 'undefined' && G.court && COURT[G.court]) || COURT[styleOf().court] || COURTS[0];
+const curBall = () => BALL[styleOf().ball] || BALLS[0];
+const lumOf = h => { const n = parseInt(h.slice(1, 7), 16); return (((n >> 16) & 255) * .299 + ((n >> 8) & 255) * .587 + (n & 255) * .114) / 255; };
+
+// ---- little pixel icons for menus and rewards
+const JERSEY_MAP = ['..aa..aa..', '.aabaabaa.', 'aaabbbbaaa', 'aa.cccc.aa', '...cccc...', '...cccc...', '...cccc...', '...dddd...'];
+function jerseySVG(j, cls) {
+  return pixSVG(['..ooo..ooo..', '.oaaoooaao..', 'oaaabbbbaaao', 'oaaocccccaao', 'oooocnncoooo', '...occncco..', '...occccco..', '...odddddo..', '...ooooooo..'].map(r => r.slice(0, 12)),
+    {o:'#120e18', a:j.c, b:j.trim, c:j.c, n:j.numc, d:j.d}, cls || 'jsy');
+}
+function ballSVG(b, cls) {
+  const map = ['..ooooo..', '.oaasaao.', 'oaaasaalo', 'oaaasaaao', 'osssssssso'.slice(0, 9), 'odaasaado', 'odaasaado', '.oddsddo.', '..ooooo..'];
+  return pixSVG(map, {o:'#120e18', a:b.base, d:b.dark, l:b.shine, s:b.seam}, cls || 'bll');
+}
+function courtSVG(c, cls) {
+  const f = {wood:'#d9a066', maple:'#ecc690', blacktop:'#30333a', concrete:'#a3a8b0', tiles:c.t1 || '#2a8fd6', glass:'#58c6dc', ice:'#dff4ff', neon:'#0d0b1e', stone:'#7b7a66', galaxy:'#24124f', gold:'#e0b04a', obsidian:'#221a1c'}[c.floor] || '#d9a066';
+  const env = {arena:'#1a1e3c', gym:'#d9cfb8', park:'#4f9a42', street:'#8a3a2a', beach:'#e8cf96', water:'#1e6fb8', snow:'#f4f8ff', city:'#151432', rooftop:'#ff9a4d', sakura:'#ffc6dd', jungle:'#1f5a2a', space:'#0b0820', palace:'#5a1622', volcano:'#ff4a1f'}[c.env] || '#1a1e3c';
+  const p = c.paint || '#e2453a', ink = c.ink;
+  return `<svg class="${cls || 'crt'}" viewBox="0 0 24 32" shape-rendering="crispEdges" aria-hidden="true"><rect width="24" height="32" fill="${env}"/><rect x="3" y="3" width="18" height="26" fill="${f}"/><rect x="9" y="3" width="6" height="7" fill="${p}"/><rect x="9" y="22" width="6" height="7" fill="${p}"/><rect x="3" y="15" width="18" height="1" fill="${ink}"/><rect x="10" y="13" width="4" height="5" fill="none" stroke="${ink}" stroke-width="1"/><rect x="3" y="3" width="18" height="26" fill="none" stroke="${ink}" stroke-width="1"/></svg>`;
+}
+
+// ================= Baller Road: 100 levels, a free and a paid reward on each =================
+const ROAD_N = 100, ROAD_PER = 10, ROAD_USD = '$4.99';
+const ROAD = (() => {
+  const freeJ = ['midnight', 'snow', 'powder', 'cream', 'camo', 'pink', 'ocean', 'maroon', 'lime', 'rose'];
+  const paidJ = ['lava', 'ice', 'neon', 'sakura', 'jungle', 'mint', 'royal2', 'chrome', 'fire', 'gold'];
+  const paidC = ['beach', 'lagoon', 'frozen', 'neon', 'rooftop', 'sakura', 'jungle', 'galaxy', 'palace', 'volcano'];
+  const paidB = ['aba', 'glow', 'ice', 'melon', 'beachb', 'lava', 'chrome', 'rainbow', 'galaxy', 'gold'];
+  const freeX = {1:{k:'$', n:150}, 25:{k:'c', id:'rec'}, 45:{k:'b', id:'street'}, 75:{k:'c', id:'cage'}, 95:{k:'b', id:'pink'}};
+  const paidX = {1:{k:'j', id:'vapor'}, 99:{k:'j', id:'galaxy'}};
+  const F = [], P = [];
+  for (let L = 1; L <= ROAD_N; L++) {
+    F.push(freeX[L] || (L % 10 === 0 ? {k:'j', id:freeJ[L / 10 - 1]} : L % 10 === 5 ? {k:'s', r:L < 35 ? 0 : L < 70 ? 1 : 2} : {k:'$', n:15 + Math.floor(L / 10) * 5}));
+    P.push(paidX[L] || (L % 10 === 0 ? {k:'c', id:paidC[L / 10 - 1]} : L % 10 === 5 ? {k:'b', id:paidB[(L - 5) / 10]} : L % 10 === 3 ? {k:'j', id:paidJ[(L - 3) / 10]} : L % 10 === 7 ? {k:'s', r:L < 50 ? 1 : L < 85 ? 2 : 3} : {k:'$', n:40 + L * 2}));
+  }
+  return {F, P};
+})();
+function roadWhere(k, id) {             // which Baller Road level unlocks an item (for the Style tab)
+  for (let i = 0; i < ROAD_N; i++) { if (ROAD.F[i].k === k && ROAD.F[i].id === id) return `Baller Road Lv ${i + 1}`; if (ROAD.P[i].k === k && ROAD.P[i].id === id) return `Premium Road Lv ${i + 1}`; }
+  return 'Starter';
+}
+
 // ================= save =================
 const KEY = 'dreamball-save-v3', OLD_KEY = 'dreamball-save-v2';
 let S = null;
@@ -1268,6 +1456,7 @@ function fixSave(s) {
     delete s.cards; delete s.deck;
   }
   // 5-on-5: ten-man lineups (five starters, five on the bench); fill from the best players you own
+  if (s.lineup && s.lineup.length > TEAM_N * 2) s.lineup = s.lineup.slice(0, TEAM_N * 2);   // back to 3-on-3: three starters, three on the bench
   if (s.lineup && s.owned && s.lineup.length < TEAM_N * 2) {
     const ov = id => ovrOf(Object.fromEntries(STATS.map(k => [k, CHARS[id].base[k]])));
     const rest = Object.keys(s.owned).map(Number).filter(id => !s.lineup.includes(id) && CHARS[id]).sort((a, b) => ov(b) - ov(a));
@@ -1275,12 +1464,20 @@ function fixSave(s) {
   }
   s.auto = !!s.auto;
   if (s.coins != null) { s.gems = (s.gems || 0) + Math.floor(s.coins / 10); delete s.coins; }   // coins became Basket Bucks
+  // style + Baller Road
+  if (!s.style) s.style = {jersey:(JERSEYS[s.fr || 0] || JERSEYS[0]).id, court:'classic', ball:'classic'};
+  s.inv = s.inv || {};
+  s.inv.jerseys = s.inv.jerseys || JERSEYS.slice(0, 6).map(j => j.id);
+  s.inv.courts = s.inv.courts || ['classic', 'park'];
+  s.inv.balls = s.inv.balls || ['classic'];
+  for (const [k, id] of [['jerseys', s.style.jersey], ['courts', s.style.court], ['balls', s.style.ball]]) if (!s.inv[k].includes(id)) s.inv[k].push(id);
+  s.road = s.road || {m:0, paid:false, cf:[], cp:[]};
   s.seen = s.seen || Date.now();
   return s;
 }
 function save() { if (!S) return; S.seen = Date.now(); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
-function newSave(name, fr) {
-  S = fixSave({v:3, name, fr, gems:550, owned:{}, lineup:[0,2,4,1,3,5,6,7,8,9], shoes:[], uid:1, story:{season:1, res:[]}});
+function newSave(name, jersey) {
+  S = fixSave({v:3, name, fr:0, style:{jersey:jersey || 'red', court:'classic', ball:'classic'}, gems:550, owned:{}, lineup:[0,2,4,1,3,9], shoes:[], uid:1, story:{season:1, res:[]}});
   for (let i = 0; i < 10; i++) S.owned[i] = {st:1, sh:0, shoe:null, tr:{sht:0, drb:0, spd:0, def:0}};
   save();
 }
@@ -1303,11 +1500,11 @@ function lookOf(id) {
 function userDesc(id, db) { const c = CHARS[id]; return {id, name:c.name, last:c.last, num:c.num, pos:c.pos, r:c.r, st:eff(id, db), look:lookOf(id)}; }
 function teamOvr() { const db = deckBoost(); return Math.round(S.lineup.slice(0, TEAM_N).reduce((a, id) => a + ovrOf(eff(id, db)), 0) / TEAM_N); }
 function userTeam() {
-  const db = deckBoost(), Lx = S.lineup.map(id => userDesc(id, db)), f = FR[S.fr];
+  const db = deckBoost(), Lx = S.lineup.map(id => userDesc(id, db)), f = myKit();
   return {name:S.name, short:S.name.toUpperCase().slice(0, 10), fr:f, starters:Lx.slice(0, TEAM_N), bench:Lx.slice(TEAM_N, TEAM_N * 2), user:true};
 }
-function genTeam(fi, ovr, seed) {
-  const R = rng(seed), f = FR[fi], pos = ['PG','SG','SF','PF','C','PG','SG','SF','PF','C'], used = new Set(), usedN = new Set();
+function genTeam(ji, ovr, seed) {
+  const R = rng(seed), f = Object.assign({}, JERSEYS[ji % JERSEYS.length]), pos = TEAM_N === 3 ? ['PG','SF','C','SG','PF','C'] : ['PG','SG','SF','PF','C','PG','SG','SF','PF','C'], used = new Set(), usedN = new Set();
   const ps = pos.map((pz, i) => {
     const t = POS_T[pz], st = {};
     for (const k of STATS) st[k] = clamp(Math.round(ovr + t[k] + (R()*6 - 3) - (i >= TEAM_N ? 3 : 0)), 35, 99);
@@ -1317,11 +1514,13 @@ function genTeam(fi, ovr, seed) {
     return {name:fn + ' ' + ln, last:ln, num, pos:pz, r:ovr >= 86 ? 3 : ovr >= 78 ? 2 : ovr >= 70 ? 1 : 0, st,
       look:{skin:Math.floor(R() * SKINS.length), hair:Math.floor(R() * 6), h:t.h, w:t.w + (R() - .5) * .06, shoe:[sm.c, sm.s], band:R() < .2, beard:R() < .3, sleeve:R() < .2, v:num}};
   });
-  return {name:f.city + ' ' + f.n, short:f.n.toUpperCase(), fr:f, starters:ps.slice(0, TEAM_N), bench:ps.slice(TEAM_N), ovr};
+  const star = ps.slice(0, TEAM_N).slice().sort((a, b) => ovrOf(b.st) - ovrOf(a.st))[0];   // no franchises: a side is known by its best player
+  f.n = star.last; f.city = ''; f.star = star;
+  return {name:'Team ' + star.last, short:star.last.toUpperCase().slice(0, 10), fr:f, starters:ps.slice(0, TEAM_N), bench:ps.slice(TEAM_N), ovr, star};
 }
 function storyGame(g, season) {
-  const others = FR.map((f, i) => i).filter(i => i !== S.fr);
-  return {g, fi:others[g % others.length], ovr:Math.round(60 + g * 2.2 + (season - 1) * 8), seed:season * 1000 + g * 17,
+  const mine = myKit(), others = JERSEYS.map((j, i) => i).filter(i => JERSEYS[i].id !== mine.jid && Math.abs(lumOf(JERSEYS[i].c) - lumOf(mine.c)) + (JERSEYS[i].c.slice(1, 3) === mine.c.slice(1, 3) ? 0 : .2) > .15);
+  return {g, ji:others[(g * 7 + season * 3) % others.length], ovr:Math.round(60 + g * 2.2 + (season - 1) * 8), seed:season * 1000 + g * 17,
     win:{gems:70 + g * 4 + (g === SEASON_GAMES - 1 ? 70 : 0)}, loss:{gems:20}, final:g === SEASON_GAMES - 1};
 }
 
@@ -1329,13 +1528,15 @@ function storyGame(g, season) {
 const W = 50, L = 94, SC = 18, QLEN = 100, OTLEN = 50;
 const BODY = 3.4, SPACE_MATE = 9, SPACE_ANY = 5.4;   // ft: hard body size, comfort radius for teammates / anyone
 const HOOPS = [{x:25, y:5.25}, {x:25, y:88.75}];
-// 5-on-5 roles by slot: 0 = point guard, 1-2 = wings, 3 = power forward, 4 = center
-const SPOTS = [
+// roles by slot. 3-on-3: 0 = ball handler, 1 = wing, 2 = big. (5-on-5 tables kept for later.)
+const SPOTS = TEAM_N === 3 ? [
+  [[25,27],[15,24],[35,24]], [[44,19],[6,19],[43,5]], [[17,9],[33,9],[25,15]]
+] : [
   [[25,27],[18,25],[32,25]], [[6,21],[3,4],[11,25]], [[44,21],[47,4],[39,25]], [[36,13],[44,9],[32,19]], [[16,7],[34,7],[20,12]]
 ];
-const LANE_X = [25, 5, 45, 19, 31];
-const START = [[25,0],[11,3],[39,3],[18,9],[32,9]];
-const isBig = p => p.i >= TEAM_N - 2;
+const LANE_X = TEAM_N === 3 ? [25, 7, 43] : [25, 5, 45, 19, 31];
+const START = TEAM_N === 3 ? [[25,0],[12,4],[38,4]] : [[25,0],[11,3],[39,3],[18,9],[32,9]];
+const isBig = p => TEAM_N === 3 ? p.i === 2 : p.i >= TEAM_N - 2;
 const QNAMES = ['1ST QTR','2ND QTR','3RD QTR','4TH QTR'];
 const AI_MOVES = ['hesi','cross','btl','inout','btb','spin'];
 const spotPos = (t,s) => t === 0 ? {x:s[0], y:s[1]} : {x:50-s[0], y:94-s[1]};
@@ -1629,7 +1830,8 @@ function offTarget(p) {
     const md = players[1 - p.t][b.owner.i], sx = b.owner.x < 25 ? 1 : -1;
     s = {x:md.x + sx * 1.8, y:md.y + dir * -.6}; sp = 1;
   } else if (b.state === 'shot' && b.shooter && b.shooter.t === p.t) {
-    if (isBig(p)) s = {x:h.x + (p.i === TEAM_N - 2 ? -5 : 5), y:h.y + dir * 6}; else s = spotPos(p.t, [25 + (p.i - 1) * 8, 34]);
+    if (TEAM_N === 3) { if (p.i === 2) s = {x:h.x - 4, y:h.y + dir * 5}; else if (p.i === 1) s = {x:h.x + 6, y:h.y + dir * 8}; else s = spotPos(p.t, [25, 34]); }
+    else if (isBig(p)) s = {x:h.x + (p.i === TEAM_N - 2 ? -5 : 5), y:h.y + dir * 6}; else s = spotPos(p.t, [25 + (p.i - 1) * 8, 34]);
   }
   // keep spacing from teammates
   let px = 0, py = 0;
@@ -1714,11 +1916,11 @@ function startFT(p, n) {
   const b = G.ball; b.state = 'held'; b.owner = p; G.banner = null;
   feed(`${nm(p)} heads to the line for ${n}`, p.t);
 }
-function ftShoot() {
-  const ft = G.ft, p = ft.p, b = G.ball, h = HOOPS[p.t];
+function ftShoot(make) {
+  const ft = G.ft, p = ft.p, b = G.ball, h = HOOPS[p.t]; G.ftWait = 0; p.gather = false;
   const s = ftSpot(p); p.x = s.x; p.y = s.y; p.vx = p.vy = 0; p.yaw = Math.atan2(h.x - p.x, h.y - p.y);
   b.state = 'ftshot'; b.owner = null; b.sx = p.x; b.sy = p.y; b.u = 0; b.dur = .85; b.peak = 5; b.shooter = p;
-  b.make = Math.random() < clamp(.52 + p.d.st.sht * .0045, .4, .95); p.shootT = .6;
+  b.make = make != null ? make : Math.random() < clamp(.52 + p.d.st.sht * .0045, .4, .95); p.shootT = .6;
 }
 
 // ---------- update ----------
@@ -1742,17 +1944,24 @@ function update(dt) {
   if (G.phase === 'dead') {
     G.timer -= dt;
     const ib = G.inbounder;
-    if (G.timer <= 0 && (!ib || dist(ib, G.inbPt) < 2 || G.timer < -1.5)) {
+    if (ib && G.timer < .45 && !G.clockOut) { b.x = ib.x; b.y = ib.y; if (!G.inbHold) { G.inbHold = true; popup(ib.x, ib.y, 'INBOUND', '#ffffff', 1); } }
+    if (G.timer <= -.45 && (!ib || dist(ib, G.inbPt) < 2 || G.timer < -1.9)) {
+      G.inbHold = false;
       if (G.clockOut) { endQuarter(); return; }
       if (ib) {
         ib.x = clamp(ib.x, -2, 52); give(ib); G.phase = 'live';
         const mates = players[ib.t].filter(m => m !== ib).sort((a, c) => dist(a, ib) - dist(c, ib));
-        doPass(ib, mates.find(m => m.i === 0) || mates[0]);
+        doPass(ib, mates.find(m => m.i === 0) || mates[0], {steal:.3});
       } else G.phase = 'live';
     }
   }
   if (G.phase === 'ftset') { G.timer -= dt; if (G.timer <= 0) { G.phase = 'ft'; G.timer = .6; } }
-  else if (G.phase === 'ft' && b.state === 'held') { G.timer -= dt; if (G.timer <= 0) ftShoot(); }
+  else if (G.phase === 'ft' && b.state === 'held') {
+    if (userFT()) {                                   // your free throw: wait for SHOOT (auto after 9 s)
+      if (G.meter) { G.meter.v += dt * G.meter.speed; G.meter.p.gv = G.meter.v; if (G.meter.v >= 1.12) releaseMeter(); }
+      else { G.ftWait = (G.ftWait || 0) + dt; if (G.ftWait > 9) ftShoot(); }
+    } else { G.timer -= dt; if (G.timer <= 0) ftShoot(); }
+  }
   if (G.oppShot) stepOppShot(dt);
   if (G.steer) stepSteer(dt);
   if (G.stealCD > 0) G.stealCD -= dt;
@@ -1800,7 +2009,7 @@ function update(dt) {
         p.cutT = rand(4, 8);
         const h = HOOPS[p.t];
         if (dist(b.owner, h) < 30) {
-          if (isBig(p) && b.owner.mode === 'set' && Math.random() < .35) { p.screen = 1.8; setTimeout(() => { if (p.screen <= 0 && b.owner && b.owner.t === p.t) p.cut = 1.4; }, 1900); }
+          if (isBig(p) && b.owner.mode === 'set' && Math.random() < (TEAM_N === 3 ? .5 : .35)) { p.screen = 1.8; setTimeout(() => { if (p.screen <= 0 && b.owner && b.owner.t === p.t) p.cut = 1.4; }, 1900); }
           else if (Math.random() < .55) p.cut = 1.6;
         }
       }
@@ -1859,7 +2068,7 @@ function update(dt) {
     }
   }
   for (const p of all) {
-    if (G.phase === 'dead' && p === G.inbounder) { p.x = clamp(p.x, .8, 49.2); p.y = clamp(p.y, -2.5, 96.5); }
+    if (p === G.inbounder && (G.phase === 'dead' || (G.ball.state === 'pass' && G.ball.passer === p))) { p.x = clamp(p.x, .8, 49.2); p.y = clamp(p.y, -2.5, 96.5); }
     else { p.x = clamp(p.x, .8, 49.2); p.y = clamp(p.y, .8, 93.2); }
   }
   moveRef(dt);
@@ -2051,17 +2260,18 @@ function startMeter(card, lv) {
 function releaseMeter() {
   const m = G.meter; if (!m) return;
   G.meter = null; const p = m.p; p.gather = false;
-  if (G.ball.owner !== p || G.ball.state !== 'held' || G.phase !== 'live') { meterEl.hidden = true; return; }
+  if (m.ft ? G.phase !== 'ft' || G.ball.owner !== p : (G.ball.owner !== p || G.ball.state !== 'held' || G.phase !== 'live')) { meterEl.hidden = true; return; }
   const v = m.v, g0 = m.g[0], g1 = m.g[1];
   let res, make, col, cls;
   if (v >= g0 && v <= g1) { res = 'GREEN!'; make = true; col = '#5fd38a'; cls = 'res-good'; buzz(25); }
   else {
     const early = v < g0, e = early ? g0 - v : v - g1;
-    if (e < .06) { res = early ? 'SLIGHTLY EARLY' : 'SLIGHTLY LATE'; make = Math.random() < .3 + (onFire(p) ? .15 : 0); col = '#ffc94d'; cls = 'res-ok'; }
-    else { res = early ? 'VERY EARLY' : 'VERY LATE'; make = Math.random() < .05; col = '#e2453a'; cls = 'res-bad'; }
+    if (e < .06) { res = early ? 'SLIGHTLY EARLY' : 'SLIGHTLY LATE'; make = Math.random() < (m.ft ? .6 : .3) + (onFire(p) ? .15 : 0); col = '#ffc94d'; cls = 'res-ok'; }
+    else { res = early ? 'VERY EARLY' : 'VERY LATE'; make = Math.random() < (m.ft ? .2 : .05); col = '#e2453a'; cls = 'res-bad'; }
   }
   meterV = v; meterEl.className = 'smeter ' + cls; meterHide = .8;
   popup(p.x, p.y, res, col, res === 'GREEN!' ? 1.7 : 1.2);
+  if (m.ft) { ftShoot(make); return; }
   doShoot(p, {make, fade:m.fade, timing:res === 'GREEN!' ? 'EXCELLENT' : res, timingGood:res === 'GREEN!'});
 }
 function playCard(k, phase) {
@@ -2350,7 +2560,19 @@ function halfGo() { if (G.phase !== 'half') return; G.phase = 'idle'; startQuart
 
 // ---- the two buttons: SHOOT + DRIBBLE with the ball, CONTEST + STEAL on defense
 function rimShot(h) { const d = dist(h, HOOPS[0]); return d < 9 ? (d < 6.5 ? ((isBig(h) || h.d.st.spd >= 74) ? 'dunk' : 'layup') : 'floater') : null; }
+const userFT = () => !!(G.ft && G.ft.p.t === 0 && G.game && !G.auto && G.phase === 'ft');
+function startFTMeter() {
+  if (!userFT() || G.meter || G.ball.state !== 'held') return false;
+  const p = G.ft.p, w = clamp((.09 + (p.d.st.sht - 60) * .002) * diff().win * (onFire(p) ? 1.3 : 1), .06, .24);
+  G.meter = {p, v:0, speed:1 / .9, g:[.8 - w / 2, .8 + w / 2], ft:true};
+  p.gather = true; p.gv = 0;
+  meterEl.hidden = false; meterEl.className = 'smeter'; meterHide = 0; meterV = 0;
+  meterEl.querySelector('.zone').style.bottom = (G.meter.g[0] / 1.12 * 100) + '%';
+  meterEl.querySelector('.zone').style.height = (w / 1.12 * 100) + '%';
+  return true;
+}
 function userShootDown() {
+  if (userFT()) return startFTMeter();
   const h = userHandler();
   if (!h) { if (G.oppShot) return userContest(); return userHandsUp(); }
   if (h.gather || h.finish || G.meter || h.stun > 0 || h.shootT > 0) return false;
@@ -2398,7 +2620,7 @@ const crowd = {fans:[1], on:true};
 let arenaPeople = [], refP = null, refP2 = null;
 const OUT = '#120e18';
 const wx = x => x - 25, wz = y => y - 47;
-function darkInk(f) { return f.numc === '#1d2433' || f.numc === '#2a1240'; }
+function darkInk(f) { return lumOf(f.numc) < .45; }
 let CAM_FLIP = 0;                                       // 1 = camera at the other end (team 1 attacks up the screen)
 const fxw = x => CAM_FLIP ? 50 - x : x, fyw = y => CAM_FLIP ? 94 - y : y;
 const PX = (x, y, h) => [Math.round((fxw(x) - fxw(cam.x)) * cam.k + IW / 2), Math.round((fyw(y) - fyw(cam.y)) * cam.k * FS + IH / 2 - (h || 0) * cam.k * HS)];
@@ -2632,7 +2854,7 @@ function poseOf(a, dt) {
   if (a.signal > 0) { P.arms = [{s:1, f:0, y:-7}, {s:1, f:0, y:-8}]; }
   P.stars = a.stun > 0;
   a.fall = (a.fall || 0) + ((a.stun > 0 ? 1 : 0) - (a.fall || 0)) * Math.min(1, dt * (a.stun > 0 ? 9 : 3.5));
-  P.lying = a.fall > .5;
+  P.lying = a.t == null && a.fall > .5;          // players never hit the floor any more: birds circle their heads instead
   // lying / workout poses (knocked down etc.)
   const q = CLK + (a.ph || 0) * .1;
   if (a.pose === 'squat') { const c = (Math.sin(CLK * 2.3 + a.ph * .1) + 1) / 2; P.crouch = Math.round(c * 4); P.legs = {mode:'wide'}; P.arms = [{s:1, f:0, y:-1}, {s:1, f:0, y:-1}]; P.dir = 'down'; }
@@ -2665,15 +2887,23 @@ function drawPerson(g, P, a, pose, sx, sy) {
 
 // ---------- ball ----------
 function drawBall(g, sx, sy, big) {
-  const r = big ? 4 : 3, rr = r * r + r * .8, sp = Math.round(Math.sin(CLK * 9) * r * .55);
+  const B = curBall(), pat = B.pat, r = big ? 4 : 3, rr = r * r + r * .8, sp = Math.round(Math.sin(CLK * 9) * r * .55), spin = CLK * 6;
+  const RB = ['#ff4d4d', '#ffa94d', '#ffe14d', '#4dff7a', '#4dc3ff', '#a64dff'], BB = ['#ffffff', '#e2453a', '#ffffff', '#ffd23f', '#ffffff', '#2a8fd6'];
   pell(g, sx, sy, r + 1, r + 1, OUT);
   for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
     if (dx * dx + dy * dy > rr) continue;
-    let c = dx + dy > r * .55 ? '#b9531d' : dx + dy < -r * .9 ? '#f08a3e' : '#e2702c';
-    if (dy === 0 || dx === sp || (Math.abs(dx - sp) === r - 1 && Math.abs(dy) >= r - 1)) c = '#3a1606';
+    const shade = dx + dy > r * .55 ? -1 : dx + dy < -r * .9 ? 1 : 0;
+    let c = shade < 0 ? B.dark : shade > 0 ? B.light : B.base, seam = true;
+    if (pat === 'aba') { c = ['#e2453a', '#ffffff', '#2d4fd6'][(((dx - sp + 30) / 2) | 0) % 3]; if (shade < 0) c = shadeHex(c, .78); seam = false; }
+    else if (pat === 'rainbow') { c = RB[(dx - sp + 36) % 6]; if (shade < 0) c = shadeHex(c, .8); seam = false; }
+    else if (pat === 'beach') { const a = Math.atan2(dy, dx) + spin; c = BB[(((a / (Math.PI / 3)) % 6 + 6) % 6) | 0]; if (shade < 0) c = shadeHex(c, .85); seam = false; }
+    else if (pat === 'stripes') { if (((dx - sp + 30) % 3) === 0) c = B.dark; }
+    else if (pat === 'stars') { if (((dx * 7 + dy * 13 + sp * 5 + 77) % 11) === 0) c = '#ffffff'; }
+    if (B.worn && ((dx * 3 + dy * 5 + 40) % 7) === 0) c = B.dark;
+    if (seam && (dy === 0 || dx === sp || (Math.abs(dx - sp) === r - 1 && Math.abs(dy) >= r - 1))) c = B.seam;
     g.fillStyle = c; g.fillRect(sx + dx, sy + dy, 1, 1);
   }
-  g.fillStyle = '#ffd2a8'; g.fillRect(sx - r + 1, sy - r + 1, 1, 1); g.fillStyle = '#ffb27a'; g.fillRect(sx - r + 2, sy - r + 1, 1, 1); g.fillRect(sx - r + 1, sy - r + 2, 1, 1);
+  g.fillStyle = B.shine; g.fillRect(sx - r + 1, sy - r + 1, 1, 1); g.fillStyle = mixHex(B.light, B.shine, .5); g.fillRect(sx - r + 2, sy - r + 1, 1, 1); g.fillRect(sx - r + 1, sy - r + 2, 1, 1);
 }
 function drawBallMini(g, sx, sy, big) {
   const r = big ? 3 : 2;
@@ -2707,6 +2937,7 @@ function paintArena(A, B, cheer, flip) {
   const c = worldCanvas(X0, Y0, X1, Y1), cg = c.getContext('2d');
   let g = cg;
   const X = x => Math.round((x - X0) * k), Y = y => Math.round((y - Y0) * k * FS);
+  const C = curCourt(), ENV = C.env, indoor = ENV === 'arena' || ENV === 'palace';
   g.fillStyle = '#0d0f22'; g.fillRect(0, 0, c.width, c.height);
   // crowd rows (procedural), optionally replaced by Higgsfield art on hosts that can load it
   let seed = 7 + (cheer ? 0 : 0); const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
@@ -2723,10 +2954,13 @@ function paintArena(A, B, cheer, flip) {
       if (up) { g.fillStyle = sk; g.fillRect(xx - 1, y - 9, 1, 4); g.fillRect(xx + 4, y - 9, 1, 4); }
     }
   };
+  const rowA = ENV === 'palace' ? '#5a1622' : '#1a1e3c', rowB = ENV === 'palace' ? '#4a101b' : '#161a33';
+  if (!indoor) paintEnv(g, C, c.width, c.height, X, Y, cheer, rnd, fanRow);
+  else {
   // far (top) stands
-  for (let y = Y(-AP) - 4, row = 0; y > 6; y -= 9, row++) { g.fillStyle = row % 2 ? '#1a1e3c' : '#161a33'; g.fillRect(0, y - 9, c.width, 9); fanRow(X(-AP - 4), X(50 + AP + 4), y, true); }
+  for (let y = Y(-AP) - 4, row = 0; y > 6; y -= 9, row++) { g.fillStyle = row % 2 ? rowA : rowB; g.fillRect(0, y - 9, c.width, 9); fanRow(X(-AP - 4), X(50 + AP + 4), y, true); }
   // near (bottom) stands
-  for (let y = Y(94 + AP) + 12, row = 0; y < c.height + 6; y += 9, row++) { g.fillStyle = row % 2 ? '#1a1e3c' : '#161a33'; g.fillRect(0, y - 9, c.width, 9); fanRow(X(-AP - 4), X(50 + AP + 4), y, false); }
+  for (let y = Y(94 + AP) + 12, row = 0; y < c.height + 6; y += 9, row++) { g.fillStyle = row % 2 ? rowA : rowB; g.fillRect(0, y - 9, c.width, 9); fanRow(X(-AP - 4), X(50 + AP + 4), y, false); }
   // side stands
   for (const sd of [0, 1]) for (let col = 0; col < 3; col++) {
     const xa = sd ? X(50 + AP + 2) + col * 7 : X(-AP - 2) - (col + 1) * 7;
@@ -2738,17 +2972,23 @@ function paintArena(A, B, cheer, flip) {
       g.fillStyle = hr; g.fillRect(xa, y - 6 - (up ? 1 : 0), 4, 1);
     }
   }
+  if (ENV === 'palace') { g.fillStyle = '#e0b04a'; g.fillRect(0, Y(-AP) - 3, c.width, 2); g.fillRect(0, Y(94 + AP) + 2, c.width, 2); g.fillRect(X(-AP) - 3, 0, 2, c.height); g.fillRect(X(50 + AP) + 1, 0, 2, c.height); }
+  }
   const art = (im, x, y, w, h) => drawCover(g, im, x, y, w, h, true);
-  if (ART.stands) { const w = X(50 + AP + 4) - X(-AP - 4), h = Y(-AP) - 2; art(ART.stands, X(-AP - 4), 0, w, h); g.fillStyle = 'rgba(13,15,34,.25)'; g.fillRect(X(-AP - 4), 0, w, h); }
-  if (ART.side) for (const sd of [0, 1]) { const x = sd ? X(50 + AP + 1) : 0, w = sd ? c.width - x : X(-AP - 1); art(ART.side, x, Y(-AP), w, Y(94 + AP) - Y(-AP)); }
+  if (ENV === 'arena' && ART.stands) { const w = X(50 + AP + 4) - X(-AP - 4), h = Y(-AP) - 2; art(ART.stands, X(-AP - 4), 0, w, h); g.fillStyle = 'rgba(13,15,34,.25)'; g.fillRect(X(-AP - 4), 0, w, h); }
+  if (ENV === 'arena' && ART.side) for (const sd of [0, 1]) { const x = sd ? X(50 + AP + 1) : 0, w = sd ? c.width - x : X(-AP - 1); art(ART.side, x, Y(-AP), w, Y(94 + AP) - Y(-AP)); }
   // floor layer (apron, wood, lines, benches): flat, so the far-end view is this layer turned 180 degrees
   const fl = document.createElement('canvas'); fl.width = c.width; fl.height = c.height; g = fl.getContext('2d');
   // apron
-  g.fillStyle = A.d; g.fillRect(X(-AP), Y(-AP), X(50 + AP) - X(-AP), Y(94 + AP) - Y(-AP));
+  g.fillStyle = C.apron || A.d; g.fillRect(X(-AP), Y(-AP), X(50 + AP) - X(-AP), Y(94 + AP) - Y(-AP));
+  paintApron(g, C, X, Y);
   g.fillStyle = OUT; g.fillRect(X(-AP), Y(-AP) - 2, X(50 + AP) - X(-AP), 2); g.fillRect(X(-AP), Y(94 + AP), X(50 + AP) - X(-AP), 3);
   // wood: planks with per-board tones, end seams, grain, gloss and light pools
   const cx0 = X(0), cy0 = Y(0), cw = X(50) - X(0), ch = Y(94) - Y(0);
-  const tones = ['#d9a066', '#cf9558', '#e2ab72', '#c88d50', '#d69d62', '#dcaa70'];
+  const woody = C.floor === 'wood' || C.floor === 'maple' || C.floor === 'gold';
+  const tones = C.floor === 'maple' ? ['#ecc690', '#e4ba80', '#f2d09e', '#dfb478', '#e8c088', '#f0cc98'] : C.floor === 'gold' ? ['#e0b04a', '#d4a23e', '#ecc25e', '#c9963a', '#e6b852', '#f0c868'] : ['#d9a066', '#cf9558', '#e2ab72', '#c88d50', '#d69d62', '#dcaa70'];
+  if (!woody) paintFloor(g, C, cx0, cy0, cw, ch, k);
+  else {
   let ps = 11; const prnd = () => (ps = (ps * 16807) % 2147483647) / 2147483647;
   for (let x = 0; x < cw; x += 4) {
     let y = -((prnd() * 30) | 0);
@@ -2771,16 +3011,20 @@ function paintArena(A, B, cheer, flip) {
   }
   for (let i = 0; i < 10; i++) { g.fillStyle = `rgba(40,18,4,${(.26 - i * .025).toFixed(3)})`; g.fillRect(cx0 + i, cy0, 1, ch); g.fillRect(cx0 + cw - 1 - i, cy0, 1, ch); }
   g.restore();
+  }
   // paint, circles, lines
-  const ink = '#fbf7ee';
+  const ink = C.ink || '#fbf7ee', glowy = C.floor === 'neon' || C.floor === 'galaxy' || C.floor === 'glass';
   const hl = (x0, x1, y) => { g.fillStyle = ink; g.fillRect(X(x0), Y(y), X(x1) - X(x0) + 1, 1); };
   const vl = (x, y0, y1) => { g.fillStyle = ink; g.fillRect(X(x), Y(y0), 1, Y(y1) - Y(y0) + 1); };
   const arcPts = (cx, cy, r, a0, a1, dash) => { g.fillStyle = ink; const n = Math.round(r * k * 4 * Math.abs(a1 - a0)) + 8; for (let i = 0; i <= n; i++) { if (dash && (i % 6) > 2) continue; const a = a0 + (a1 - a0) * i / n; g.fillRect(X(cx + Math.cos(a) * r), Y(cy + Math.sin(a) * r), 1, 1); } };
   for (const flip of [0, 1]) {
     const fy = y => flip ? 94 - y : y, F = flip ? A : B;
     const top = Math.min(fy(0), fy(19)), bot = Math.max(fy(0), fy(19));
-    g.fillStyle = F.c; g.fillRect(X(17), Y(top), X(33) - X(17), Y(bot) - Y(top));
-    g.fillStyle = shadeHex(F.c, .82); g.fillRect(X(17), Y(top), X(33) - X(17), 2); g.fillRect(X(17), Y(top), 2, Y(bot) - Y(top)); g.fillRect(X(33) - 2, Y(top), 2, Y(bot) - Y(top));
+    const PC = C.paint || F.c;
+    if (glowy) g.globalAlpha = .55;
+    g.fillStyle = PC; g.fillRect(X(17), Y(top), X(33) - X(17), Y(bot) - Y(top));
+    g.globalAlpha = 1;
+    g.fillStyle = shadeHex(PC, .82); g.fillRect(X(17), Y(top), X(33) - X(17), 2); g.fillRect(X(17), Y(top), 2, Y(bot) - Y(top)); g.fillRect(X(33) - 2, Y(top), 2, Y(bot) - Y(top));
     g.fillStyle = 'rgba(255,255,255,.10)'; for (let yy = Y(top) + 3; yy < Y(bot) - 1; yy += 6) g.fillRect(X(17) + 3, yy, X(33) - X(17) - 6, 1);
     vl(17, top, bot); vl(33, top, bot); hl(17, 33, fy(19));
     const s = flip ? -1 : 1;
@@ -2795,14 +3039,18 @@ function paintArena(A, B, cheer, flip) {
   }
   // centre circle + crest
   const ccx = X(25), ccy = Y(47);
-  pell(g, ccx, ccy, Math.round(6 * k), Math.round(6 * k * FS), A.c);
+  if (glowy) g.globalAlpha = .6;
+  pell(g, ccx, ccy, Math.round(6 * k), Math.round(6 * k * FS), C.paint || A.c);
+  g.globalAlpha = 1;
   pring(g, ccx, ccy, Math.round(6 * k), Math.round(6 * k * FS), ink);
-  pring(g, ccx, ccy, Math.round(5.2 * k), Math.round(5.2 * k * FS), A.trim);
-  ptext(g, A.n[0], ccx, ccy, 14, darkInk(A) ? A.numc : '#fffaf2', 'center');
+  pring(g, ccx, ccy, Math.round(5.2 * k), Math.round(5.2 * k * FS), C.paint ? shadeHex(C.paint, .7) : A.trim);
+  if (indoor || ENV === 'gym') ptext(g, A.n[0], ccx, ccy, 14, darkInk(A) ? A.numc : '#fffaf2', 'center');
+  else { pell(g, ccx, ccy, 4, 4, OUT); drawBall(g, ccx, ccy, true); }
   // boundary + half court
   g.fillStyle = ink; g.fillRect(X(0) - 1, Y(0) - 1, X(50) - X(0) + 3, 2); g.fillRect(X(0) - 1, Y(94), X(50) - X(0) + 3, 2); g.fillRect(X(0) - 1, Y(0), 2, Y(94) - Y(0)); g.fillRect(X(50), Y(0), 2, Y(94) - Y(0) + 1);
   hl(0, 50, 47);
   // scorer's table and team benches on the left apron
+  if (indoor || ENV === 'gym') {
   g.fillStyle = OUT; g.fillRect(X(-5.4) - 1, Y(39) - 6, X(-2) - X(-5.4) + 2, Y(55) - Y(39) + 8);
   g.fillStyle = '#14172e'; g.fillRect(X(-5.4), Y(39) - 5, X(-2) - X(-5.4), Y(55) - Y(39) + 6);
   g.fillStyle = A.c; g.fillRect(X(-2) - 1, Y(39) - 5, 1, Y(55) - Y(39) + 6);
@@ -2810,17 +3058,20 @@ function paintArena(A, B, cheer, flip) {
     const y = Y(47 + (t ? -1 : 1) * (12 + i * 2.2));
     g.fillStyle = OUT; g.fillRect(X(-4.6) - 1, y - 4, 7, 6); g.fillStyle = t ? B.c : A.c; g.fillRect(X(-4.6), y - 3, 5, 4);
   }
+  }
   if (flip) { cg.save(); cg.translate(c.width, c.height); cg.rotate(Math.PI); cg.drawImage(fl, 0, 0); cg.restore(); }
   else cg.drawImage(fl, 0, 0);
   // apron lettering, always upright
   const Xs = x => X(flip ? 50 - x : x), Ys = y => Y(flip ? 94 - y : y);
   const wl = Math.min(Xs(10), Xs(40)), wr = Math.max(Xs(10), Xs(40));
-  ptext(cg, 'DREAM', wl, Ys(-3), 8, '#ffffff', 'center'); ptext(cg, 'BALL', wr, Ys(-3), 8, '#ffffff', 'center');
-  ptext(cg, A.n.toUpperCase(), wl, Ys(97.2), 8, A.trim, 'center'); ptext(cg, A.n.toUpperCase(), wr, Ys(97.2), 8, A.trim, 'center');
+  if (indoor || ENV === 'gym') {
+    ptext(cg, 'DREAM', wl, Ys(-3), 8, ENV === 'gym' ? '#2a2a2a' : '#ffffff', 'center'); ptext(cg, 'BALL', wr, Ys(-3), 8, ENV === 'gym' ? '#2a2a2a' : '#ffffff', 'center');
+    ptext(cg, A.n.toUpperCase(), wl, Ys(97.2), 8, A.trim, 'center'); ptext(cg, A.n.toUpperCase(), wr, Ys(97.2), 8, A.trim, 'center');
+  }
   return c;
 }
 const arenaK = () => Math.max(2.4, IW / 46);   // zoomed so the court fits the hi-bit players
-const arenaKeyNow = () => G.T[0].fr.n + G.T[1].fr.n + arenaK().toFixed(3) + (ART.stands ? 1 : 0) + (ART.side ? 1 : 0) + SET.q;
+const arenaKeyNow = () => G.T[0].fr.n + G.T[0].fr.c + G.T[1].fr.c + curCourt().id + arenaK().toFixed(3) + (ART.stands ? 1 : 0) + (ART.side ? 1 : 0) + SET.q;
 let arenaCache = {};
 function repaintArena() {
   if (!renderer || !G.T[0]) return;
@@ -2891,7 +3142,7 @@ function drawRim(g, t) {
     const u = y / nh, w = Math.round(rx - rx * .42 * u), sh = Math.round(Math.sin(CLK * 3 + y * .7) * sw * 2);
     for (let x = -w; x <= w; x++) {
       if (((x + y + 100) % 3) !== 0 && y !== nh) continue;
-      g.fillStyle = x > w * .4 ? 'rgba(190,200,220,.85)' : 'rgba(255,255,255,.95)';
+      g.fillStyle = CHAIN() ? (x > w * .4 ? '#7d8596' : '#c3cad6') : x > w * .4 ? 'rgba(190,200,220,.85)' : 'rgba(255,255,255,.95)';
       g.fillRect(c[0] + x + sh, c[1] + y, 1, 1);
     }
   }
@@ -2899,6 +3150,7 @@ function drawRim(g, t) {
   pring(g, c[0], c[1], rx + 1, ry + 1, OUT); pring(g, c[0], c[1] + 1, rx, ry, '#b8461a'); pring(g, c[0], c[1], rx, ry, '#ff6a1f');
   R(g, c[0] - rx + 1, c[1] - 1, 2, 1, '#ffb070'); R(g, c[0] - 1, c[1] - ry, 2, 1, '#ffb070');
 }
+const CHAIN = () => { const e = curCourt().env; return e === 'park' || e === 'street'; };
 function animateNets(dt) { for (const n of arenaG.userData.nets) if (n.userData.sw > 0) n.userData.sw = Math.max(0, n.userData.sw - dt * 1.6); }
 
 // ---------- arena frame ----------
@@ -2946,7 +3198,7 @@ function renderArena(dt) {
   if (b.state === 'held') h = (b.owner && b.owner.gather ? 6.9 + (b.owner.gv || 0) * 1.1 : .55 + b.z * 1.05) * 1.1;
   else if (b.state === 'pass') h = Math.max(3.4, b.z + 1);
   else if (b.state === 'shot' || b.state === 'rim') h = Math.max(.55, b.z);
-  else if (b.state === 'dead') h = G.phase === 'dead' ? Math.max(.55, 9.6 - (1 - G.timer) * 22) : .55;
+  else if (b.state === 'dead') h = G.phase === 'dead' ? (G.inbHold ? 3.4 : Math.max(.55, 9.6 - (1 - G.timer) * 22)) : .55;
   const owner = b.state === 'held' ? b.owner : null;
   // shadows + handler ring first (on the floor)
   for (const it of items) if (it.p) { const s = PX(it.p.x, it.p.y, 0); shadowAt(g, s[0], s[1], 7); }
@@ -2976,14 +3228,14 @@ const HOME_POSE = {
 const HOME_SEQ = [['spin', 'hip', 'dribble', 'raise'], ['cross', 'point', 'flex'], ['hip', 'flex', 'cross', 'point']];
 function homeSetup() {
   if (!S) return;
-  const f = FR[S.fr];
+  const f = myKit();
   home.actors = S.lineup.slice(0, 3).map((id, k) => {
     const d = userDesc(id), buf = document.createElement('canvas'); buf.width = 60; buf.height = 64;
     return {id, d, P:buildPerson(d, f), buf, seq:HOME_SEQ[k], pi:0, pt:k * 1.3, hop:0};
   });
   home.bgKey = ''; home.sig = homeSig();
 }
-function homeSig() { return S ? S.fr + '|' + S.lineup.slice(0, 3).map(id => id + ':' + ovrOf(eff(id)) + ':' + (S.owned[id] ? S.owned[id].shoe : '')).join(',') : ''; }
+function homeSig() { return S ? styleOf().jersey + '|' + S.lineup.slice(0, 3).map(id => id + ':' + ovrOf(eff(id)) + ':' + (S.owned[id] ? S.owned[id].shoe : '')).join(',') : ''; }
 function homeSync() {
   if (!S) return;
   const sig = homeSig(); if (sig === home.sig) return;
@@ -3041,9 +3293,10 @@ function homeLayout() {
   ];
 }
 function spinBall(g, x, y, t) {
-  pell(g, x, y, 3, 3, OUT); pell(g, x, y, 2, 2, '#e2702c');
+  const B = curBall();
+  pell(g, x, y, 3, 3, OUT); pell(g, x, y, 2, 2, B.base);
   const k = Math.floor(t * 10) % 4;
-  g.fillStyle = '#3a1606'; g.fillRect(x - 2, y, 5, 1); g.fillRect(x - 1 + (k > 1 ? 4 - k : k), y - 2, 1, 5);
+  g.fillStyle = B.seam; g.fillRect(x - 2, y, 5, 1); g.fillRect(x - 1 + (k > 1 ? 4 - k : k), y - 2, 1, 5);
   g.fillStyle = '#ffb27a'; g.fillRect(x - 1, y - 1, 1, 1);
 }
 function drawHomeActor(a, sc) {
@@ -3092,7 +3345,7 @@ function renderHome(dt) {
     g.fillStyle = '#e8f1ff'; g.fillRect(x, y, 1, 1); if (ph < .12) { g.fillRect(x - 1, y, 3, 1); g.fillRect(x, y - 1, 1, 3); }
   }
   void by;
-  const L = homeLayout(), f = FR[S.fr];
+  const L = homeLayout(), f = myKit();
   home.hits = [];
   const order = [1, 2, 0];
   for (const k of order) {
@@ -3403,7 +3656,14 @@ function drawDoll(g, x0, y0, look, f, num, P) {
     else { d(-1, yH + 5, 1, 2, hc); d(0, yH + 7, 3, 1, hc); d(2, yH + 5, 2, 1, hc); }
   }
   if (look.band || st === 'bald') d(side ? -3 : -4, yH + 1, side ? 7 : 8, 1, C.trim);
-  if (P.stars) for (let k = 0; k < 3; k++) { const a = CLK * 6 + k * 2.1; fine.push([Math.round(Math.cos(a) * 7), yH - 4 + Math.round(Math.sin(a) * 2), 1, 1, '#ffc94d']); }
+  if (P.stars) for (let k = 0; k < 3; k++) {          // dazed: little birds flap in a circle around his head
+    const a = CLK * 3.6 + k * 2.1, bx = Math.round(Math.cos(a) * 10), by = yH - 7 + Math.round(Math.sin(a) * 3), up = Math.floor(CLK * 9 + k * 3) % 2 === 0;
+    const col = ['#5fc6ff', '#ffd94d', '#ff8ad0'][k], dk = shadeHex(col, .55), f = Math.sin(a) > 0 ? 1 : -1;
+    fine.push([bx - 2, by - 1, 5, 4, 'rgba(18,14,24,.75)'],                                   // soft outline so they read on any floor
+      [bx - 1, by, 3, 2, col], [bx + f * 2, by, 1, 1, col], [bx + f * 2, by - 1 + 0, 1, 1, '#120e18'],
+      [bx + f * 3, by + 1, 1, 1, '#ff9a3a'],
+      up ? [bx - 2, by - 1, 2, 1, dk] : [bx - 2, by + 2, 2, 1, dk], up ? [bx + 1, by - 1, 2, 1, dk] : [bx + 1, by + 2, 2, 1, dk]);
+  }
   // ---- near arms
   if (side) drawArm(fl > 0 ? 1 : 0, false); else { drawArm(0, false); drawArm(1, false); }
   // ---- render: outline pass, colour pass, fine details, number
@@ -3588,6 +3848,203 @@ function drawPlayArt(g, T, D, W, H) {
   g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(0, H - 1, W, 1);
 }
 
+// ================= themed courts: surroundings, aprons and floors =================
+// Everything is painted once into the cached world canvas, so fancy scenery costs nothing per frame.
+function prng(seed) { let s = seed % 2147483647 || 1; return () => (s = (s * 16807) % 2147483647) / 2147483647; }
+function dither(g, x0, y0, w, h, cA, cB, step, rnd) { g.fillStyle = cA; g.fillRect(x0, y0, w, h); g.fillStyle = cB; for (let y = y0; y < y0 + h; y += step) for (let x = x0 + ((y / step) % 2 ? step >> 1 : 0); x < x0 + w; x += step) if (rnd() < .55) g.fillRect(x, y, 1, 1); }
+function blob(g, cx, cy, rx, ry, c) { pell(g, Math.round(cx), Math.round(cy), Math.max(1, Math.round(rx)), Math.max(1, Math.round(ry)), c); }
+function tree(g, x, y, s, leaf, leafL, trunk) {
+  g.fillStyle = OUT; g.fillRect(x - 2, y - s * .6, 5, s * .8); g.fillStyle = trunk || '#6b4423'; g.fillRect(x - 1, y - s * .6, 3, s * .8);
+  blob(g, x, y - s, s * .75 + 1, s * .6 + 1, OUT); blob(g, x, y - s, s * .75, s * .6, leaf); blob(g, x - s * .25, y - s * 1.15, s * .35, s * .25, leafL);
+}
+function pine(g, x, y, s, snow) {
+  g.fillStyle = '#4a3020'; g.fillRect(x - 1, y - 3, 3, 4);
+  for (let i = 0; i < 3; i++) { const w = s * (1 - i * .25), yy = y - 3 - i * s * .45; for (let r = 0; r < s * .6; r++) { const ww = Math.round(w * (r / (s * .6))); g.fillStyle = r === 0 ? OUT : '#1f5a35'; g.fillRect(x - ww, yy - s * .6 + r, ww * 2 + 1, 1); if (snow && r < 2) { g.fillStyle = '#ffffff'; g.fillRect(x - ww, yy - s * .6 + r, ww * 2 + 1, 1); } } }
+}
+function palm(g, x, y, s) {
+  g.fillStyle = '#8a5a32'; for (let i = 0; i < s; i++) g.fillRect(x + Math.round(Math.sin(i / s * 1.4) * 3), y - i, 2, 1);
+  const tx = x + Math.round(Math.sin(1.4) * 3), ty = y - s;
+  for (const [dx, dy] of [[-7, 2], [7, 2], [-5, -3], [5, -3], [0, -5]]) pline(g, tx, ty, tx + dx, ty + dy + 2, '#2f8a3a', 2);
+  g.fillStyle = '#6b4423'; g.fillRect(tx - 1, ty, 3, 2);
+}
+function fence(g, x0, y0, x1, y1) {        // chain-link: diamond mesh with posts
+  g.fillStyle = 'rgba(200,208,220,.55)';
+  for (let y = y0; y < y1; y += 1) for (let x = x0; x < x1; x += 4) if (((x - x0) + (y - y0)) % 4 === 0 || ((x - x0) - (y - y0) + 400) % 4 === 0) g.fillRect(x + ((y - y0) % 4), y, 1, 1);
+  g.fillStyle = '#8a93a3'; for (let x = x0; x < x1; x += 22) g.fillRect(x, y0 - 2, 2, y1 - y0 + 2); g.fillRect(x0, y0 - 2, x1 - x0, 1);
+}
+function building(g, x, y, w, h, wall, lit, rnd) {
+  g.fillStyle = OUT; g.fillRect(x - 1, y - 1, w + 2, h + 2); g.fillStyle = wall; g.fillRect(x, y, w, h);
+  for (let yy = y + 3; yy < y + h - 2; yy += 5) for (let xx = x + 2; xx < x + w - 2; xx += 4) { g.fillStyle = rnd() < .45 ? lit[(rnd() * lit.length) | 0] : shadeHex(wall, .7); g.fillRect(xx, yy, 2, 2); }
+}
+
+function paintEnv(g, C, W, H, X, Y, cheer, rnd, fanRow) {
+  const r = prng(C.id.length * 97 + 13), top = Y(-AP), bot = Y(94 + AP), lft = X(-AP), rgt = X(50 + AP);
+  const around = (fn) => { for (let y = 0; y < H; y += 1) { if (y < top - 2 || y > bot + 2) fn(0, y, W); else { fn(0, y, lft - 2); fn(rgt + 2, y, W - rgt - 2); } } };
+  const scatter = (n, fn) => { for (let i = 0; i < n; i++) { const x = r() * W, y = r() * H; if (x > lft - 6 && x < rgt + 6 && y > top - 6 && y < bot + 6) continue; fn(x, y); } };
+  switch (C.env) {
+    case 'gym': {
+      g.fillStyle = '#d9cfb8'; g.fillRect(0, 0, W, H);
+      g.fillStyle = '#cbbfa5'; for (let y = 0; y < H; y += 6) g.fillRect(0, y, W, 1);
+      for (const [y0, dir] of [[top - 6, -1], [bot + 10, 1]]) for (let row = 0; row < 6; row++) { const y = y0 + dir * row * 8; g.fillStyle = row % 2 ? '#b98a55' : '#a8794a'; g.fillRect(lft - 10, y - 4, rgt - lft + 20, 6); g.fillStyle = '#6b4a2a'; g.fillRect(lft - 10, y + 2, rgt - lft + 20, 1); if (r() < .7) fanRow(lft + 10 + ((r() * 30) | 0), lft + 40 + ((r() * 80) | 0), y, dir < 0); }
+      const ban = ['#3a7d44', '#e2453a', '#2d4fd6', '#ffc94d'];
+      for (let i = 0; i < 6; i++) { const x = lft + 6 + i * ((rgt - lft) / 6); g.fillStyle = OUT; g.fillRect(x - 1, 2, 14, 18); g.fillStyle = ban[i % 4]; g.fillRect(x, 3, 12, 16); g.fillStyle = '#ffffff'; g.fillRect(x + 3, 8, 6, 2); }
+      break;
+    }
+    case 'park': case 'sakura': {
+      const sak = C.env === 'sakura';
+      around((x, y, w) => { g.fillStyle = sak ? '#7cc06a' : '#4f9a42'; g.fillRect(x, y, w, 1); });
+      g.fillStyle = sak ? '#6fb35e' : '#468c3a'; for (let i = 0; i < W * H / 40; i++) g.fillRect((r() * W) | 0, (r() * H) | 0, 1, 2);
+      g.fillStyle = '#c9b48a'; g.fillRect(0, bot + 30, W, 8); g.fillRect(0, top - 38, W, 6);                       // footpaths
+      scatter(sak ? 30 : 24, (x, y) => sak ? tree(g, x, y, 9 + r() * 6, '#ff9cc4', '#ffd0e4', '#6b3a2a') : tree(g, x, y, 9 + r() * 7, '#2f7a32', '#4fa64a'));
+      if (sak) { g.fillStyle = '#ffb7d2'; for (let i = 0; i < W * H / 260; i++) g.fillRect((r() * W) | 0, (r() * H) | 0, 1, 1); }
+      fence(g, lft - 4, top - 4, rgt + 4, top - 1); fence(g, lft - 4, bot + 1, rgt + 4, bot + 4);
+      fanRow(lft + 20, lft + 70, bot + 20, false); fanRow(rgt - 80, rgt - 20, top - 12, true);
+      break;
+    }
+    case 'street': {
+      for (let y = 0; y < H; y += 4) for (let x = (y / 4) % 2 ? -4 : 0; x < W; x += 9) { g.fillStyle = ['#8a3a2a', '#7d3426', '#94412f'][((x + y) / 7 | 0) % 3]; g.fillRect(x, y, 8, 3); }
+      g.fillStyle = '#5a2418'; for (let y = 3; y < H; y += 4) g.fillRect(0, y, W, 1);
+      const gc = ['#ff3fd0', '#39ff88', '#36e6ff', '#ffd84d', '#ff6a1f'];
+      scatter(26, (x, y) => { const w = 14 + r() * 26, h = 7 + r() * 8, c = gc[(r() * gc.length) | 0]; blob(g, x, y, w / 2 + 1, h / 2 + 1, OUT); blob(g, x, y, w / 2, h / 2, c); g.fillStyle = '#ffffff'; g.fillRect(x - w / 4, y - 1, w / 2, 2); });
+      g.fillStyle = '#6d7179'; g.fillRect(0, top - 18, W, 14); g.fillRect(0, bot + 4, W, 14);
+      fence(g, lft - 4, top - 4, rgt + 4, top - 1); fence(g, lft - 4, bot + 1, rgt + 4, bot + 4);
+      fanRow(lft + 10, lft + 90, top - 6, true); fanRow(rgt - 90, rgt - 10, bot + 14, false);
+      break;
+    }
+    case 'beach': {
+      dither(g, 0, 0, W, H, '#e8cf96', '#d9bd80', 3, r);
+      for (let y = 0; y < top - 30; y++) { g.fillStyle = y % 7 < 2 ? '#7fd0f0' : y % 7 < 4 ? '#2a9fd6' : '#2290c8'; g.fillRect(0, y, W, 1); }
+      g.fillStyle = '#ffffff'; for (let x = 0; x < W; x += 3) g.fillRect(x, top - 30 + Math.round(Math.sin(x * .2) * 2), 2, 2);
+      for (let y = bot + 50; y < H; y++) { g.fillStyle = y % 7 < 2 ? '#7fd0f0' : y % 7 < 4 ? '#2a9fd6' : '#2290c8'; g.fillRect(0, y, W, 1); }
+      scatter(16, (x, y) => palm(g, x, y, 14 + r() * 6));
+      const um = ['#e2453a', '#ffd84d', '#2a8fd6', '#ff7ab8'];
+      for (let i = 0; i < 8; i++) { const x = lft + 10 + i * ((rgt - lft) / 8), y = bot + 26 + (i % 2) * 8, c = um[i % 4]; g.fillStyle = '#6b4423'; g.fillRect(x, y - 8, 1, 9); blob(g, x, y - 9, 8, 4, OUT); blob(g, x, y - 9, 7, 3, c); g.fillStyle = '#ffffff'; g.fillRect(x - 2, y - 11, 4, 2); }
+      fanRow(lft + 30, rgt - 30, bot + 14, false);
+      break;
+    }
+    case 'water': {
+      for (let y = 0; y < H; y++) { g.fillStyle = (y >> 2) % 2 ? '#1e6fb8' : '#1b66ab'; g.fillRect(0, y, W, 1); }
+      for (let i = 0; i < W * H / 90; i++) { const x = (r() * W) | 0, y = (r() * H) | 0; g.fillStyle = r() < .7 ? '#3f8fd6' : '#9fd3f5'; g.fillRect(x, y, 3 + ((r() * 3) | 0), 1); }
+      for (let i = 0; i < 10; i++) { const x = r() * W, y = r() * H; if (x > lft - 10 && x < rgt + 10 && y > top - 10 && y < bot + 10) continue; blob(g, x, y, 4, 3, OUT); blob(g, x, y, 3, 2, i % 2 ? '#e2453a' : '#ffffff'); }
+      for (let i = 0; i < 6; i++) { const x = r() * W, y = r() * H; if (x > lft - 10 && x < rgt + 10 && y > top - 10 && y < bot + 10) continue; g.fillStyle = OUT; g.fillRect(x - 1, y - 1, 7, 5); g.fillStyle = '#ffd84d'; g.fillRect(x, y, 5, 3); g.fillRect(x + 3, y - 2, 3, 3); g.fillStyle = '#ff8a2a'; g.fillRect(x + 6, y - 1, 2, 1); }   // rubber ducks
+      for (let i = 0; i < 14; i++) { const x = r() * W, y = r() * H; if (x > lft - 10 && x < rgt + 10 && y > top - 10 && y < bot + 10) continue; blob(g, x, y, 6, 3, '#3f9a4a'); g.fillStyle = '#ff9cc4'; g.fillRect(x, y - 1, 2, 2); }       // lily pads
+      // dock posts around the floating court
+      g.fillStyle = '#5a3a1e'; for (let x = lft; x < rgt; x += 16) { g.fillRect(x, top - 4, 3, 4); g.fillRect(x, bot, 3, 4); }
+      break;
+    }
+    case 'snow': {
+      dither(g, 0, 0, W, H, '#f4f8ff', '#dfe9f7', 3, r);
+      scatter(34, (x, y) => pine(g, x, y, 10 + r() * 6, true));
+      for (let i = 0; i < 4; i++) { const x = lft + 20 + i * 60, y = bot + 24; blob(g, x, y, 5, 4, '#ffffff'); blob(g, x, y - 7, 4, 3, '#ffffff'); g.fillStyle = OUT; g.fillRect(x - 1, y - 8, 1, 1); g.fillRect(x + 1, y - 8, 1, 1); g.fillStyle = '#ff8a2a'; g.fillRect(x, y - 7, 2, 1); }   // snowmen
+      g.fillStyle = '#ffffff'; for (let i = 0; i < W * H / 120; i++) g.fillRect((r() * W) | 0, (r() * H) | 0, 1, 1);
+      fanRow(lft + 20, rgt - 20, bot + 12, false);
+      break;
+    }
+    case 'city': case 'rooftop': {
+      const roof = C.env === 'rooftop';
+      if (roof) { for (let y = 0; y < H; y++) { const u = y / H; g.fillStyle = mixHex('#ffb35a', '#5a2a7a', Math.min(1, Math.abs(u - .5) * 2.2)); g.fillRect(0, y, W, 1); } }
+      else { g.fillStyle = '#151432'; g.fillRect(0, 0, W, H); g.fillStyle = '#ffffff'; for (let i = 0; i < W * H / 300; i++) g.fillRect((r() * W) | 0, (r() * H) | 0, 1, 1); }
+      const wall = roof ? '#3a2448' : '#1f1d44', lit = roof ? ['#ffd28a', '#ffb35a'] : ['#ffe066', '#36e6ff', '#ff3fd0'];
+      for (let x = -10; x < W; x += 18 + ((r() * 14) | 0)) { const h = 30 + r() * 50; building(g, x, top - 14 - h, 14 + r() * 12, h, wall, lit, r); building(g, x + 6, bot + 18, 14 + r() * 12, h, wall, lit, r); }
+      if (!roof) { const nc = ['#ff3fd0', '#39ff88', '#36e6ff']; for (let i = 0; i < 6; i++) { const x = lft + 10 + i * ((rgt - lft) / 6), c = nc[i % 3]; g.fillStyle = shadeHex(c, .5); g.fillRect(x - 1, top - 13, 26, 7); g.fillStyle = c; g.fillRect(x, top - 12, 24, 5); g.fillStyle = '#ffffff'; g.fillRect(x + 2, top - 10, 20, 1); } }
+      else { g.fillStyle = '#4b2a5c'; g.fillRect(lft - 8, top - 10, rgt - lft + 16, 6); g.fillRect(lft - 8, bot + 4, rgt - lft + 16, 6); for (let i = 0; i < 4; i++) { const x = lft + 14 + i * 70; g.fillStyle = OUT; g.fillRect(x - 1, bot + 13, 16, 11); g.fillStyle = '#9aa3b5'; g.fillRect(x, bot + 14, 14, 9); g.fillStyle = '#5a6478'; g.fillRect(x + 3, bot + 16, 8, 5); } }
+      fanRow(lft + 20, rgt - 20, top - 3, true); fanRow(lft + 20, rgt - 20, bot + 12, false);
+      break;
+    }
+    case 'jungle': {
+      g.fillStyle = '#16401f'; g.fillRect(0, 0, W, H);
+      for (let i = 0; i < W * H / 50; i++) { const x = r() * W, y = r() * H; blob(g, x, y, 3 + r() * 4, 2 + r() * 2, ['#1f5a2a', '#2a7a38', '#3a9a46', '#185028'][(r() * 4) | 0]); }
+      for (let x = lft - 6; x < rgt + 6; x += 30) for (const y of [top - 10, bot + 2]) { g.fillStyle = OUT; g.fillRect(x - 1, y - 1, 10, 10); g.fillStyle = '#8a8670'; g.fillRect(x, y, 8, 8); g.fillStyle = '#6b6856'; g.fillRect(x + 6, y, 2, 8); g.fillStyle = '#3a9a46'; g.fillRect(x, y, 3, 2); }
+      g.fillStyle = '#2a7a38'; for (let x = 0; x < W; x += 9) { const len = 6 + ((r() * 16) | 0); g.fillRect(x, 0, 1, len); }
+      g.fillStyle = '#ffb000'; for (let i = 0; i < 30; i++) g.fillRect((r() * W) | 0, (r() * H) | 0, 2, 2);         // jungle flowers
+      break;
+    }
+    case 'space': {
+      g.fillStyle = '#0b0820'; g.fillRect(0, 0, W, H);
+      for (let i = 0; i < 8; i++) { const x = r() * W, y = r() * H, c = ['rgba(255,122,217,.10)', 'rgba(122,92,255,.12)', 'rgba(54,230,255,.08)'][i % 3]; for (let k2 = 4; k2 >= 1; k2--) blob(g, x, y, 14 * k2, 9 * k2, c); }
+      for (let i = 0; i < W * H / 60; i++) { g.fillStyle = r() < .8 ? '#ffffff' : r() < .5 ? '#9ef3ff' : '#ffd84d'; g.fillRect((r() * W) | 0, (r() * H) | 0, 1, 1); }
+      for (const [px, py, pr, pc] of [[lft - 30, top - 40, 14, '#ff7a59'], [rgt + 26, bot + 34, 18, '#5a8cff'], [rgt + 10, top - 60, 8, '#9df0c8']]) { blob(g, px, py, pr + 1, pr + 1, OUT); blob(g, px, py, pr, pr, pc); blob(g, px - pr * .3, py - pr * .3, pr * .4, pr * .4, mixHex(pc, '#ffffff', .4)); pring(g, px, py, pr * 1.6, pr * .45, '#ffd84d'); }
+      break;
+    }
+    case 'volcano': {
+      g.fillStyle = '#2a1c1a'; g.fillRect(0, 0, W, H);
+      for (let i = 0; i < W * H / 70; i++) { g.fillStyle = r() < .5 ? '#3a2622' : '#1c1210'; g.fillRect((r() * W) | 0, (r() * H) | 0, 3, 2); }
+      for (let n = 0; n < 7; n++) { let x = r() * W, y = r() < .5 ? r() * (top - 10) : bot + 10 + r() * (H - bot); for (let s2 = 0; s2 < 80; s2++) { g.fillStyle = s2 % 3 ? '#ff6a1f' : '#ffd84d'; g.fillRect(x, y, 4, 3); x += 2; y += Math.sin(s2 * .3 + n) * 1.5; } }
+      g.fillStyle = '#ffb347'; for (let i = 0; i < 40; i++) g.fillRect((r() * W) | 0, (r() * H) | 0, 1, 1);           // embers
+      g.fillStyle = 'rgba(255,90,20,.25)'; g.fillRect(lft - 6, top - 6, rgt - lft + 12, 4); g.fillRect(lft - 6, bot + 2, rgt - lft + 12, 4);
+      break;
+    }
+    default: g.fillStyle = '#0d0f22'; g.fillRect(0, 0, W, H);
+  }
+}
+
+function paintApron(g, C, X, Y) {
+  const x0 = X(-AP), y0 = Y(-AP), w = X(50 + AP) - x0, h = Y(94 + AP) - y0, r = prng(31);
+  if (C.env === 'water') { for (let x = x0; x < x0 + w; x += 4) { g.fillStyle = ['#8a5a32', '#7a4e2a', '#946238'][(x / 4 | 0) % 3]; g.fillRect(x, y0, 4, h); g.fillStyle = '#5a3a1e'; g.fillRect(x, y0, 1, h); } }
+  else if (C.env === 'park' || C.env === 'street') { g.fillStyle = shadeHex(C.apron, 1.1); for (let i = 0; i < w * h / 30; i++) g.fillRect(x0 + ((r() * w) | 0), y0 + ((r() * h) | 0), 1, 1); }
+  else if (C.env === 'beach') { g.fillStyle = '#d9bd80'; for (let i = 0; i < w * h / 12; i++) g.fillRect(x0 + ((r() * w) | 0), y0 + ((r() * h) | 0), 1, 1); }
+  else if (C.env === 'snow') { g.fillStyle = '#ffffff'; for (let i = 0; i < w * h / 14; i++) g.fillRect(x0 + ((r() * w) | 0), y0 + ((r() * h) | 0), 1, 1); }
+  else if (C.env === 'volcano') { g.fillStyle = '#ff6a1f'; for (let i = 0; i < w * h / 200; i++) g.fillRect(x0 + ((r() * w) | 0), y0 + ((r() * h) | 0), 2, 1); }
+  else if (C.env === 'palace') { g.fillStyle = '#e0b04a'; g.fillRect(x0, y0, w, 2); g.fillRect(x0, y0 + h - 2, w, 2); }
+}
+
+function paintFloor(g, C, x0, y0, w, h, k) {
+  const r = prng(C.id.length * 131 + 7);
+  const speck = (n, cols, sz) => { for (let i = 0; i < n; i++) { g.fillStyle = cols[(r() * cols.length) | 0]; g.fillRect(x0 + ((r() * w) | 0), y0 + ((r() * h) | 0), sz || 1, sz || 1); } };
+  g.save(); g.beginPath(); g.rect(x0, y0, w, h); g.clip();
+  switch (C.floor) {
+    case 'blacktop':
+      g.fillStyle = '#30333a'; g.fillRect(x0, y0, w, h); speck(w * h / 6, ['#3c4048', '#25272d', '#363a41']);
+      for (let i = 0; i < 9; i++) { let x = x0 + r() * w, y = y0 + r() * h; g.fillStyle = '#1c1e22'; for (let s = 0; s < 30; s++) { g.fillRect(x | 0, y | 0, 1, 1); x += r() * 2 - .6; y += r() * 2 - .2; } }
+      for (let i = 0; i < 5; i++) { g.fillStyle = 'rgba(255,255,255,.04)'; blob(g, x0 + r() * w, y0 + r() * h, 20 + r() * 20, 10 + r() * 10, g.fillStyle); }
+      break;
+    case 'concrete':
+      g.fillStyle = '#a3a8b0'; g.fillRect(x0, y0, w, h); speck(w * h / 7, ['#b2b7bf', '#959aa2', '#aab0b8']);
+      g.fillStyle = '#878c94'; for (let x = x0; x < x0 + w; x += Math.round(10 * k)) g.fillRect(x, y0, 1, h); for (let y = y0; y < y0 + h; y += Math.round(10 * k * FS)) g.fillRect(x0, y, w, 1);
+      for (let i = 0; i < 7; i++) blob(g, x0 + r() * w, y0 + r() * h, 6 + r() * 10, 3 + r() * 5, 'rgba(60,64,72,.12)');
+      break;
+    case 'tiles': {
+      const s = Math.max(4, Math.round(2 * k));
+      for (let y = y0, j = 0; y < y0 + h; y += s, j++) for (let x = x0, i = 0; x < x0 + w; x += s, i++) { g.fillStyle = (i + j) % 2 ? C.t1 : C.t2; g.fillRect(x, y, s, s); }
+      g.fillStyle = 'rgba(0,0,0,.12)'; for (let x = x0; x < x0 + w; x += s) g.fillRect(x, y0, 1, h); for (let y = y0; y < y0 + h; y += s) g.fillRect(x0, y, w, 1);
+      if (C.env === 'sakura') { g.fillStyle = '#ffb7d2'; speck(w * h / 160, ['#ffb7d2', '#ff9cc4', '#ffd0e4'], 2); }
+      break;
+    }
+    case 'glass':
+      for (let y = y0; y < y0 + h; y++) { g.fillStyle = mixHex('#58c6dc', '#2a8fb8', (y - y0) / h * .5); g.fillRect(x0, y, w, 1); }
+      g.fillStyle = 'rgba(255,255,255,.28)'; for (let y = y0 + 2; y < y0 + h; y += 5) for (let x = x0; x < x0 + w; x += 1) if (Math.sin(x * .25 + y * .7) > .82) g.fillRect(x, y + Math.round(Math.sin(x * .1) * 1.5), 1, 1);
+      g.fillStyle = 'rgba(10,60,90,.18)'; for (let i = 0; i < 12; i++) blob(g, x0 + r() * w, y0 + r() * h, 10 + r() * 14, 4 + r() * 6, g.fillStyle);
+      speck(w * h / 400, ['#ffffff']);
+      break;
+    case 'ice':
+      g.fillStyle = '#dff4ff'; g.fillRect(x0, y0, w, h);
+      for (let i = 0; i < 60; i++) { const x = x0 + r() * w, y = y0 + r() * h, l = 6 + r() * 20; g.fillStyle = 'rgba(255,255,255,.8)'; for (let s = 0; s < l; s++) g.fillRect((x + s) | 0, (y + s * .35) | 0, 1, 1); }
+      for (let i = 0; i < 10; i++) { let x = x0 + r() * w, y = y0 + r() * h; g.fillStyle = '#9cc9ea'; for (let s = 0; s < 24; s++) { g.fillRect(x | 0, y | 0, 1, 1); x += r() * 2 - 1; y += r() * 2 - .8; } }
+      break;
+    case 'neon':
+      g.fillStyle = '#0d0b1e'; g.fillRect(x0, y0, w, h);
+      g.fillStyle = '#1c1840'; const st = Math.round(4 * k); for (let x = x0; x < x0 + w; x += st) g.fillRect(x, y0, 1, h); for (let y = y0; y < y0 + h; y += Math.round(st * FS)) g.fillRect(x0, y, w, 1);
+      g.fillStyle = 'rgba(255,63,208,.05)'; blob(g, x0 + w / 2, y0 + h / 2, w * .45, h * .3, g.fillStyle);
+      break;
+    case 'stone': {
+      const bw = Math.round(4 * k), bh = Math.max(4, Math.round(3 * k * FS));
+      for (let y = y0, j = 0; y < y0 + h; y += bh, j++) for (let x = x0 - (j % 2) * (bw >> 1); x < x0 + w; x += bw) { g.fillStyle = ['#7b7a66', '#85836e', '#6f6e5c', '#8a8874'][(r() * 4) | 0]; g.fillRect(x, y, bw - 1, bh - 1); g.fillStyle = '#4a4436'; g.fillRect(x + bw - 1, y, 1, bh); g.fillRect(x, y + bh - 1, bw, 1); if (r() < .25) { g.fillStyle = '#3a9a46'; g.fillRect(x + 1, y + bh - 2, 3, 1); } }
+      break;
+    }
+    case 'galaxy':
+      g.fillStyle = '#1d0f45'; g.fillRect(x0, y0, w, h);
+      for (let i = 0; i < 10; i++) { const c = ['rgba(255,122,217,.10)', 'rgba(54,230,255,.08)', 'rgba(122,92,255,.12)'][i % 3]; for (let k2 = 3; k2 >= 1; k2--) blob(g, x0 + r() * w, y0 + r() * h, 16 * k2, 7 * k2, c); }
+      speck(w * h / 50, ['#ffffff', '#9ef3ff', '#ffd84d']);
+      break;
+    case 'obsidian':
+      g.fillStyle = '#1f1719'; g.fillRect(x0, y0, w, h); speck(w * h / 8, ['#2a2022', '#171113', '#2f2427']);
+      for (let i = 0; i < 16; i++) { let x = x0 + r() * w, y = y0 + r() * h; for (let s = 0; s < 26; s++) { g.fillStyle = s % 4 ? '#ff6a1f' : '#ffd84d'; g.fillRect(x | 0, y | 0, 1, 1); x += r() * 2 - .7; y += r() * 2 - .7; } }
+      break;
+    default: g.fillStyle = '#d9a066'; g.fillRect(x0, y0, w, h);
+  }
+  g.restore();
+}
+
 // ================= instant replay =================
 // The last few seconds of play are recorded every frame. After a dunk or a made three the
 // highlight plays back in slow motion with an INSTANT REPLAY banner; tap to skip.
@@ -3651,9 +4108,89 @@ function endReplay(quiet) {
   void quiet;
 }
 
+// ================= Baller Road + Style locker (menus) =================
+const roadLvl = () => Math.min(ROAD_N, 1 + Math.floor(((S && S.road && S.road.m) || 0) / ROAD_PER));
+const roadProg = () => ((S.road.m || 0) % ROAD_PER);
+const RK_NAME = {j:'jerseys', c:'courts', b:'balls'};
+function rewardName(rw) {
+  if (rw.k === '$') return `${rw.n} Basket Bucks`;
+  if (rw.k === 's') return `${RAR[rw.r].n} shoes`;
+  if (rw.k === 'j') return `${JERSEY[rw.id].n} jersey`;
+  if (rw.k === 'c') return `${COURT[rw.id].n} court`;
+  return `${BALL[rw.id].n} ball`;
+}
+function rewardIcon(rw) {
+  if (rw.k === '$') return `<span class="rw-ic bucks">${GEM}<b>${rw.n}</b></span>`;
+  if (rw.k === 's') return `<span class="rw-ic">${shoeSVG(SHOES.find(m => m.r === rw.r) || SHOES[0])}</span>`;
+  if (rw.k === 'j') return `<span class="rw-ic">${jerseySVG(JERSEY[rw.id])}</span>`;
+  if (rw.k === 'c') return `<span class="rw-ic">${courtSVG(COURT[rw.id])}</span>`;
+  return `<span class="rw-ic">${ballSVG(BALL[rw.id])}</span>`;
+}
+function rewardRar(rw) { return rw.k === '$' ? 0 : rw.k === 's' ? rw.r : (rw.k === 'j' ? JERSEY : rw.k === 'c' ? COURT : BALL)[rw.id].r; }
+function grantReward(rw) {
+  if (rw.k === '$') { S.gems += rw.n; return rewardName(rw); }
+  if (rw.k === 's') { const pool = SHOES.filter(m => m.r === rw.r); const mi = SHOES.indexOf(pick(pool.length ? pool : SHOES)); S.shoes.push({u:S.uid++, m:mi}); return SHOES[mi].n; }
+  const list = S.inv[RK_NAME[rw.k]];
+  if (list.includes(rw.id)) { S.gems += 100; return `${rewardName(rw)} (already owned, +100 Bucks)`; }
+  list.push(rw.id); return rewardName(rw);
+}
+function canClaim(L, side) { const r = S.road, done = side === 'f' ? r.cf : r.cp; return L <= roadLvl() && !done.includes(L) && (side === 'f' || r.paid); }
+function claimRoad(L, side) {
+  if (!canClaim(L, side)) return null;
+  const rw = (side === 'f' ? ROAD.F : ROAD.P)[L - 1];
+  (side === 'f' ? S.road.cf : S.road.cp).push(L);
+  return grantReward(rw);
+}
+function roadClaimable() { let n = 0; for (let L = 1; L <= roadLvl(); L++) { if (canClaim(L, 'f')) n++; if (canClaim(L, 'p')) n++; } return n; }
+function roadHTML() {
+  const lv = roadLvl(), pr = roadProg(), R = S.road, n = roadClaimable();
+  const tile = (rw, L, side) => {
+    const done = (side === 'f' ? R.cf : R.cp).includes(L), ok = canClaim(L, side), locked = L > lv || (side === 'p' && !R.paid);
+    return `<button class="rtile r${rewardRar(rw)} ${done ? 'done' : ok ? 'ready' : ''} ${locked ? 'locked' : ''}" ${ok ? `data-act="rclaim" data-l="${L}" data-s="${side}"` : 'disabled'} aria-label="${esc(rewardName(rw))}">
+      ${rewardIcon(rw)}<small>${rw.k === '$' ? 'Basket Bucks' : esc(rewardName(rw))}</small>${done ? '<i class="st">✓</i>' : ok ? '<i class="st go">CLAIM</i>' : locked && side === 'p' && !R.paid ? '<i class="st lk">PREMIUM</i>' : ''}</button>`;
+  };
+  const rows = [];
+  for (let L = 1; L <= ROAD_N; L++) rows.push(`<div class="rrow ${L === lv ? 'cur' : ''} ${L <= lv ? 'open' : ''}" id="rl${L}">${tile(ROAD.F[L - 1], L, 'f')}<div class="rlv"><b>${L}</b>${L === lv ? '<small>YOU</small>' : ''}</div>${tile(ROAD.P[L - 1], L, 'p')}</div>`);
+  return `<div class="rhead"><div class="rlvl"><small>LEVEL</small><b>${lv}</b><span>/ ${ROAD_N}</span></div>
+      <div class="rprog"><div class="rbar">${Array.from({length:ROAD_PER}, (_, i) => `<i class="${i < pr ? 'on' : ''}"></i>`).join('')}</div><p>${lv >= ROAD_N ? 'Road complete!' : `${pr} of ${ROAD_PER} games to level ${lv + 1}`}</p></div></div>
+    <p class="hint">Every ${ROAD_PER} games you finish moves you up a level, win or lose. Claim a free reward on the left of every level, and a premium reward on the right.</p>
+    ${R.paid ? '<div class="rpass on"><b>PREMIUM ROAD ACTIVE</b></div>' : `<div class="rpass"><div><b>PREMIUM ROAD</b><small>Unlock the right side: exclusive courts, balls, jerseys and shoes</small></div><button class="buy" data-act="roadpass">${ROAD_USD}</button></div>`}
+    ${n ? `<button class="mbtn pri" data-act="rclaimall">Claim all (${n})</button>` : ''}
+    <div class="rcols"><span>FREE</span><span>LV</span><span>PREMIUM</span></div>
+    <div class="rlist">${rows.join('')}</div>`;
+}
+function renderRoadBtn() {
+  const el = $('road'); if (!el || !S) return;
+  const n = roadClaimable();
+  el.innerHTML = `${pixSVG(BALL_MAP, {o:'#120e18', a:'#e2702c', x:'#3a1606'}, 'rd-ic')}<span class="rd-t"><b>BALLER ROAD</b><small>LEVEL ${roadLvl()} · ${roadProg()}/${ROAD_PER}</small></span>${pixSVG(TROPHY_MAP, {o:'#120e18', y:'#ffc94d', Y:'#fff3b0'}, 'rd-ic')}${n ? `<em class="rd-dot">${n}</em>` : ''}`;
+  el.setAttribute('aria-label', `Baller Road, level ${roadLvl()}`);
+}
+const CROWN_MAP = ['o...o...o', 'oyoyoyoyo', 'oyyyyyyyo', 'oyYyyyYyo', 'oyyyyyyyo', 'ooooooooo'];
+function renderRankBtn() {
+  const el = $('rank'); if (!el) return;
+  el.innerHTML = `${pixSVG(CROWN_MAP, {o:'#120e18', y:'#ffc94d', Y:'#ff4d6a'}, 'rd-ic crown')}<span class="rd-t"><b>RANK LEAGUE</b><small>${pixSVG(LOCK_MAP, {o:'#120e18', l:'#ffc94d'}, 'rd-lock')}LOCKED</small></span>${pixSVG(BALL_MAP, {o:'#120e18', a:'#e2702c', x:'#3a1606'}, 'rd-ic')}`;
+}
+
+// ---- Style locker (Team → Style): jerseys, courts, basketballs
+let styleSub = 'j';
+function styleHTML() {
+  const st = S.style, inv = S.inv;
+  const kinds = [['j', 'JERSEYS'], ['c', 'COURTS'], ['b', 'BALLS']];
+  const list = styleSub === 'j' ? JERSEYS : styleSub === 'c' ? COURTS : BALLS, key = RK_NAME[styleSub], cur = styleSub === 'j' ? st.jersey : styleSub === 'c' ? st.court : st.ball;
+  const tiles = list.map(it => {
+    const own = inv[key].includes(it.id), on = it.id === cur, ic = styleSub === 'j' ? jerseySVG(it) : styleSub === 'c' ? courtSVG(it) : ballSVG(it);
+    return `<button class="stile r${it.r} ${on ? 'on' : ''} ${own ? '' : 'locked'}" ${own ? `data-act="equipst" data-k="${styleSub}" data-id="${it.id}"` : 'disabled'} style="--rc:${RAR[it.r].c}">
+      <span class="sic">${ic}</span><b>${esc(it.n)}</b><small>${on ? 'EQUIPPED' : own ? (styleSub === 'c' ? 'PLAY HERE' : 'TAP TO WEAR') : roadWhere(styleSub, it.id)}</small></button>`;
+  }).join('');
+  const C = COURT[st.court];
+  return `<div class="chips">${kinds.map(([k, l]) => `<button class="fchip ${styleSub === k ? 'on' : ''}" data-act="stsub" data-k="${k}">${l} ${inv[RK_NAME[k]].length}/${(k === 'j' ? JERSEYS : k === 'c' ? COURTS : BALLS).length}</button>`).join('')}</div>
+    ${styleSub === 'c' ? `<p class="hint">All your games are played on <b>${esc(C.n)}</b>. ${esc(C.d)}.</p>` : styleSub === 'j' ? '<p class="hint">Your whole team wears this jersey in games and on the home screen.</p>' : '<p class="hint">The ball used in all your games.</p>'}
+    <div class="sgrid">${tiles}</div><p class="hint">Unlock more on Baller Road.</p>`;
+}
+
 // ================= UI =================
 const app = $('app'), panel = $('panel'), modal = $('modal');
-let mode = 'home', tab = null, teamSub = 'lineup', selSlot = -1, setupFr = 0, deckFilter = 'all', rosterSort = 'ovr';
+let mode = 'home', tab = null, teamSub = 'lineup', selSlot = -1, setupFr = 'red', deckFilter = 'all', rosterSort = 'ovr';
 const meterEl = document.createElement('div'); meterEl.className = 'smeter'; meterEl.hidden = true;
 meterEl.innerHTML = '<i class="zone"></i><i class="fill"></i>'; fx.appendChild(meterEl);
 let meterHide = 0, meterP = null, meterV = 0;
@@ -3665,13 +4202,14 @@ function setMode(m) {
 }
 function renderTop() {
   if (!S) return;
-  const f = FR[S.fr];
-  $('crest').innerHTML = crestSVG(f);
+  const f = myKit();
+  $('crest').innerHTML = jerseySVG(f, 'crest');
   $('tname').textContent = S.name;
-  $('tsub').textContent = `${f.city} ${f.n} · OVR ${teamOvr()}`;
+  $('tsub').textContent = `Team OVR ${teamOvr()} · ${(JERSEY[f.jid] || f).n}`;
   const short = n => n >= 1e6 ? (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'M' : n >= 1e4 ? (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'K' : n.toLocaleString();
   $('gems').textContent = short(S.gems);
   const rs = document.documentElement.style;
+  renderRoad();
   rs.setProperty('--team', f.c); rs.setProperty('--team-d', f.d); rs.setProperty('--team-ink', darkInk(f) ? f.numc : '#fffaf2');
   homeSync();
 }
@@ -3680,6 +4218,7 @@ function openPanel(t) {
   tab = t; selSlot = -1; panel.hidden = false;
   document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
   renderPanel(); panel.scrollTop = 0;
+  if (t === 'road') { const r = $('rl' + Math.max(1, roadLvl() - 1)); if (r && r.offsetTop) panel.scrollTop = Math.max(0, r.offsetTop - 120); }
 }
 function closePanel() {
   tab = null; panel.hidden = true; selSlot = -1;
@@ -3694,29 +4233,31 @@ function renderPanel() {
   else if (tab === 'pvp') panel.innerHTML = head('PVP') + `<div class="locked-panel"><span class="biglock">${PXI(PX_ICONS.lock, '')}</span><b>PVP IS LOCKED</b><p class="hint">Head-to-head games against other players aren't open yet. Build your squad in Story mode for now.</p></div>`;
   else if (tab === 'packs') panel.innerHTML = head('BANNERS') + packsHTML();
   else if (tab === 'shop') panel.innerHTML = head('SHOP') + shopHTML();
+  else if (tab === 'road') panel.innerHTML = head('BALLER ROAD') + roadHTML();
   panel.scrollTop = st;
 }
 function plainLook(c) { return {skin:c.skin, hair:c.hair, band:c.r >= 2, beard:c.beard, v:c.id, pid:c.id}; }
 function chipHTML(id, extra, act) {
-  const c = CHARS[id], o = S.owned[id], f = FR[S.fr];
+  const c = CHARS[id], o = S.owned[id], f = myKit();
   if (!o) return `<div class="chip locked${c.r === 3 ? ' leg' : ''}" style="--rc:${RAR[c.r].c}" aria-label="${esc(c.name)}, locked">${portraitSVG(plainLook(c), f, c.num)}<span class="nm">${esc(c.last)}</span><span class="st">${RAR[c.r].n.toUpperCase()}</span></div>`;
   const ov = ovrOf(eff(id)), canStar = o.st < 5 && o.sh >= SHARDS[o.st];
   return `<button class="chip ${extra || ''}${c.r === 3 ? ' leg' : ''}" style="--rc:${RAR[c.r].c}" ${act || `data-act="char" data-id="${id}"`}><span class="ov">${ov}</span><span class="ps">${c.pos}</span>${portraitSVG(lookOf(id), f, c.num)}<span class="nm">${esc(c.last)}</span><span class="st">${'★'.repeat(o.st)}</span>${canStar ? '<span class="tag">★ UP</span>' : ''}</button>`;
 }
 function teamHTML() {
-  const tabs = `<div class="subtabs">${['lineup','shoes'].map(s => `<button class="${teamSub === s ? 'on' : ''}" data-act="sub" data-sub="${s}">${s.toUpperCase()}</button>`).join('')}</div>`;
+  const tabs = `<div class="subtabs">${['lineup','shoes','style'].map(s => `<button class="${teamSub === s ? 'on' : ''}" data-act="sub" data-sub="${s}">${s.toUpperCase()}</button>`).join('')}</div>`;
   if (teamSub === 'lineup') {
     const slot = i => chipHTML(S.lineup[i], selSlot === i ? 'sel' : '', `data-act="slot" data-slot="${i}"`);
     const db = deckBoost();
     const owned = CHARS.filter(c => S.owned[c.id]).sort((a, b) => rosterSort === 'ovr' ? ovrOf(eff(b.id, db)) - ovrOf(eff(a.id, db)) : rosterSort === 'pos' ? 'PGSGSFPFC'.indexOf(a.pos) - 'PGSGSFPFC'.indexOf(b.pos) : b.r - a.r);
     const locked = CHARS.filter(c => !S.owned[c.id]).sort((a, b) => b.r - a.r);
-    return tabs + `<div class="sect"><h3>STARTERS <em>Team OVR ${teamOvr()}</em></h3><div class="slots five">${[0,1,2,3,4].map(slot).join('')}</div></div>
-      <div class="sect"><h3>BENCH <em>Sub in when legs get tired</em></h3><div class="slots five">${[5,6,7,8,9].map(slot).join('')}</div></div>
+    return tabs + `<div class="sect"><h3>STARTERS <em>Team OVR ${teamOvr()}</em></h3><div class="slots${TEAM_N > 3 ? ' five' : ''}">${Array.from({length:TEAM_N}, (_, i) => i).map(slot).join('')}</div></div>
+      <div class="sect"><h3>BENCH <em>Sub in when legs get tired</em></h3><div class="slots${TEAM_N > 3 ? ' five' : ''}">${Array.from({length:TEAM_N}, (_, i) => i + TEAM_N).map(slot).join('')}</div></div>
       <p class="hint ${selSlot >= 0 ? 'act' : ''}">${selSlot >= 0 ? `Pick a player below for this ${selSlot < TEAM_N ? 'starter' : 'sub'} spot.` : 'Tap a spot, then a player, to swap them in. Tap a player in the roster to see their full body, stats, star-ups and shoes.'}</p>
       <div class="sect"><h3>ROSTER <em>${owned.length}/${CHARS.length} unlocked</em></h3>
       <div class="chips">${[['ovr','Best'],['pos','Position'],['rar','Rarity']].map(([k, l]) => `<button class="fchip ${rosterSort === k ? 'on' : ''}" data-act="rsort" data-k="${k}">${l}</button>`).join('')}</div>
       <div class="grid">${owned.map(c => chipHTML(c.id)).join('')}${locked.map(c => chipHTML(c.id)).join('')}</div></div>`;
   }
+  if (teamSub === 'style') return tabs + styleHTML();
   if (teamSub === 'deck') {
     const counts = {}; for (const id of S.deck) counts[id] = (counts[id] || 0) + 1;
     const byType = t => S.deck.filter(id => CARD[id].t === t).length;
@@ -3748,16 +4289,16 @@ function teamHTML() {
 function storyHTML() {
   const st = S.story, res = st.res, w = res.filter(r => r.w).length, l = res.length - w, n = res.length;
   const rows = Array.from({length:SEASON_GAMES}, (_, g) => {
-    const sg = storyGame(g, st.season), f = FR[sg.fi], r = res[g];
+    const sg = storyGame(g, st.season), T = genTeam(sg.ji, sg.ovr + diff().ovr, sg.seed), f = T.fr, r = res[g];
     const right = r ? `<span class="res ${r.w ? 'w' : 'l'}">${r.w ? 'W' : 'L'} ${r.s[0]}–${r.s[1]}</span>` : `<span class="up">OVR ${sg.ovr + diff().ovr}</span>`;
-    return `<div class="game ${g === n ? 'cur' : ''}"><span class="gn">${sg.final ? 'FINAL' : 'G' + (g + 1)}</span>${crestSVG(f)}<span>${f.city} ${f.n}</span>${right}</div>`;
+    return `<div class="game ${g === n ? 'cur' : ''}"><span class="gn">${sg.final ? 'FINAL' : 'G' + (g + 1)}</span>${portraitSVG(T.star.look, f, T.star.num)}<span>${esc(T.name)}</span>${right}</div>`;
   }).join('');
   let top;
   if (n >= SEASON_GAMES) {
     top = `<div class="next"><b style="font-family:var(--display);font-weight:400;font-size:18px">SEASON ${st.season} COMPLETE</b><p class="hint">You finished ${w}–${l}. Next season's opponents are tougher, and starting it grants 100 gems.</p><button class="mbtn pri" data-act="newseason">Start season ${st.season + 1}</button></div>`;
   } else {
-    const sg = storyGame(n, st.season), f = FR[sg.fi];
-    top = `<div class="next"><div class="vs">${crestSVG(f)}<div><small>${sg.final ? 'SEASON FINALE' : 'GAME ' + (n + 1) + ' OF ' + SEASON_GAMES}</small><b>${f.city} ${f.n}</b></div></div>
+    const sg = storyGame(n, st.season), T = genTeam(sg.ji, sg.ovr + diff().ovr, sg.seed), f = T.fr;
+    top = `<div class="next"><div class="vs">${portraitSVG(T.star.look, f, T.star.num)}<div><small>${sg.final ? 'SEASON FINALE' : 'GAME ' + (n + 1) + ' OF ' + SEASON_GAMES}</small><b>${esc(T.name)}</b></div></div>
       <div class="ovrs"><span>THEM<b>${sg.ovr + diff().ovr}</b></span><span>YOU<b>${teamOvr()}</b></span></div>
       <div class="rewards" style="justify-content:flex-start"><span class="cur">${GEM}<b>${Math.round(sg.win.gems * diff().rew)}</b></span><span class="hint" style="align-self:center">for a win · ${diff().n}</span></div>
       <button class="mbtn pri" data-act="play">Play game</button></div>`;
@@ -3817,7 +4358,7 @@ function bannerBg(B) {
   return u;
 }
 function bannerArt(B) {
-  const f = FR[S.fr], info = `<button class="binfo" data-act="binfo" data-b="${B.id}" aria-label="What's in the ${B.n} banner">i</button>`;
+  const f = myKit(), info = `<button class="binfo" data-act="binfo" data-b="${B.id}" aria-label="What's in the ${B.n} banner">i</button>`;
   let inner;
   if (B.id === 'feat') {
     const L = featured();
@@ -3851,7 +4392,7 @@ function bannerPool(B) {
 }
 function openBannerInfo(bid) {
   const B = BANNERS.find(x => x.id === bid); if (!B) return;
-  const P = bannerPool(B), od = bannerOdds(B), f = FR[S.fr];
+  const P = bannerPool(B), od = bannerOdds(B), f = myKit();
   const rar = RAR.map((r, i) => od[i] ? `<span style="color:${r.c}">${r.n} ${Math.round(od[i] * 1000) / 10}%</span>` : '').join('');
   const kinds = [B.mix.p && `Players ${Math.round(B.mix.p * 100)}%`, B.mix.c && `Cards ${Math.round(B.mix.c * 100)}%`, B.mix.s && `Shoes ${Math.round(B.mix.s * 100)}%`].filter(Boolean).join(' · ');
   const pl = P.players.map(c => `<div class="bi-p${c.r === 3 ? ' leg' : ''}" style="--rc:${RAR[c.r].c}">${portraitSVG(plainLook(c), f, c.num)}<b>${esc(c.last)}</b><small>${c.pos}${S.owned[c.id] ? ' · OWNED' : ''}</small></div>`).join('');
@@ -3909,7 +4450,7 @@ function pullBanner(bid, n) {
 let revealTok = 0;
 function showReveal(out) { revealTok++; dealCards(out); modal.hidden = false; }
 function dealCards(out) {
-  const f = FR[S.fr], best = Math.max(...out.map(o => o.r));
+  const f = myKit(), best = Math.max(...out.map(o => o.r));
   const cards = out.map((o, i) => {
     const rc = RAR[o.r].c, rca = rgba(rc, .38);
     let front;
@@ -3946,7 +4487,7 @@ function viewerInit() {
 function viewerShow(id) {
   if (!viewerInit()) return false;
   const d = userDesc(id);
-  VW.P = buildPerson(d, FR[S.fr]);
+  VW.P = buildPerson(d, myKit());
   VW.a = {x:25, y:47, vx:0, vy:0, yaw:0, ph:0, fall:0, stun:0, shootT:0, celebT:0, gather:false, gv:0, fixYaw:0, side:1, ballSide:1, ballZ:0, t:0};
   VW.anim = 'idle'; VW.rot = 0;
   return true;
@@ -3989,7 +4530,7 @@ function viewerFrame(dt) {
 }
 function openPlayer(id) { sheetId = id; sheetShoes = false; renderPlayer(); modal.hidden = false; }
 function renderPlayer() {
-  const id = sheetId, c = CHARS[id], o = S.owned[id], f = FR[S.fr], st = eff(id), db = deckBoost(), sh = shoeOf(id), m = sh ? SHOES[sh.m] : null;
+  const id = sheetId, c = CHARS[id], o = S.owned[id], f = myKit(), st = eff(id), db = deckBoost(), sh = shoeOf(id), m = sh ? SHOES[sh.m] : null;
   const rows = STATS.map(k => {
     const base = Math.min(99, c.base[k] + (o.st - 1) * 3), tr = Math.floor(o.tr[k] || 0), shoeB = (m && m.b[k]) || 0, bonus = st[k] - base;
     return `<div class="statl"><span>${STATN[k]}</span><div class="bar"><i style="width:${base}%"></i><i class="b" style="width:${Math.max(0, bonus)}%"></i></div><span>${st[k]}${bonus > 0 ? `<em>+${bonus}</em>` : ''}</span></div>
@@ -4029,10 +4570,10 @@ function renderSetup() {
   const el = $('setup');
   el.innerHTML = `<div class="wrap"><h1 class="logo">DREAM<br>BALL<small>BUILD YOUR SQUAD</small></h1>
     <div class="field"><label for="teamname">TEAM NAME</label><input id="teamname" maxlength="16" autocomplete="off" placeholder="Night Shift"></div>
-    <div class="field"><label>PICK YOUR FRANCHISE</label><div class="frs">${FR.map((f, i) => `<button class="fr ${i === setupFr ? 'on' : ''}" data-act="setfr" data-fr="${i}">${crestSVG(f)}<span><b>${f.n}</b><small>${f.city}</small></span></button>`).join('')}</div></div>
+    <div class="field"><label>PICK YOUR JERSEY</label><div class="frs">${JERSEYS.slice(0, 6).map(j => `<button class="fr ${j.id === setupFr ? 'on' : ''}" data-act="setfr" data-fr="${j.id}">${jerseySVG(j, 'crest')}<span><b>${j.n}</b><small>Unlock more on Baller Road</small></span></button>`).join('')}</div></div>
     <p class="err" id="setuperr"></p>
     <button class="mbtn pri" data-act="create">Start career</button>
-    <p class="hint" style="text-align:center">You start with 10 players (five starters, five on the bench) and 550 Basket Bucks.</p></div>`;
+    <p class="hint" style="text-align:center">You start with 10 players (three starters, three on the bench) and 550 Basket Bucks.</p></div>`;
   el.hidden = false;
   $('teamname').addEventListener('input', () => { $('setuperr').textContent = ''; });
 }
@@ -4051,9 +4592,9 @@ function mcard(d, f, k) {
 function showMatchup() {
   const A = G.T[0], B = G.T[1], ov = T => Math.round(T.starters.reduce((a, d) => a + ovrOf(d.st), 0) / T.starters.length);
   const el = $('matchup');
-  el.innerHTML = `<div class="mside" style="--tc:${A.fr.c}"><div class="mhead">${crestSVG(A.fr)}<div><b>${esc(A.short)}</b><span>OVR ${ov(A)}</span></div></div>${A.starters.map((d, k) => mcard(d, A.fr, k)).join('')}</div>
+  el.innerHTML = `<div class="mside" style="--tc:${A.fr.c}"><div class="mhead">${jerseySVG(A.fr, 'crest')}<div><b>${esc(A.short)}</b><span>OVR ${ov(A)}</span></div></div>${A.starters.map((d, k) => mcard(d, A.fr, k)).join('')}</div>
     <div class="mvs"><b>VS</b></div>
-    <div class="mside away" style="--tc:${B.fr.c}"><div class="mhead">${crestSVG(B.fr)}<div><b>${esc(B.short)}</b><span>OVR ${ov(B)}</span></div></div>${B.starters.map((d, k) => mcard(d, B.fr, k + TEAM_N)).join('')}</div>
+    <div class="mside away" style="--tc:${B.fr.c}"><div class="mhead">${jerseySVG(B.fr, 'crest')}<div><b>${esc(B.short)}</b><span>OVR ${ov(B)}</span></div></div>${B.starters.map((d, k) => mcard(d, B.fr, k + TEAM_N)).join('')}</div>
     <div class="mfoot"><p class="hint">${diff().n} · ${(QLENS.find(x => x[0] === qLen()) || [0, "Normal"])[1]} quarters. Tap a teammate to pass, swipe or hold and drag to move.</p><button class="mbtn pri" data-act="tipoff">Tip off</button></div>`;
   el.hidden = false; app.classList.add('pre');
 }
@@ -4061,11 +4602,11 @@ function startStory() {
   const n = S.story.res.length; if (n >= SEASON_GAMES) return;
   const sg = storyGame(n, S.story.season);
   closePanel();
-  G.game = sg; G.T = [userTeam(), genTeam(sg.fi, sg.ovr + diff().ovr, sg.seed)]; resetGameStats();
+  G.game = sg; G.T = [userTeam(), genTeam(sg.ji, sg.ovr + diff().ovr, sg.seed)]; resetGameStats(); G.court = styleOf().court;
   G.score = [0, 0]; G.q = 0; G.firstPoss = Math.random() < .5 ? 0 : 1; G.done = false; G.paused = false; G.cheer = 0; G.auto = !!S.auto;
   for (const k in G.eff) G.eff[k] = 0;
   for (const pp of G.popups) pp.el.remove(); G.popups = [];
-  G.stam = 15; replayReset(); G.queue = []; G.stealCD = 0;
+  G.stam = 15; replayReset(); G.queue = []; G.stealCD = 0; G.subsLeft = 3; G.subMade = false; G.inbHold = false; G.ftWait = 0;
   $('n0').textContent = G.T[0].short; $('n1').textContent = G.T[1].short;
   $('tA').style.setProperty('--tc', G.T[0].fr.c); $('tB').style.setProperty('--tc', G.T[1].fr.c);
   $('pause').hidden = true; $('result').hidden = true;
@@ -4083,12 +4624,14 @@ function finishStory(win, forfeit) {
   const sg = G.game, rw = {gems:Math.round((win ? sg.win : sg.loss).gems * diff().rew)};
   S.gems += rw.gems;
   S.story.res.push({w:win, s:[G.score[0], G.score[1]]});
-  save();
+  const lv0 = roadLvl(); if (!forfeit) S.road.m = (S.road.m || 0) + 1; const lvUp = roadLvl() > lv0;
+  save(); renderRoad();
   const r = $('result');
   r.innerHTML = `<h2 style="color:${win ? 'var(--good)' : 'var(--bad)'}">${win ? 'WIN' : 'LOSS'}</h2>
     <div class="line">${esc(G.T[0].short)} ${G.score[0]} – ${G.score[1]} ${G.T[1].short}</div>
     ${forfeit ? '<p class="hint">You forfeited this game.</p>' : potgHTML(win ? 0 : 1) + boxHTML(0)}
     <div class="rewards"><span class="cur">${GEM}<b>+${rw.gems}</b></span></div>
+    ${forfeit ? '' : `<div class="rgain ${lvUp ? 'up' : ''}">${lvUp ? `BALLER ROAD LEVEL ${roadLvl()}! Rewards are waiting` : `Baller Road ${roadProg()}/${ROAD_PER} to level ${roadLvl() + 1}`}</div>`}
     <p class="hint">Season record ${S.story.res.filter(x => x.w).length}–${S.story.res.filter(x => !x.w).length}</p>
     <button class="mbtn pri" data-act="continue" style="min-width:200px">Continue</button>`;
   setTimeout(() => { if (G.done && G.game) r.hidden = false; }, forfeit ? 0 : 1600);
@@ -4106,7 +4649,7 @@ let rosterSig = '';
 function updateMatchHud() {
   hudExtras();
   const h = userHandler();
-  $('handhint').textContent = G.auto ? 'Autoplay is on. Your team plays itself.' : G.meter ? 'Let go on green!' : h ? 'Your ball. Drag to move, tap a teammate to pass.' : G.oppShot ? 'Hit CONTEST as he rises!' : G.poss === 1 && G.phase === 'live' ? 'On defense. Drag to guard, STEAL or CONTEST.' : 'Wait for the next play.';
+  $('handhint').textContent = G.auto ? 'Autoplay is on. Your team plays itself.' : userFT() && !G.meter ? 'Your free throw. Hold SHOOT, let go on green.' : G.meter ? 'Let go on green!' : h ? 'Your ball. Drag to move, tap a teammate to pass.' : G.oppShot ? 'Hit CONTEST as he rises!' : G.poss === 1 && G.phase === 'live' ? 'On defense. Drag to guard, STEAL or CONTEST.' : 'Wait for the next play.';
   $('s0').textContent = G.score[0]; $('s1').textContent = G.score[1];
   $('qtr').textContent = G.q > 4 ? (G.q === 5 ? 'OVERTIME' : `${G.q - 4}OT`) : (QNAMES[G.q - 1] || '');
   const c = G.clock; $('clock').textContent = c < 10 ? c.toFixed(1) : `${Math.floor(Math.ceil(c) / 60)}:${String(Math.ceil(c) % 60).padStart(2, '0')}`;
@@ -4134,24 +4677,26 @@ function showShotFb(p, timing, cov, pct, good) {
 function hudExtras() {
   // energy + fire for your three on the floor
   const ro = $('roster');
-  let sig = G.auto ? 'a' : '';
+  let sig = (G.auto ? 'a' : '') + (G.subsLeft ?? 3);
   for (const p of players[0]) sig += `${p.d ? p.d.id + p.d.last : ''}:${p.d ? Math.round((p.d.en || 0) / 4) : 0}:${p.d && p.d.fire ? 1 : 0}:${p.d && p.d.streak === 2 ? 1 : 0}|`;
   if (sig !== rosterSig) {
     rosterSig = sig;
     ro.innerHTML = players[0].map(p => { const d = p.d; if (!d) return ''; const e = Math.round(d.en == null ? 100 : d.en);
       return `<div class="rp ${d.fire ? 'fire' : d.streak === 2 ? 'warm' : ''}"><b>${esc(d.last)}</b>${d.fire ? pixSVG(FIRE_MAP, {o:'#c2280f', y:'#ff6a1f', Y:'#ffc94d'}, 'rp-fire') : ''}<i class="${e < 38 ? 'low' : e < 60 ? 'mid' : ''}"><u style="width:${e}%"></u></i></div>`; }).join('')
-      + `<button class="subbtn" data-act="subs" aria-label="Substitutions">SUB</button>`;
+      + `<button class="subbtn${(G.subsLeft ?? 3) <= 0 ? ' off' : ''}" data-act="subs" aria-label="Substitutions, ${G.subsLeft ?? 3} left">SUB <i>${G.subsLeft ?? 3}</i></button>`;
   }
   // the two buttons swap jobs on defense
   const live = G.game && !G.auto && G.phase === 'live' && !G.done, h = userHandler(), def = live && G.poss === 1, o = G.oppShot;
   let L, R;
-  if (def) { L = ['stl', 'STEAL', 'REACH FOR IT', (G.stealCD || 0) > 0]; R = ['con' + (o ? ' hot' : ''), o && o.fin ? 'BLOCK' : 'CONTEST', o ? 'NOW! TIME IT' : 'HANDS UP', false]; }
+  const ftMe = userFT();
+  if (ftMe) { L = ['drb', 'DRIBBLE', 'CROSS HIM UP', true]; R = ['sht' + (G.meter ? ' hot' : ''), 'FREE THROW', G.meter ? 'LET GO ON GREEN' : 'HOLD, LET GO ON GREEN', false]; }
+  else if (def) { L = ['stl', 'STEAL', 'REACH FOR IT', (G.stealCD || 0) > 0]; R = ['con' + (o ? ' hot' : ''), o && o.fin ? 'BLOCK' : 'CONTEST', o ? 'NOW! TIME IT' : 'HANDS UP', false]; }
   else {
     const fin = h && rimShot(h), three = h && isThree(h, 0);
     L = ['drb', 'DRIBBLE', 'CROSS HIM UP', !h || h.cool > 0 || h.gather || !!h.finish];
     R = ['sht' + (G.meter ? ' hot' : ''), fin === 'dunk' ? 'DUNK' : fin === 'layup' ? 'LAYUP' : fin ? 'FLOATER' : three ? 'SHOOT 3' : 'SHOOT', fin ? 'TAP TO ATTACK' : G.meter ? 'LET GO ON GREEN' : 'HOLD, LET GO ON GREEN', !h && !G.meter];
   }
-  if (!live) { L[3] = true; R[3] = true; }
+  if (!live && !ftMe) { L[3] = true; R[3] = true; }
   for (const [el, v] of [[$('btnL'), L], [$('btnR'), R]]) {
     const sig = v.join('|'); if (el._s === sig) continue; el._s = sig;
     el.className = 'cbtn ' + v[0] + (v[3] ? ' off' : ''); el.querySelector('b').textContent = v[1]; el.querySelector('small').textContent = v[2];
@@ -4185,7 +4730,10 @@ let subOpen = false, subPick = -1;
 function openSubs() {
   if (!G.game || G.done || G.phase === 'final' || !G.T[0].pool) return;
   if (!G.T[0].pool.length) { toast('No one on the bench'); return; }
-  subOpen = true; G.paused = true; subPick = -1; if (G.meter) releaseMeter();
+  if ((G.subsLeft ?? 3) <= 0) { toast('No subs left this game'); return; }
+  if (G.meter) releaseMeter();
+  whistle('SUB!'); buzz([30, 40, 30]); G.subMade = false;
+  subOpen = true; G.paused = true; subPick = -1;
   renderSubs(); modal.hidden = false;
 }
 function renderSubs() {
@@ -4193,7 +4741,7 @@ function renderSubs() {
   const bar = d => { const e = Math.round(d.en == null ? 100 : d.en); return `<i class="en ${e < 38 ? 'low' : e < 60 ? 'mid' : ''}"><u style="width:${e}%"></u></i><span class="enn">${e}</span>`; };
   const row = (d, attrs, on) => `<button class="subrow ${on ? 'on' : ''}" ${attrs}>${portraitSVG(d.look, f, d.num)}<span class="sr-n"><b>${esc(d.last)}</b><small>${d.pos} · OVR ${ovrOf(d.st)} · ${lineOf(d)}</small>${bar(d)}</span></button>`;
   modal.innerHTML = `<div class="sheet subsheet"><div class="phead"><h2>SUBS</h2><button class="xbtn" data-act="mclose" aria-label="Close">${XIC}</button></div>
-    <p class="hint">${subPick >= 0 ? 'Now pick who checks in.' : 'Tired players lose speed and shooting. Tap who comes out.'}</p>
+    <p class="hint">${subPick >= 0 ? 'Now pick who checks in.' : `Tired players lose speed and shooting. Tap who comes out. This is sub ${4 - (G.subsLeft ?? 3)} of 3, swap as many as you like.`}</p>
     <div class="sect"><h3>ON THE FLOOR</h3>${players[0].map(p => row(p.d, `data-act="subpick" data-i="${p.i}"`, subPick === p.i)).join('')}</div>
     <div class="sect"><h3>BENCH</h3>${T.pool.map((d, j) => row(d, subPick >= 0 ? `data-act="subin" data-j="${j}"` : 'disabled', false)).join('')}</div>
     <button class="mbtn pri" data-act="mclose">Back to the game</button></div>`;
@@ -4234,7 +4782,7 @@ function toast(msg) {
   if (!toastEl) { toastEl = document.createElement('div'); toastEl.className = 'toast'; wrap.appendChild(toastEl); }
   toastEl.textContent = msg; toastEl.hidden = false; clearTimeout(toastEl._t); toastEl._t = setTimeout(() => { toastEl.hidden = true; }, 1900);
 }
-function closeModal() { if (subOpen) { subOpen = false; G.paused = false; } revealTok++; modal.hidden = true; modal.innerHTML = ''; if (VW.P) { disposePerson(VW.P); VW.P = null; } renderPanel(); }
+function closeModal() { if (subOpen) { subOpen = false; G.paused = false; if (G.subMade) { G.subsLeft = Math.max(0, (G.subsLeft ?? 3) - 1); G.subMade = false; toast(G.subsLeft ? `${G.subsLeft} sub${G.subsLeft === 1 ? '' : 's'} left this game` : 'That was your last sub'); } } revealTok++; modal.hidden = true; modal.innerHTML = ''; if (VW.P) { disposePerson(VW.P); VW.P = null; } renderPanel(); }
 function act(a, d) {
   if (a === 'tab') { if (mode === 'home') openPanel(d.tab); }
   else if (a === 'close') closePanel();
@@ -4251,7 +4799,13 @@ function act(a, d) {
   }
   else if (a === 'binfo') openBannerInfo(d.b);
   else if (a === 'skipreplay') endReplay();
-  else if (a === 'road') toast('Baller Road is locked for now. Coming soon!');
+  else if (a === 'road') { if (mode === 'home' && S) openPanel('road'); }
+  else if (a === 'rank') toast('Rank League is locked for now. Coming soon!');
+  else if (a === 'rclaim') { const got = claimRoad(+d.l, d.s); if (got) { save(); renderTop(); renderRoad(); renderPanel(); toast(`Claimed ${got}`); buzz(20); } }
+  else if (a === 'rclaimall') { const got = []; for (let L = 1; L <= roadLvl(); L++) for (const sd of ['f', 'p']) { const g2 = claimRoad(L, sd); if (g2) got.push(g2); } if (got.length) { save(); renderTop(); renderRoad(); renderPanel(); toast(got.length === 1 ? `Claimed ${got[0]}` : `Claimed ${got.length} rewards`); buzz(20); } }
+  else if (a === 'roadpass') toast(`Checkout isn't open yet. You weren't charged ${ROAD_USD}`);
+  else if (a === 'stsub') { styleSub = d.k; renderPanel(); }
+  else if (a === 'equipst') { const k = {j:'jersey', c:'court', b:'ball'}[d.k]; if (!S.inv[RK_NAME[d.k]].includes(d.id)) return; S.style[k] = d.id; save(); renderTop(); renderPanel(); homeSync && homeSync(); home.bgKey = ''; toast(`${d.k === 'j' ? JERSEY[d.id].n + ' jersey on' : d.k === 'c' ? 'Now playing at ' + COURT[d.id].n : BALL[d.id].n + ' ball in play'}`); }
   else if (a === 'dfilter') { deckFilter = d.t; renderPanel(); }
   else if (a === 'deckadd') {
     const id = d.id, have = S.cards[id] ? S.cards[id].n : 0, inD = S.deck.filter(x => x === id).length;
@@ -4284,13 +4838,13 @@ function act(a, d) {
   else if (a === 'halfgo') { $('half').hidden = true; halfGo(); }
   else if (a === 'subs') openSubs();
   else if (a === 'subpick') { subPick = subPick === +d.i ? -1 : +d.i; renderSubs(); }
-  else if (a === 'subin') { if (subPick >= 0 && subIn(0, subPick, +d.j)) { subPick = -1; buzz(15); } renderSubs(); }
+  else if (a === 'subin') { if (subPick >= 0 && subIn(0, subPick, +d.j)) { subPick = -1; G.subMade = true; buzz(15); } renderSubs(); }
   else if (a === 'setshow') { SET.showFps = d.v === '1'; saveSet(); $('fpsbox').hidden = !SET.showFps; openSettings(); }
   else if (a === 'pull') pullBanner(d.b, +d.n);
   else if (a === 'play') startStory();
   else if (a === 'tipoff') tipOff();
   else if (a === 'newseason') { S.story.season++; S.story.res = []; S.gems += 100; save(); renderTop(); renderPanel(); }
-  else if (a === 'setfr') { setupFr = +d.fr; document.querySelectorAll('.fr').forEach((b, i) => b.classList.toggle('on', i === setupFr)); }
+  else if (a === 'setfr') { setupFr = d.fr; document.querySelectorAll('.fr').forEach((b, i) => b.classList.toggle('on', b.dataset.fr === setupFr)); }
   else if (a === 'create') createTeam();
   else if (a === 'pause') { if (G.game && !G.done) { G.paused = true; $('pause').hidden = false; } }
   else if (a === 'resume') { G.paused = false; $('pause').hidden = true; }
@@ -4373,7 +4927,7 @@ const TROPHY_MAP = ['.ooooooo.', 'oyyyyyyyo', 'oyYyyyyyo', '.oyyyyyo.', '..oyyyo
 const LOCK_MAP = ['..ooo..', '.o...o.', '.o...o.', 'ooooooo', 'olllllo', 'oll.llo', 'olllllo', 'ooooooo'];
 function renderRoad() {
   const el = $('road'); if (!el) return;
-  el.innerHTML = `${pixSVG(BALL_MAP, {o:'#120e18', a:'#e2702c', x:'#3a1606'}, 'rd-ic')}<span class="rd-t"><b>BALLER ROAD</b><small>${pixSVG(LOCK_MAP, {o:'#120e18', l:'#ffc94d'}, 'rd-lock')}LOCKED</small></span>${pixSVG(TROPHY_MAP, {o:'#120e18', y:'#ffc94d', Y:'#fff3b0'}, 'rd-ic')}`;
+  renderRoadBtn(); renderRankBtn();
 }
 
 // ---------- start screen ----------
@@ -4384,7 +4938,7 @@ function startLook(id) {
   return {skin:c.skin, hair:c.hair, h:POS_T[c.pos].h, w:POS_T[c.pos].w, shoe:[0xf4f1ea, 0x22252f], band:c.r >= 2, beard:c.beard, sleeve:c.sleeve, v:c.id, pid:c.id};
 }
 function showStart() {
-  const el = $('start'), f = S ? FR[S.fr] : FR[0];
+  const el = $('start'), f = S ? myKit() : JERSEYS[0];
   const ids = S ? S.lineup.slice(0, TEAM_N) : [0, 2, 4];
   const slots = [[ids[1], 'cross', 'l'], [ids[0], 'spin', 'c'], [ids[2], 'point', 'r']];
   const dolls = slots.map(([id, pose, cls]) => {
@@ -4431,7 +4985,7 @@ function showIntro() {
   const vid = INTRO_VIDEO ? `<video class="in-video" src="${PH_BASE + INTRO_VIDEO}.mp4" autoplay muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>` : '';
   el.innerHTML = `<div class="in-scene"><canvas class="in-cv" width="180" height="320"></canvas>${vid}</div><img class="in-logo" src="${INTRO_LOGO}" alt="TreyyyVerse" draggable="false">`;
   el.hidden = false; el.classList.remove('out');   // studio intro: plays in full, no skipping
-  const ids = S ? S.lineup.slice(0, TEAM_N) : [0, 2, 4], f = S ? FR[S.fr] : FR[0];
+  const ids = S ? S.lineup.slice(0, TEAM_N) : [0, 2, 4], f = S ? myKit() : JERSEYS[0];
   const mk = () => { const c = document.createElement('canvas'); c.width = 60; c.height = 64; return c; };
   INTRO = {t:0, el, g:el.querySelector('.in-cv').getContext('2d'), f, vid:false,
     runners:[ids[2], ids[1], ids[0]].map((id, k) => ({id, look:startLook(id), num:CHARS[id].num, buf:mk(), tint:mk(), off:k * 1.3}))};
