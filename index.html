@@ -1589,6 +1589,41 @@ function roadWhere(k, id) {             // which Baller Road level unlocks an it
   return 'Starter';
 }
 
+// ---- team identity: every uniform has a pattern and an emblem (original pixel icons) ----
+const PAT_OF = {red:'side', teal:'band', sunset:'fade', silver:'pin', royal:'sash', emerald:'side', midnight:'pin', snow:'band', powder:'fade',
+  cream:'pin', camo:'fade', pink:'sash', ocean:'band', lime:'side', rose:'fade', maroon:'pin', lava:'flame', gold:'sash', galaxy:'fade', ice:'band',
+  neon:'side', sakura:'fade', jungle:'band', chrome:'pin', fire:'flame', mint:'side', royal2:'band', vapor:'sash'};
+const LOGO_OF = {red:'flame', teal:'wave', sunset:'sun', silver:'bolt', royal:'crown', emerald:'leaf', midnight:'moon', snow:'snow', powder:'cloud',
+  cream:'star', camo:'shield', pink:'heart', ocean:'wave', lime:'bolt', rose:'heart', maroon:'shield', lava:'flame', gold:'crown', galaxy:'star', ice:'snow',
+  neon:'bolt', sakura:'leaf', jungle:'paw', chrome:'diamond', fire:'flame', mint:'leaf', royal2:'star', vapor:'diamond'};
+const hashStr = s => { let h = 7; for (const ch of String(s || '')) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return h; };
+function patOf(f) { if (!f) return null; if (f.pat) return f.pat; if (PAT_OF[f.id]) return PAT_OF[f.id]; return ['side', 'band', 'pin', 'fade', 'sash'][hashStr(f.c) % 5]; }
+function logoOf(f) { if (!f) return 'star'; if (f.logo) return f.logo; if (LOGO_OF[f.id]) return LOGO_OF[f.id]; return Object.keys(EMBLEMS)[hashStr(f.c) % Object.keys(EMBLEMS).length]; }
+// 11 x 11 emblems: X = main colour, o = trim, . = clear
+const EMBLEMS = {
+  flame:  ['.....X.....', '....XX.....', '....XXX....', '...XXXX..X.', '..XXXoXX.X.', '..XXooXXXX.', '.XXXooXXXX.', '.XXooooXXX.', '.XXoooooXX.', '..XXoooXX..', '...XXXXX...'],
+  star:   ['.....X.....', '.....X.....', '....XoX....', 'XXXXXoXXXXX', '.XXXoooXXX.', '..XXoooXX..', '...XXoXX...', '..XXX.XXX..', '..XX...XX..', '.XX.....XX.', '.X.......X.'],
+  crown:  ['...........', 'X....X....X', 'XX..XXX..XX', 'XXX.XoX.XXX', 'XXXXXoXXXXX', 'XXoXXXXXoXX', 'XXXXXXXXXXX', 'ooooooooooo', 'XXXXXXXXXXX', '...........', '...........'],
+  bolt:   ['......XXX..', '.....XXX...', '....XXX....', '...XXX.....', '..XXXXXXX..', '.....XXX...', '....XXX....', '...XXX.....', '..XXo......', '.XX........', '.X.........'],
+  wave:   ['...........', '....XXX....', '..XXoooX...', '.XoXXX.XX..', '.XoX....X..', 'XXoXX......', 'XooXXX..XX.', 'XoooXXXXoX.', 'XXoooooooXX', '.XXXXXXXXX.', '...........'],
+  sun:    ['.....X.....', '.X...X...X.', '..X.XXX.X..', '...XoooX...', '.XXoooooXX.', 'XXXoooooXXX', '.XXoooooXX.', '...XoooX...', '..X.XXX.X..', '.X...X...X.', '.....X.....'],
+  moon:   ['...XXXX....', '..XXX......', '.XXX.......', '.XXo.......', 'XXXo.......', 'XXXo.......', 'XXXo.......', '.XXXo......', '.XXXXo...X.', '..XXXXXXX..', '...XXXXX...'],
+  snow:   ['.....X.....', '...X.X.X...', '....XXX....', '.X..XoX..X.', '..XXoXoXX..', 'XXXXoooXXXX', '..XXoXoXX..', '.X..XoX..X.', '....XXX....', '...X.X.X...', '.....X.....'],
+  cloud:  ['...........', '...........', '....XXX....', '..XXoooX...', '.XoooooXXX.', '.XoooooooX.', 'XoooooooooX', 'XoooooooooX', '.XXXXXXXXX.', '...........', '...........'],
+  shield: ['XXXXXXXXXXX', 'XoooooooooX', 'XoXXXXXXXoX', 'XoXXXXXXXoX', 'XoXXoooXXoX', 'XoXXoooXXoX', '.XoXXXXXoX.', '.XoXXXXXoX.', '..XoXXXoX..', '...XoooX...', '....XXX....'],
+  heart:  ['...........', '.XXX...XXX.', 'XXoXX.XXXXX', 'XooXXXXXXXX', 'XoXXXXXXXXX', 'XXXXXXXXXXX', '.XXXXXXXXX.', '..XXXXXXX..', '...XXXXX...', '....XXX....', '.....X.....'],
+  leaf:   ['.......XXXX', '.....XXXooX', '...XXXXXoX.', '..XXXXXoXX.', '.XXXXXoXXX.', '.XXXXoXXX..', '.XXXoXXXX..', '.XXoXXXX...', '..XoXXX....', '.Xo........', 'X..........'],
+  paw:    ['...XX.XX...', '..XXX.XXX..', '..XXX.XXX..', 'XX.......XX', 'XXX.....XXX', '.X..XXX..X.', '...XXXXX...', '..XXXoXXX..', '..XXoooXX..', '...XXXXX...', '...........'],
+  diamond:['...XXXXX...', '..XoXoXoX..', '.XXXXXXXXX.', 'XooXXoXXooX', '.XoXXoXXoX.', '..XXXoXXX..', '...XXoXX...', '....XoX....', '.....X.....', '...........', '...........']
+};
+// draws an emblem centred on (cx, cy), scale s, outlined
+function drawEmblem(g, name, cx, cy, s, main, trim) {
+  const E = EMBLEMS[name] || EMBLEMS.star, n = E.length, x0 = Math.round(cx - n * s / 2), y0 = Math.round(cy - n * s / 2);
+  g.fillStyle = OUT;
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (E[y][x] !== '.') g.fillRect(x0 + x * s - 1, y0 + y * s - 1, s + 2, s + 2);
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const ch = E[y][x]; if (ch === '.') continue; g.fillStyle = ch === 'o' ? trim : main; g.fillRect(x0 + x * s, y0 + y * s, s, s); }
+}
+
 // ================= MyCareer: your created player, career stages and the city stores =================
 const HAIR_STYLES = [['fade', 'Fade'], ['waves', 'Waves'], ['cornrows', 'Cornrows'], ['afro', 'Afro'], ['hightop', 'High Top'], ['locs', 'Locs'], ['mohawk', 'Mohawk'], ['bald', 'Bald']];
 const HAIR_COLORS = ['#15100c', '#2b1d12', '#4a3220', '#7a4a22', '#b07a3a', '#d9b26a', '#8a8a8a', '#e8e4dc', '#c2402f', '#2d4fd6', '#3fae4f', '#ff7ab8'];
@@ -1692,7 +1727,12 @@ function meStats() { const m = meShoe(), r = {}; for (const k of STATS) r[k] = M
 function meLook(street) {
   const me = S.me, m = meShoe(), L = Object.assign({}, me.look);
   L.h = hOf(me.hIn); L.w = (BUILDS.find(b => b[0] === me.build) || BUILDS[1])[2]; L.shoe = m ? [m.c, m.s] : [0xf4f1ea, 0x22252f]; L.v = me.num;
+  const age = ageGray();
+  if (age > 0) L.hairC = mixHex(L.hairC || '#2b1d12', '#d4d4da', age);
   return L;
+}
+// a long NBA career shows in your hair: it starts graying in season 4 and is silver by season 12
+function ageGray() { return S && S.stage === 'nba' && S.season > 3 ? Math.min(.85, (S.season - 3) * .1) : 0;
 }
 function meDesc() {
   const me = S.me, st = meStats(), o = ovrOf(st);
@@ -1849,7 +1889,7 @@ function genTeam(ji, ovr, seed) {
     const sm = SHOES[Math.floor(R() * SHOES.length)];
     const fn = FIRST[Math.floor(R() * FIRST.length)]; let ln; do { ln = LAST[Math.floor(R() * LAST.length)]; } while (usedN.has(ln)); usedN.add(ln);
     return {name:fn + ' ' + ln, last:ln, num, pos:pz, r:ovr >= 86 ? 3 : ovr >= 78 ? 2 : ovr >= 70 ? 1 : 0, st,
-      look:{skin:Math.floor(R() * SKINS.length), hair:Math.floor(R() * 6), h:t.h, w:t.w + (R() - .5) * .06, shoe:[sm.c, sm.s], band:R() < .2, beard:R() < .3, sleeve:R() < .2, v:num}};
+      look:{skin:Math.floor(R() * SKINS.length), hair:Math.floor(R() * 6), h:t.h, w:t.w + (R() - .5) * .06, shoe:[sm.c, sm.s], band:R() < .2, beard:R() < .3, sleeve:R() < .2, knee:R() < .22 ? ['#16181f', '#f4f1ea', f.c][Math.floor(R() * 3)] : false, gog:R() < .06, tat:R() < .28 ? 1 + Math.floor(R() * 3) : 0, v:num}};
   });
   const star = ps.slice(0, TEAM_N).slice().sort((a, b) => ovrOf(b.st) - ovrOf(a.st))[0];   // no franchises: a side is known by its best player
   f.n = star.last; f.city = ''; f.star = star;
@@ -2086,7 +2126,7 @@ function applyMove(p, card, lv, user) {
   for (let k = 0; k < (card.multi || 1) && k < defs.length; k++) {
     const d = defs[k]; if (dist(p, d) > (card.back ? 6.5 : 5.4)) break;
     const ch = card.beat + (lv - 1) * .04 + (p.d.st.drb - d.d.st.def) / 220;
-    if (Math.random() < ch) { d.stun = card.stun; beaten.push(d); }
+    if (Math.random() < ch) { d.stun = card.stun; beaten.push(d); if (card.stun >= 1.5 || Math.random() < .35) { d.stumble = .75; d.stumbleDir = p.side; } }   // ankle breaker: he stumbles
   }
   if (beaten.length) {
     p.hot = Math.max(p.hot, 1.8);
@@ -3250,18 +3290,28 @@ function poseOf(a, dt) {
   P.arms = [{s:0, f:sw, y:6}, {s:0, f:-sw, y:6}];
   if (sp > 1 && P.dir !== 'side') P.arms = [{s:0, f:0, y:6 - Math.max(0, sw)}, {s:0, f:0, y:6 + Math.min(0, sw)}];
   if (a.t == null && !a.isRef && !a.pose && !(a.kit && a.kit.outfit) && sp <= 1) P.spin = true;   // off the court in a jersey: spin the ball on a finger
-  if (a.def && !a.isRef) { P.crouch = 2; P.legs = sp > 1.5 ? {mode:'run', ph:a.ph, amp:.6} : {mode:'wide'}; P.arms = [{s:3, f:2, y:1}, {s:3, f:2, y:1}]; }
+  if (a.def && !a.isRef) { P.crouch = 2; P.legs = sp > 1.5 ? {mode:'slide', ph:a.ph * 1.6} : {mode:'wide'}; P.arms = [{s:3, f:2, y:1}, {s:3, f:2, y:1}]; }   // defensive slide
   if (a.handler && !a.gather) {
     const k = a.ballSide > 0 ? 1 : 0, bz = clamp((a.ballZ || 0) / 2.6, 0, 1);
     P.arms[k] = {s:2, f:3, y:4 + Math.round(bz * 2)}; P.arms[1 - k] = {s:2, f:2, y:3}; P.crouch = Math.max(P.crouch, 1);
+  }
+  if (a.handler && a.move && !a.gather) {            // dribble moves: low stance, the ball hand works, the off hand guards
+    const u = clamp(a.move.t / a.move.dur, 0, 1), k = a.ballSide > 0 ? 1 : 0, an = a.move.anim, low = Math.round(Math.sin(Math.PI * u) * 2);
+    if (an === 'cross' || an === 'inout' || an === 'hesi') { P.crouch = 2 + low; P.legs = {mode:'wide'}; P.arms[k] = {s:Math.round(3 - 4 * Math.sin(Math.PI * u)), f:2, y:6}; P.arms[1 - k] = {s:3, f:1, y:2}; }
+    else if (an === 'btl') { P.crouch = 3 + low; P.legs = {mode:'wide'}; P.arms = [{s:-1, f:2, y:7}, {s:-1, f:2, y:7}]; }
+    else if (an === 'btb') { P.crouch = 2; P.legs = {mode:'wide'}; P.arms[k] = {s:2, f:u < .7 ? -3 : 1, y:6}; P.arms[1 - k] = {s:3, f:1, y:2}; }
+    else if (an === 'euro') { P.crouch = 1 + low; P.arms[k] = {s:1, f:3, y:3}; P.arms[1 - k] = {s:3, f:0, y:1}; }
+    else if (an === 'step') { P.crouch = 2; P.headDrop = -1; P.arms[k] = {s:2, f:1, y:5}; }
+    else if (an === 'spin') { P.crouch = 2; P.arms[k] = {s:3, f:1, y:4}; P.arms[1 - k] = {s:4, f:0, y:0}; }
   }
   if (a.contestT > 0 && !a.isRef) { const u = clamp(a.contestT / .7, 0, 1); P.arms = [{s:1, f:1, y:-9}, {s:1, f:1, y:-10}]; P.lift = Math.max(P.lift, Math.sin(u * Math.PI) * 1.7); P.legs = {mode:'tuck'}; P.crouch = 0; }
   if (a.pokeT > 0 && !a.isRef) { const u = clamp(1 - a.pokeT / .35, 0, 1), ext = Math.round(Math.sin(u * Math.PI) * 4); P.arms = [{s:1, f:2, y:4}, {s:0, f:3 + ext, y:3}]; P.crouch = Math.max(P.crouch, 2); P.lift = 0; }
   if (a.move) { const u = clamp(a.move.t / a.move.dur, 0, 1); P.crouch = Math.max(P.crouch, Math.round(Math.sin(Math.PI * u) * 2)); }
   if (a.gather) { const g2 = clamp(a.gv || 0, 0, 1); P.crouch = Math.round(2 * (1 - g2)); P.arms = [{s:-1, f:2, y:-2 - Math.round(g2 * 3)}, {s:-2, f:2, y:-3 - Math.round(g2 * 4)}]; }
   if (a.shootT > 0) {
-    const u = clamp(1 - a.shootT / .6, 0, 1); P.lift = Math.sin(Math.PI * u) * 2.1; P.legs = {mode:u < .85 ? 'tuck' : 'stand'};
-    P.arms = [{s:-2, f:2, y:-6}, {s:-2, f:2, y:-9}];
+    const u = clamp(1 - a.shootT / .6, 0, 1);
+    if (u < .14) { P.crouch = 3; P.lift = 0; P.legs = {mode:'wide'}; P.arms = [{s:-1, f:2, y:-2}, {s:-2, f:2, y:-3}]; }   // load: knees bend first
+    else { const v = (u - .14) / .86; P.lift = Math.sin(Math.PI * v) * 2.1; P.legs = {mode:v < .85 ? 'tuck' : 'stand'}; P.arms = [{s:-2, f:2, y:-6}, {s:-2, f:2, y:-9}]; }
   }
   if (a.celebT > 0) {
     const ck = a.d && a.d.me && S && S.gear && ANIM[S.gear.celeb] ? ANIM[S.gear.celeb].look : ['arms', 'flex', 'point'][(a.celebKind || 0) % 3], w9 = Math.sin(a.celebT * 14);
@@ -3277,12 +3327,12 @@ function poseOf(a, dt) {
     const u = clamp(a.finish.t / a.finish.dur, 0, 1.4);
     if (a.finish.kind === 'dunk') {
       const dl = a.d && a.d.me && S && S.gear && ANIM[S.gear.dunk] ? ANIM[S.gear.dunk].look : 'two';
-      const hang = dl === 'hang' && u > 1 ? Math.max(0, 1 - (u - 1.25) * 6) : null;
+      const hang = u > 1 ? Math.max(0, 1 - (u - (dl === 'hang' ? 1.25 : 1.15)) * 6) : null;   // every dunk hangs on the rim for a beat
       P.lift = hang != null ? 3.3 * Math.min(1, hang + .4) : Math.sin(Math.min(u, 1) * Math.PI * .5) * (u > 1.05 ? Math.max(0, 1 - (u - 1.05) * 4) : 1) * 3.3;
       P.arms = [{s:2, f:0, y:3}, {s:0, f:2, y:u < .75 ? -10 : -7}];
       if (dl === 'tomahawk') P.arms = [{s:2, f:0, y:3}, u < .7 ? {s:-1, f:-3, y:-9} : {s:0, f:3, y:-6}];
       else if (dl === 'windmill') { const an = Math.min(1, u) * Math.PI * 2.2; P.arms = [{s:2, f:0, y:3}, {s:Math.round(Math.cos(an) * 5), f:Math.round(Math.sin(an) * 3), y:Math.round(-Math.sin(an + 1.2) * 7) - 3}]; }
-      else if (dl === 'hang' && u > 1) P.arms = [{s:1, f:1, y:-9}, {s:1, f:1, y:-9}];
+      if (u > 1) { P.arms = [{s:1, f:1, y:-9}, {s:1, f:1, y:-9}]; P.legs = {mode:'stand'}; P.mouth = true; }
       else if (dl === 'two') P.arms = [{s:1, f:2, y:u < .75 ? -10 : -7}, {s:1, f:2, y:u < .75 ? -10 : -7}];
     }
     else { P.lift = Math.sin(Math.min(u, 1) * Math.PI) * 2.3; P.arms = [{s:2, f:1, y:3}, {s:-1, f:2, y:-9}]; }
@@ -3290,6 +3340,11 @@ function poseOf(a, dt) {
   }
   if (a.passPose > 0) { a.passPose -= dt; const u = clamp(1 - a.passPose / .3, 0, 1), ext = Math.round(1 + u * 3); P.arms = [{s:0, f:ext, y:2}, {s:0, f:ext, y:2}]; }
   if (a.signal > 0) { P.arms = [{s:1, f:0, y:-7}, {s:1, f:0, y:-8}]; }
+  if (a.stumble > 0 && !a.isRef) {                   // ankles broken: knees buckle, arms flail, he lurches the wrong way
+    a.stumble -= dt; const u = clamp(1 - a.stumble / .75, 0, 1), w2 = Math.sin(u * Math.PI * 4);
+    P.crouch = Math.round(4 * Math.sin(Math.PI * Math.min(1, u * 1.4))); P.legs = {mode:'wide'}; P.headDrop = Math.round(2 * Math.sin(Math.PI * u));
+    P.arms = [{s:4, f:0, y:Math.round(-4 + w2 * 3)}, {s:4, f:0, y:Math.round(-4 - w2 * 3)}]; P.mouth = true;
+  }
   P.stars = a.stun > 0;
   a.fall = (a.fall || 0) + ((a.stun > 0 ? 1 : 0) - (a.fall || 0)) * Math.min(1, dt * (a.stun > 0 ? 9 : 3.5));
   P.lying = a.t == null && a.fall > .5;          // players never hit the floor any more: birds circle their heads instead
@@ -3464,7 +3519,7 @@ function paintArena(A, B, cheer, flip) {
   g.globalAlpha = 1;
   pring(g, ccx, ccy, Math.round(6 * k), Math.round(6 * k * FS), ink);
   pring(g, ccx, ccy, Math.round(5.2 * k), Math.round(5.2 * k * FS), C.paint ? shadeHex(C.paint, .7) : A.trim);
-  if (indoor || ENV === 'gym') ptext(g, A.n[0], ccx, ccy, 14, darkInk(A) ? A.numc : '#fffaf2', 'center');
+  if (indoor || ENV === 'gym') drawEmblem(g, logoOf(A), ccx, ccy, Math.max(1, Math.round(k / 3.4)), lumOf(A.trim) > .75 && lumOf(A.c) > .75 ? A.d : A.trim, lumOf(A.c) > .8 ? A.d : '#fffaf2');
   else { pell(g, ccx, ccy, 4, 4, OUT); drawBall(g, ccx, ccy, true); }
   // boundary + half court
   g.fillStyle = ink; g.fillRect(X(0) - 1, Y(0) - 1, X(50) - X(0) + 3, 2); g.fillRect(X(0) - 1, Y(94), X(50) - X(0) + 3, 2); g.fillRect(X(0) - 1, Y(0), 2, Y(94) - Y(0)); g.fillRect(X(50), Y(0), 2, Y(94) - Y(0) + 1);
@@ -3976,7 +4031,9 @@ function hiColors(look, f) {
     sleeve:typeof look.sleeveC === 'string' ? look.sleeveC : hx2(look.sleeveC || 0x15171f),
     iris, irisL:mixHex(iris, '#ffd8a0', .4), pupil:'#1a0c08', eye:'#ffffff', tongue:'#ff5f6d', mouthK:'#3a1212',
     sock:'#f8f6f0', sockS:'#cfcbd8', wrist:look.bandC || '#f6f4ee',
-    pants, pantsS:shadeHex(pants, .75), pantsL:mixHex(pants, '#ffffff', .25), cuff:mixHex(pants, '#ffffff', .4)
+    pants, pantsS:shadeHex(pants, .75), pantsL:mixHex(pants, '#ffffff', .25), cuff:mixHex(pants, '#ffffff', .4),
+    knee:look.knee ? (typeof look.knee === 'string' ? look.knee : '#16181f') : null, tat:look.tat || 0, ink:mixHex(sk, '#16243a', .6), gog:look.gog ? (typeof look.gog === 'string' ? look.gog : '#ffc94d') : null,
+    pat:f.ref || O ? null : (f.pat || patOf(f)), patC:f.d || shadeHex(f.c || '#888888', .6)
   };
 }
 function hiHair(look) { return hairStyle(look); }
@@ -3984,8 +4041,10 @@ function hiHair(look) { return hairStyle(look); }
 function drawDoll(g, x0, y0, look, f, num, P) {
   const C = (P.C && P.C.chibi) ? P.C : (P.C = hiColors(look, f));
   const K = OUT, h = look.h || .94, w = look.w || 1;
-  const L = h >= .99 ? 7 : h >= .95 ? 6 : h >= .91 ? 5 : 4, T = h >= .97 ? 10 : 9;
-  const JW = w >= 1.08 ? 12 : w >= 1.03 ? 11 : w <= .95 ? 9 : 10;    // jersey width (front)
+  // body types: guards are short and slim, centers tall and wide, so every player has his own silhouette
+  const L = h >= .99 ? 8 : h >= .97 ? 7 : h >= .94 ? 6 : h >= .91 ? 5 : 4, T = h >= .97 ? 11 : h >= .93 ? 10 : 9;
+  const JW = w >= 1.08 ? 13 : w >= 1.03 ? 11 : w <= .96 ? 8 : 10;    // jersey width (front)
+  const LW = w >= 1.08 ? 4 : w <= .96 ? 2 : 3;                       // leg thickness
   const dir = P.dir, side = dir === 'side', fl = side ? (P.flip || 1) : 1, back = dir === 'up';
   const parts = [], fine = [];
   let LY = 0;                       // 0 legs + far arm, 1 body, 2 back hair, 3 head + face + front hair, 4 near arms, 9 effects
@@ -4011,29 +4070,32 @@ function drawDoll(g, x0, y0, look, f, num, P) {
     d(sx, t0 + 5, 8, 1, C.sole);                                                      // coloured outsole
   };
   if (!side) {
-    const sp = lg.mode === 'wide' ? 2 : lg.mode === 'tuck' ? -1 : 0;
+    const sp = lg.mode === 'wide' ? 2 : lg.mode === 'tuck' ? -1 : lg.mode === 'slide' ? 1 + Math.round((Math.sin(ph) + 1) * 1.2) : 0;
     for (const sd of [-1, 1]) {
       let up = 0;
       if (lg.mode === 'run') up = Math.round(Math.max(0, Math.sin(ph + (sd > 0 ? Math.PI : 0))) * 2 * amp);
       if (lg.mode === 'tuck') up = 2;
       if (lg.mode === 'sit') up = Math.round((Math.sin(ph + (sd > 0 ? Math.PI : 0)) + 1) * 1.5);
-      const x = sd < 0 ? -5 - sp : 2 + sp, top = yHip + 4, bot = -5 - up, len = Math.max(2, bot - top);
-      r(x, top, 3, len, legC); d(x + 2, top, 1, len, legS); d(x, top, 1, len, legL);
-      if (C.jog) { d(sd < 0 ? x : x + 2, top, 1, len, '#f4f1ea'); }
+      const x = sd < 0 ? -2 - LW - sp : 2 + sp, top = yHip + 4, bot = -5 - up, len = Math.max(2, bot - top);
+      r(x, top, LW, len, legC); d(x + LW - 1, top, 1, len, legS); if (LW > 2) d(x, top, 1, len, legL);
+      if (C.jog) { d(sd < 0 ? x : x + LW - 1, top, 1, len, '#f4f1ea'); }
+      if (C.knee && !PL) { const ky = top + Math.max(0, Math.round(len * .35)); r(x, ky, LW, 2, C.knee); d(x, ky, LW, 1, mixHex(C.knee, '#ffffff', .25)); }   // knee pads
       if (C.jeans) { r(x - (sd < 0 ? 1 : 0), bot - 2, 4, 2, C.cuff); d(x - (sd < 0 ? 1 : 0), bot - 2, 4, 1, mixHex(C.cuff, '#ffffff', .3)); }  // rolled cuffs
-      if (!PL) { r(x, bot - 2, 3, 2, C.sock); d(x + 2, bot - 2, 1, 2, C.sockS); }
-      shoeFront(sd < 0 ? x - 3 : x - 2, bot, sd);
+      if (!PL) { r(x, bot - 2, LW, 2, C.sock); d(x + LW - 1, bot - 2, 1, 2, C.sockS); }
+      shoeFront(Math.round(x + LW / 2 - 4) + (sd < 0 ? 0 : 0), bot, sd);
     }
   } else {
     for (const sd of [-1, 1]) {          // -1 = far leg (behind), 1 = near leg
       let fx = 0, up = 0;
       if (lg.mode === 'run') { const s2 = Math.sin(ph + (sd > 0 ? 0 : Math.PI)); fx = Math.round(s2 * 5 * amp); up = s2 > .3 ? Math.round(amp * 1.5) : 0; }
       if (lg.mode === 'wide') fx = sd * 3;
+      if (lg.mode === 'slide') fx = sd * (2 + Math.round((Math.sin(ph) + 1) * 1.5));
       if (lg.mode === 'tuck') { fx = sd > 0 ? 2 : -1; up = 2; }
       if (lg.mode === 'sit') { fx = 2; up = Math.round((Math.sin(ph + (sd > 0 ? Math.PI : 0)) + 1) * 1.5); }
       const far = sd < 0, top = yHip + 3, foot = -5 - up;
       const kx = Math.round(fx * .45), ky = top + Math.round((foot - top) * .5);
-      seg(-1, top, kx - 1, ky, far ? legS : legC, 3, true); seg(kx - 1, ky, fx - 1, foot - 1, far ? legS : legC, 3, true);
+      seg(-1, top, kx - 1, ky, far ? legS : legC, LW, true); seg(kx - 1, ky, fx - 1, foot - 1, far ? legS : legC, LW, true);
+      if (C.knee && !PL) r(kx - 1, ky - 1, LW, 2, far ? shadeHex(C.knee, .8) : C.knee);
       if (!far && C.jog) seg(kx, top, fx, foot - 1, '#f4f1ea', 1, false);
       if (C.jeans) r(fx - 2, foot - 2, 4, 2, far ? shadeHex(C.cuff, .85) : C.cuff);
       if (!PL) r(fx - 1, foot - 2, 3, 2, far ? C.sockS : C.sock);
@@ -4090,6 +4152,7 @@ function drawDoll(g, x0, y0, look, f, num, P) {
       r(x - 1, y, 2, 1, cuffZ ? (behind ? C.jerseyD : C.jerseyS) : armC(behind));
       if (!behind && LA && C.zip && t <= .7) sleeveStripe(x, y);
       if (!behind && !LA && t > .15) d(sd > 0 || side ? x : x - 1, y, 1, 1, sd > 0 || side ? C.skinS : C.skinL);
+      if (!LA && C.tat && (C.tat === 3 || C.tat === (i === 0 ? 1 : 2)) && t > .1 && t < .8 && ((k + i) % 3 !== 1)) d(x - 1 + (k % 2), y, 1, 1, behind ? shadeHex(C.ink, .8) : C.ink);   // tattoo sleeve
     }
     if (!behind && !LA && (i === 1 || look.band)) d(ex - 1, ey - 1, 2, 1, C.wrist);     // wristband
     hand(ex, ey, behind, false);
@@ -4105,6 +4168,12 @@ function drawDoll(g, x0, y0, look, f, num, P) {
       r(x0 + 1, yT, JW - 2, 1, C.jersey); r(x0, yT + 1, JW, T - 1, C.jersey);
       d(x0 + JW - 2, yT + 2, 2, T - 3, C.jerseyS); d(x0 + 1, yT + 2, 1, T - 4, C.jerseyL);
       d(x0, yT + T - 1, JW, 1, C.jerseyD);
+      if (C.pat === 'pin') for (let x = x0 + 2; x < x0 + JW - 1; x += 2) d(x, yT + 2, 1, T - 3, C.patC);
+      else if (C.pat === 'side') { d(x0 + 1, yT + 2, 2, T - 3, C.trim); d(x0 + JW - 3, yT + 2, 2, T - 3, C.trim); }
+      else if (C.pat === 'sash' && !back) for (let k = 0; k < T - 2; k++) d(x0 + JW - 2 - Math.round(k * (JW - 3) / (T - 3)), yT + 1 + k, 2, 1, C.trim);
+      else if (C.pat === 'band') { d(x0, yT + 3, JW, 2, C.trim); d(x0, yT + 5, JW, 1, C.patC); }
+      else if (C.pat === 'fade') for (let y = yT + Math.ceil(T / 2); y < yT + T - 1; y++) for (let x = x0 + ((y + 1) & 1); x < x0 + JW; x += (y > yT + T - 4 ? 1 : 2)) d(x, y, 1, 1, C.patC);
+      else if (C.pat === 'flame') for (let x = x0; x < x0 + JW; x++) { const fh = 1 + ((x * 5 + 3) % 4); d(x, yT + T - 1 - fh, 1, fh, (x & 1) ? C.trim : mixHex(C.trim, '#ff6a1f', .5)); }
       if (!C.plain) {                                                                   // tank: V-neck + armhole trim + hem
         d(-2, yT, 1, 1, C.trim); d(1, yT, 1, 1, C.trim); d(-1, yT + 1, 1, 1, C.trim); d(0, yT + 1, 1, 1, C.trim); d(-1, yT, 2, 1, C.skin);
         d(-3, yT, 1, 1, C.trim); d(2, yT, 1, 1, C.trim);
@@ -4127,6 +4196,11 @@ function drawDoll(g, x0, y0, look, f, num, P) {
     if (C.ref) { for (let k = 0; k < 8; k++) r(-4 + k, yT, 1, T, k % 2 ? '#16181f' : '#f2f2f2'); }
     else {
       r(-5, yT, 10, T, C.jersey); d(-5, yT, 2, T, C.jerseyS); d(2, yT + 1, 1, 3, C.jerseyL); d(-5, yT + T - 1, 10, 1, C.jerseyD);
+      if (C.pat === 'pin') for (let x = -4; x < 5; x += 2) d(x, yT + 2, 1, T - 3, C.patC);
+      else if (C.pat === 'side') d(-2, yT + 2, 2, T - 3, C.trim);
+      else if (C.pat === 'band') { d(-5, yT + 3, 10, 2, C.trim); d(-5, yT + 5, 10, 1, C.patC); }
+      else if (C.pat === 'fade') for (let y = yT + Math.ceil(T / 2); y < yT + T - 1; y++) for (let x = -5 + ((y + 1) & 1); x < 5; x += 2) d(x, y, 1, 1, C.patC);
+      else if (C.pat === 'flame') for (let x = -5; x < 5; x++) { const fh = 1 + ((x * 5 + 33) % 4); d(x, yT + T - 1 - fh, 1, fh, (x & 1) ? C.trim : mixHex(C.trim, '#ff6a1f', .5)); }
       if (!C.plain) { d(3, yT, 1, 2, C.trim); d(2, yT + 1, 1, 1, C.trim); d(-4, yT + T - 2, 8, 1, C.trim); d(-1, yT, 1, 3, C.trim); }
       else if (C.hood) { r(-6, yT - 2, 5, 4, C.jerseyS); d(-5, yT - 1, 3, 2, C.jerseyD); d(2, yT + 1, 1, 4, '#f4f1ea'); d(-1, yT + T - 5, 5, 3, C.jerseyS); }
       else if (C.zip) { r(-6, yT - 2, 5, 4, '#f4f1ea'); d(-5, yT - 1, 3, 2, '#d8d4c8'); d(3, yT, 1, T - 1, '#f4f1ea'); }
@@ -4138,7 +4212,7 @@ function drawDoll(g, x0, y0, look, f, num, P) {
     r(sx0, yHip - 1, SW, 6, C.shorts);
     d(sx0 + SW - 2, yHip, 1, 5, C.shortsS); d(sx0 + 1, yHip, 1, 3, C.shortsL);
     if (!C.ref && !C.plain) {
-      if (!side) { d(sx0 + 1, yHip - 1, 1, 6, C.trim); d(sx0 + SW - 2, yHip - 1, 1, 6, C.trim); d(sx0, yHip + 4, SW, 1, C.trim); }
+      if (!side) { d(sx0 + 1, yHip - 1, 1, 6, C.trim); d(sx0 + SW - 2, yHip - 1, 1, 6, C.trim); d(sx0, yHip + 4, SW, 1, C.trim); if (C.pat === 'side' || C.pat === 'pin') { d(sx0, yHip - 1, 1, 6, C.patC); d(sx0 + SW - 1, yHip - 1, 1, 6, C.patC); } }
       else { d(-2, yHip - 1, 1, 6, C.trim); d(-5, yHip + 4, 10, 1, C.trim); }
     } else d(sx0, yHip + 4, SW, 1, C.shortsS);
     if (!side) d(-1, yHip + 2, 1, 3, C.shortsS);
@@ -4256,6 +4330,14 @@ function drawDoll(g, x0, y0, look, f, num, P) {
     d(4, yH + 11, 3, 1, C.mouthK); d(6, yH + 10, 1, 1, C.mouthK); d(4, yH + 12, 2, 1, P.mouth ? C.tongue : C.skinS);
     d(1, yH + 10, 2, 1, C.skinB);
   }
+  if (C.gog) {                                           // sports goggles
+    LY = 4; const gc = C.gog, gs = shadeHex(gc, .7), lens = 'rgba(190,235,255,.28)';
+    if (!side && !back) {
+      for (const ex of [-7, 2]) { d(ex - 1, yH + 4, 7, 1, gc); d(ex - 1, yH + 10, 7, 1, gs); d(ex - 1, yH + 5, 1, 5, gc); d(ex + 5, yH + 5, 1, 5, gs); d(ex, yH + 5, 5, 5, lens); }
+      d(-2, yH + 6, 4, 1, gc); d(-9, yH + 6, 1, 2, '#16181f'); d(8, yH + 6, 1, 2, '#16181f');
+    } else if (side) { d(1, yH + 4, 6, 1, gc); d(1, yH + 10, 6, 1, gs); d(6, yH + 5, 1, 5, gs); d(1, yH + 5, 5, 5, lens); d(-7, yH + 6, 8, 1, '#16181f'); }
+    else d(-8, yH + 6, 16, 1, '#16181f');
+  }
   LY = 4;
   const cap = (rows, c) => rows.forEach(([ry, a0, a1]) => r(a0, yH + ry, a1 - a0 + 1, 1, c || hc));
   const fcap = (rows, c) => rows.forEach(([ry, a0, a1]) => d(a0, yH + ry, a1 - a0 + 1, 1, c || hc));
@@ -4297,7 +4379,7 @@ function drawDoll(g, x0, y0, look, f, num, P) {
   if (side) drawArm(fl > 0 ? 1 : 0, false);
   else for (const i of [0, 1]) {                         // seen from behind, arms reaching forward go behind the body
     const A = arms[i] || {};
-    if (back && (A.f || 0) >= 1 && (A.y || 0) > -3) { const keep = LY; LY = 0; drawArm(i, true); LY = keep; }
+    if (back && (A.f || 0) >= 1 && (A.y || 0) > -3 || !back && (A.f || 0) <= -2) { const keep = LY; LY = 0; drawArm(i, true); LY = keep; }
     else drawArm(i, false);
   }
   // ---- render: per layer outline, colour, details; jersey number after the body
@@ -5255,6 +5337,9 @@ function renderCreator() {
   else if (CR.tab === 'gear') body = `
     <div class="crrow"><label>HEADBAND</label>${crSw('crband', ACC_COLORS, L.band ? L.bandC : null, true)}</div>
     <div class="crrow"><label>ARM SLEEVE</label>${crSw('crsleeve', ACC_COLORS, L.sleeve ? L.sleeveC : null, true)}</div>
+    <div class="crrow"><label>KNEE PADS</label>${crSw('crknee', ACC_COLORS, L.knee || null, true)}</div>
+    <div class="crrow"><label>GOGGLES</label>${crSw('crgog', ACC_COLORS, L.gog || null, true)}</div>
+    <div class="crrow"><label>TATTOOS</label><div class="seg">${[[0, 'None'], [1, 'Left'], [2, 'Right'], [3, 'Both']].map(([v, l]) => `<button class="${(L.tat || 0) === v ? 'on' : ''}" data-act="crtat" data-v="${v}">${l}</button>`).join('')}</div></div>
     <p class="hint">Shoes, jerseys, street clothes and new moves are in the stores around Dream City.</p>`;
   else body = `
     <div class="crrow"><label for="crfirst">FIRST NAME</label><input id="crfirst" maxlength="12" autocomplete="off" value="${esc(M.first)}" placeholder="Trey"></div>
@@ -5298,6 +5383,9 @@ function creatorAct(a, d) {
   else if (a === 'creye') L.eyeC = d.v;
   else if (a === 'crband') { L.band = !!d.v; if (d.v) L.bandC = d.v; }
   else if (a === 'crsleeve') { L.sleeve = !!d.v; if (d.v) L.sleeveC = d.v; }
+  else if (a === 'crknee') L.knee = d.v || false;
+  else if (a === 'crgog') L.gog = d.v || false;
+  else if (a === 'crtat') L.tat = +d.v || 0;
   else if (a === 'crback') { const order = ['body', 'look', 'gear', 'name'], i = order.indexOf(CR.tab); if (i > 0) CR.tab = order[i - 1]; else { const sl = CR.slot; CR = null; showModes(sl); return; } }
   else if (a === 'crdone') {
     const order = ['body', 'look', 'gear', 'name'], i = order.indexOf(CR.tab);
