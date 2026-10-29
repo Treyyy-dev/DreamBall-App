@@ -1036,6 +1036,12 @@ svg.crest.px,.who svg.crest,.mhead svg.crest,.fr svg.crest{image-rendering:pixel
 .sitem.furn{grid-template-columns:48px 1fr auto}
 /* Baller Road and Rank League live in the phone now */
 .home .road{display:none!important}
+/* detailed pixel shop icons */
+.aic svg.aisvg{width:40px;height:40px;image-rendering:pixelated}
+.fic{width:52px;height:40px;display:flex;align-items:center;justify-content:center;background:#1b1f4a;box-shadow:0 0 0 2px #2a2f6a;flex:none}
+.fic svg{width:48px;height:auto;image-rendering:pixelated}
+.sic svg.jsy{height:46px}
+.sitem .sh,.sitem>svg.sh{width:56px}
 
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0;-webkit-text-size-adjust:100%;overscroll-behavior:none;touch-action:manipulation}
@@ -1306,7 +1312,7 @@ function crestSVG(f) {
 const SHOE_MAP = ['......kkkkk............', '.....kuuuuuk...........', '.....kuwwuuuk..........', '.....kuuwwuuuk.........', '....kuuuuwwuuukk.......', '....kuuuuuwwuuuukk.....', '...kuuaaaauuuuuuuukk...', '..kuuuuuaaaauuuuuuuukk.', '.kuuuuuuuuuuuuuuuuuuuuk', '.kllllllllllllllllllllk', '.ksssssssssssssssssssk.', '..kkkkkkkkkkkkkkkkkkk..'];
 function shoeSVG(m) {
   const idx = SHOES.indexOf(m), u = hexS(m.c), sole = hexS(m.s);
-  const svg = pixSVG(SHOE_MAP, {k:'#120e18', u, w:'#f4f1ea', a:sole, l:'#f4f1ea', s:sole}, 'sh px');
+  const svg = shoeIconSVG(m, 'sh px');
   if (typeof PHOTO_OK === 'undefined' || !PHOTO_OK || typeof SHOE_ART === 'undefined' || !SHOE_ART[idx]) return svg;
   return `<span class="sh shw">${svg.replace('class="sh px"', 'class="shi px"')}<img src="${PH_BASE + SHOE_ART[idx]}_min.webp" alt="" loading="lazy" onerror="this.remove()"></span>`;
 }
@@ -1553,10 +1559,7 @@ const lumOf = h => { const n = parseInt(h.slice(1, 7), 16); return (((n >> 16) &
 
 // ---- little pixel icons for menus and rewards
 const JERSEY_MAP = ['..aa..aa..', '.aabaabaa.', 'aaabbbbaaa', 'aa.cccc.aa', '...cccc...', '...cccc...', '...cccc...', '...dddd...'];
-function jerseySVG(j, cls) {
-  return pixSVG(['..ooo..ooo..', '.oaaoooaao..', 'oaaabbbbaaao', 'oaaocccccaao', 'oooocnncoooo', '...occncco..', '...occccco..', '...odddddo..', '...ooooooo..'].map(r => r.slice(0, 12)),
-    {o:'#120e18', a:j.c, b:j.trim, c:j.c, n:j.numc, d:j.d}, cls || 'jsy');
-}
+function jerseySVG(j, cls) { return jerseyIconSVG(j, cls); }
 function ballSVG(b, cls) {
   const map = ['..ooooo..', '.oaasaao.', 'oaaasaalo', 'oaaasaaao', 'osssssssso'.slice(0, 9), 'odaasaado', 'odaasaado', '.oddsddo.', '..ooooo..'];
   return pixSVG(map, {o:'#120e18', a:b.base, d:b.dark, l:b.shine, s:b.seam}, cls || 'bll');
@@ -1789,6 +1792,177 @@ const FURN = [
 const FURNI = Object.fromEntries(FURN.map(f => [f.id, f]));
 const FURN_ROOMS = [['living', 'LIVING ROOM', ['couch', 'tv', 'rug', 'lamp', 'plant', 'art']], ['kitchen', 'KITCHEN', ['fridge', 'table']], ['bedroom', 'BEDROOM', ['bed', 'desk', 'game', 'poster']], ['fun', 'TROPHY ROOM', ['trophy', 'hoop']]];
 const HOME0 = {couch:'couch_gray', tv:'tv_small', rug:'rug_beige', lamp:'lamp_none', plant:'plant_none', art:'art_none', fridge:'fridge_white', table:'table_wood', bed:'bed_twin', desk:'desk_basic', game:'game_none', poster:'poster_none', trophy:'trophy_none', hoop:'hoop_none'};
+
+// ================= shop item icons: detailed pixel art (original designs) =================
+// Drawn on a small pixel grid and emitted as an SVG of merged runs, so it works anywhere the old icons did.
+const ICON_CACHE = new Map();
+function PXG(w, h) {
+  const a = new Array(w * h).fill(null);
+  const o = {w, h, a,
+    set(x, y, c) { x = Math.round(x); y = Math.round(y); if (x >= 0 && y >= 0 && x < w && y < h) a[y * w + x] = c; },
+    get(x, y) { return x >= 0 && y >= 0 && x < w && y < h ? a[y * w + x] : null; },
+    rect(x, y, ww, hh, c) { for (let j = 0; j < hh; j++) for (let i = 0; i < ww; i++) o.set(x + i, y + j, c); },
+    span(y, x0, x1, c) { for (let x = x0; x <= x1; x++) o.set(x, y, c); },
+    shape(rows, y0, c) { rows.forEach((r, j) => { for (let k = 0; k < r.length; k += 2) o.span(y0 + j, r[k], r[k + 1], c); }); },
+    outline(c) { const add = []; for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (!a[y * w + x] && [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => { const v = o.get(x + dx, y + dy); return v && v !== c; })) add.push(y * w + x); for (const i of add) a[i] = c; },
+    recolor(from, to, test) { for (let i = 0; i < a.length; i++) if (a[i] === from && (!test || test(i % w, (i / w) | 0))) a[i] = to; },
+    svg(cls) { let r = ''; for (let y = 0; y < h; y++) { let x = 0; while (x < w) { const c = a[y * w + x]; if (!c) { x++; continue; } let e = x; while (e + 1 < w && a[y * w + e + 1] === c) e++; r += `<rect x="${x}" y="${y}" width="${e - x + 1}" height="1" fill="${c}"/>`; x = e + 1; } }
+      return `<svg class="${cls}" viewBox="0 0 ${w} ${h}" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`; }};
+  return o;
+}
+const icon = (key, fn) => { if (!ICON_CACHE.has(key)) ICON_CACHE.set(key, fn()); return ICON_CACHE.get(key); };
+const IK = '#120e18';
+const lt = (c, k) => mixHex(c, '#ffffff', k), dk = (c, k) => shadeHex(c, k);
+const ICON_DIG = ['111101101101111', '010110010010111', '111001111100111', '111001111001111', '101101111001001', '111100111001111', '111100111101111', '111001010010010', '111101111101111', '111101111001111'];
+function pxNum(G, n, cx, y, c) { const s = String(n), w = s.length * 4 - 1, x0 = Math.round(cx - w / 2); [...s].forEach((ch, i) => { const m = ICON_DIG[+ch] || ICON_DIG[0]; for (let k = 0; k < 15; k++) if (m[k] === '1') G.set(x0 + i * 4 + (k % 3), y + ((k / 3) | 0), c); }); }
+
+// ---- sneakers: side view high-top, team-colour upper, accent heel, white midsole, coloured outsole
+function shoeIconSVG(m, cls) {
+  const u = typeof m.c === 'number' ? hx2(m.c) : m.c, s = typeof m.s === 'number' ? hx2(m.s) : m.s;
+  return icon('sh' + u + s + (m.r || 0) + cls, () => {
+    const G = PXG(32, 20), acc = lumOf(s) < .2 && lumOf(u) > .7 ? '#e2453a' : s, white = '#f8f6f0';
+    G.shape([[4, 11], [3, 13], [3, 15], [3, 17], [3, 19], [3, 21], [2, 24], [2, 26], [2, 28], [2, 29], [2, 29]], 3, u);   // upper
+    G.span(3, 4, 11, lt(u, .35)); G.span(4, 4, 6, lt(u, .25));                                                 // padded collar
+    G.rect(5, 3, 5, 1, dk(u, .5));                                                                            // opening
+    G.rect(11, 2, 3, 4, lt(u, .2)); G.set(11, 2, lt(u, .45));                                                 // tongue
+    for (let i = 0; i < 4; i++) { G.set(12 + i * 2, 6 + i, white); G.set(13 + i * 2, 6 + i, white); G.set(12 + i * 2, 7 + i, dk(u, .7)); }   // laces
+    G.shape([[2, 6], [2, 7], [2, 7], [2, 7], [2, 6]], 9, acc); G.span(8, 3, 5, acc);                         // heel counter
+    G.shape([[21, 26], [21, 28], [21, 29]], 11, lt(u, .3));                                                    // toe cap
+    for (let x = 9; x < 18; x++) { G.set(x, 12 - Math.floor((x - 9) / 3), acc); G.set(x, 13 - Math.floor((x - 9) / 3), dk(acc, .8)); }   // side stripe
+    G.span(14, 2, 29, white); G.span(15, 3, 29, '#d8d4dc'); G.span(16, 3, 28, acc); G.span(17, 4, 27, dk(acc, .6));   // midsole + outsole
+    for (let x = 6; x < 28; x += 3) G.set(x, 15, '#bdb8c4');
+    G.span(13, 2, 2, dk(u, .7)); G.set(29, 12, dk(u, .7)); G.set(3, 5, lt(u, .5)); G.set(8, 8, lt(u, .5)); G.set(24, 10, lt(u, .6));
+    G.outline(IK); return G.svg(cls || 'sh px');
+  });
+}
+// ---- jersey: tank with V-neck + armhole trim, side panels / pattern, number
+function jerseyIconSVG(j, cls) {
+  const num = (JERSEYS.indexOf(j) * 7 + 3) % 60;
+  return icon('js' + j.id + j.c + (cls || ''), () => {
+    const G = PXG(26, 28), c = j.c, t = j.trim, d = j.d, pat = patOf(j);
+    G.shape([[5, 8, 17, 20], [5, 8, 17, 20], [4, 9, 16, 21], [4, 10, 15, 21], [3, 11, 14, 22], [3, 22], [3, 22]], 1, c);
+    for (let y = 8; y < 26; y++) G.span(y, 2, 23, c);
+    for (let y = 1; y < 6; y++) { const lx = [5, 5, 4, 4, 3][y - 1], rx = [20, 20, 21, 21, 22][y - 1]; G.set(lx, y, t); G.set(rx, y, t); }   // armhole trim
+    for (let y = 1; y < 6; y++) { G.set(8 + Math.min(3, y - 1), y, t); G.set(17 - Math.min(3, y - 1), y, t); } G.span(6, 11, 14, t);       // V-neck trim
+    G.set(2, 8, t); G.set(23, 8, t); G.set(3, 7, t); G.set(22, 7, t);
+    if (pat === 'side') { for (let y = 8; y < 25; y++) { G.set(3, y, t); G.set(4, y, t); G.set(21, y, t); G.set(22, y, t); } }
+    else if (pat === 'pin') { for (let x = 4; x < 22; x += 3) for (let y = 7; y < 25; y++) G.set(x, y, dk(c, .82)); }
+    else if (pat === 'band') { G.span(16, 2, 23, t); G.span(17, 2, 23, t); G.span(18, 2, 23, d); }
+    else if (pat === 'sash') { for (let y = 7; y < 25; y++) { const x = 22 - Math.round((y - 7) * 19 / 17); G.set(x, y, t); G.set(x + 1, y, t); } }
+    else if (pat === 'fade') { for (let y = 16; y < 25; y++) for (let x = 2 + (y & 1); x < 24; x += (y > 21 ? 1 : 2)) G.set(x, y, d); }
+    else if (pat === 'flame') { for (let x = 2; x < 24; x++) { const h = 2 + ((x * 5 + 3) % 4); for (let k = 0; k < h; k++) G.set(x, 24 - k, k > h - 2 ? '#ffd84d' : '#ff6a1f'); } }
+    for (let y = 8; y < 25; y++) { G.set(21, y, G.get(21, y) === c ? dk(c, .8) : G.get(21, y)); G.set(22, y, G.get(22, y) === c ? dk(c, .7) : G.get(22, y)); G.set(23, y, dk(c, .6)); }
+    for (let y = 8; y < 16; y++) G.set(4, y, G.get(4, y) === c ? lt(c, .25) : G.get(4, y));
+    G.span(25, 2, 23, t); G.span(24, 2, 23, G.get(12, 24) === c ? dk(c, .85) : G.get(12, 24));
+    G.rect(8, 9, 10, 7, null); for (let y = 9; y < 16; y++) for (let x = 8; x < 18; x++) G.set(x, y, pat === 'pin' && x % 3 === 1 ? dk(c, .82) : c);
+    pxNum(G, num, 13, 10, j.numc);
+    G.outline(IK); return G.svg(cls || 'jsy');
+  });
+}
+// ---- street clothes
+function clothIconSVG(c) {
+  return icon('cl' + c.id, () => {
+    const k = c.c, d1 = dk(k, .78), d2 = dk(k, .6), l1 = lt(k, .25), white = '#f4f1ea';
+    if (c.slot === 'top') {
+      const G = PXG(30, 28);
+      const sleeves = c.type === 'tee' ? 'short' : c.type === 'tank' ? 'none' : 'long';
+      G.shape([[9, 20], [6, 23], [5, 24]], 2, k); for (let y = 5; y < 25; y++) G.span(y, 7, 22, k);                         // body
+      if (sleeves === 'short') { G.shape([[3, 7], [2, 7], [1, 7], [1, 6], [2, 6]], 4, k); G.shape([[22, 26], [22, 27], [22, 28], [23, 28], [23, 27]], 4, k); G.span(8, 1, 6, d1); G.span(8, 23, 28, d1); }
+      else if (sleeves === 'long') { for (let y = 4; y < 23; y++) { G.span(y, Math.max(1, 5 - (y > 6 ? 3 : 1)), 6, k); G.span(y, 23, Math.min(28, 24 + (y > 6 ? 3 : 1)), k); } G.span(22, 2, 6, d2); G.span(22, 23, 27, d2); G.span(21, 2, 6, d1); G.span(21, 23, 27, d1); }
+      else { G.rect(5, 2, 4, 4, null); G.rect(21, 2, 4, 4, null); G.shape([[9, 11, 18, 20], [8, 11, 18, 21]], 2, k); }
+      for (let y = 5; y < 25; y++) { G.set(21, y, d1); G.set(22, y, d2); G.set(8, y, l1); }                                     // shading
+      if (c.type === 'hoodie') {
+        G.shape([[10, 19], [9, 20], [8, 21], [8, 21]], 0, d1); G.rect(12, 1, 6, 3, d2);                                     // hood
+        for (let y = 4; y < 11; y++) { G.set(12, y, white); G.set(17, y, white); } G.set(12, 11, '#c9c2b4'); G.set(17, 11, '#c9c2b4');   // drawstrings
+        G.rect(10, 15, 10, 5, d1); G.span(15, 10, 19, d2); G.set(10, 19, d2); G.set(19, 19, d2);                               // pouch
+        G.span(23, 7, 22, d2); G.span(24, 7, 22, d1);
+      } else if (c.type === 'jacket') {
+        const varsity = c.id === 'jack_blue', sl = varsity ? '#efe4c8' : k;
+        if (varsity) for (let y = 4; y < 23; y++) for (let x = 1; x < 29; x++) if ((x < 7 || x > 22) && G.get(x, y)) G.set(x, y, x < 7 ? '#efe4c8' : '#d6c8a6');
+        G.span(2, 10, 19, varsity ? white : d2); G.span(3, 9, 20, varsity ? k : d2);                                            // ribbed collar
+        for (let y = 4; y < 25; y++) G.set(15, y, varsity ? d2 : '#c9d1de');                                                   // zip / placket
+        if (varsity) { for (let y = 6; y < 24; y += 3) G.set(16, y, white); G.rect(9, 7, 3, 3, '#ffcf3a'); G.set(10, 8, k); G.span(23, 7, 22, white); G.span(24, 7, 22, k); G.span(21, 2, 6, k); G.span(21, 23, 27, k); }
+        else { G.rect(9, 15, 4, 1, d2); G.rect(18, 15, 4, 1, d2); G.span(24, 7, 22, d2); G.set(16, 6, '#e8eef6'); }
+      } else if (c.type === 'long') { G.span(3, 11, 18, d2); G.span(24, 7, 22, d1); }
+      else if (c.type === 'tank') { G.span(3, 11, 18, d2); G.span(24, 7, 22, d1); }
+      else { G.shape([[12, 17], [13, 16]], 2, d2); G.span(24, 7, 22, d1); for (let y = 12; y < 20; y += 4) G.set(18, y, d1); }   // tee: collar + folds
+      G.outline(IK); return G.svg('cl');
+    }
+    if (c.slot === 'bot') {
+      if (c.type === 'shorts') {
+        const G = PXG(28, 22);
+        G.rect(4, 2, 20, 3, d1); for (let y = 5; y < 19; y++) { G.span(y, 3, 13, k); G.span(y, 15, 24, k); } G.rect(13, 5, 2, 5, k);
+        G.set(13, 3, white); G.set(14, 3, white); G.set(13, 4, white); G.set(14, 5, white);                                      // drawstring
+        for (let y = 5; y < 19; y++) { G.set(4, y, white); G.set(23, y, white); G.set(22, y, d1); G.set(5, y, l1); }
+        G.span(18, 3, 13, d2); G.span(18, 15, 24, d2); G.set(14, 9, d2);
+        G.outline(IK); return G.svg('cl');
+      }
+      const G = PXG(24, 32), jeans = c.type === 'jeans';
+      G.rect(4, 1, 16, 3, d1); for (let y = 4; y < 29; y++) { const t = jeans ? 0 : Math.floor((y - 4) / 8); G.span(y, 4 + t, 11, k); G.span(y, 12, 19 - t, k); }
+      for (let x = 5; x < 19; x += 4) G.set(x, 2, d2);                                                                       // belt loops
+      for (let y = 4; y < 28; y++) { G.set(11, y, d1); G.set(18 - (jeans ? 0 : Math.floor((y - 4) / 8)), y, d1); G.set(5 + (jeans ? 0 : Math.floor((y - 4) / 8)), y, l1); }
+      if (jeans) { G.span(5, 6, 9, lt(k, .35)); G.span(5, 14, 17, lt(k, .35)); G.set(6, 6, lt(k, .35)); G.set(17, 6, lt(k, .35)); for (let y = 6; y < 27; y += 2) { G.set(7, y, lt(k, .2)); G.set(16, y, lt(k, .2)); } G.rect(4, 26, 8, 3, lt(k, .4)); G.rect(12, 26, 8, 3, lt(k, .4)); G.span(27, 4, 11, lt(k, .2)); G.span(27, 12, 19, lt(k, .2)); }
+      else { for (let y = 4; y < 27; y++) { const t = Math.floor((y - 4) / 8); G.set(4 + t, y, white); G.set(19 - t, y, white); G.set(5 + t, y, white); G.set(18 - t, y, white); } G.span(27, 7, 11, d2); G.span(28, 7, 11, d2); G.span(27, 12, 16, d2); G.span(28, 12, 16, d2); }
+      G.outline(IK); return G.svg('cl');
+    }
+    const G = PXG(28, 20);
+    if (c.type === 'none') { for (let a = 0; a < 40; a++) { const t = a / 40 * Math.PI * 2; G.set(14 + Math.round(Math.cos(t) * 7), 10 + Math.round(Math.sin(t) * 7), '#5a6086'); } for (let i = -5; i <= 5; i++) G.set(14 + i, 10 - i, '#5a6086'); return G.svg('cl'); }
+    if (c.type === 'cap') {
+      G.shape([[9, 16], [7, 18], [6, 19], [5, 20], [5, 20], [5, 20], [5, 20]], 3, k); G.set(12, 2, d2); G.set(13, 2, d2);
+      for (let y = 4; y < 10; y++) { G.set(12, y, d1); G.set(16, y, d1); G.set(19, y, d1); } G.span(4, 8, 11, l1); G.span(5, 7, 10, l1);
+      G.shape([[5, 26], [8, 27], [16, 26]], 10, d1); G.span(11, 17, 25, d2); G.rect(7, 6, 4, 3, white);                     // brim + front panel
+      G.outline(IK); return G.svg('cl');
+    }
+    if (c.type === 'beanie') {
+      G.rect(12, 1, 4, 2, white); G.set(11, 2, white); G.set(16, 2, white);
+      G.shape([[10, 17], [8, 19], [7, 20], [6, 21], [6, 21], [6, 21]], 3, k); for (let x = 7; x < 21; x += 2) for (let y = 4; y < 9; y++) G.set(x, y, d1);
+      G.rect(5, 9, 18, 4, d1); for (let x = 6; x < 22; x += 2) for (let y = 9; y < 13; y++) G.set(x, y, d2); G.span(9, 5, 22, l1);
+      G.outline(IK); return G.svg('cl');
+    }
+    if (c.type === 'bucket') {
+      G.shape([[10, 17], [9, 18], [9, 18], [8, 19], [8, 19]], 3, k); G.span(4, 10, 13, l1); G.span(7, 8, 19, d1);
+      G.shape([[5, 22], [3, 24], [2, 25]], 8, d1); G.span(10, 2, 25, d2); G.outline(IK); return G.svg('cl');
+    }
+    G.shape([[9, 18], [7, 20], [6, 21], [6, 21], [6, 21], [7, 20]], 4, k); G.span(5, 9, 13, l1); for (let y = 6; y < 10; y++) G.set(19, y, d1);   // durag
+    G.rect(20, 10, 2, 6, k); G.rect(22, 11, 2, 7, d1); G.outline(IK); return G.svg('cl');
+  });
+}
+// ---- moves studio: little scenes per category, tinted per item
+function animIconSVG(a) {
+  return icon('an' + a.id, () => {
+    const G = PXG(32, 32), tone = ['#ff3fd0', '#36e6ff', '#ffd84d', '#5fd38a', '#ff6a1f', '#a77bff'][hashStr(a.id) % 6], ball = '#f0801e', skin = '#c88a5a';
+    const ballAt = (cx, cy) => { G.shape([[cx - 1, cx + 1], [cx - 2, cx + 2], [cx - 2, cx + 2], [cx - 2, cx + 2], [cx - 1, cx + 1]], cy - 2, ball); G.span(cy, cx - 2, cx + 2, '#5a2408'); G.set(cx, cy - 2, '#5a2408'); G.set(cx, cy - 1, '#5a2408'); G.set(cx, cy + 1, '#5a2408'); G.set(cx - 1, cy - 1, '#ffb15a'); };
+    const person = (x, y, armsUp, jersey) => { G.rect(x - 2, y, 5, 5, skin); G.span(y, x - 2, x + 2, '#2b1d12'); G.rect(x - 3, y + 5, 7, 6, jersey); G.rect(x - 3, y + 11, 3, 6, skin); G.rect(x + 1, y + 11, 3, 6, skin); G.rect(x - 3, y + 16, 3, 2, '#f4f1ea'); G.rect(x + 1, y + 16, 3, 2, '#f4f1ea');
+      if (armsUp) { G.rect(x - 5, y - 4, 2, 10, skin); G.rect(x + 4, y - 4, 2, 10, skin); } else { G.rect(x - 5, y + 5, 2, 6, skin); G.rect(x + 4, y + 5, 2, 6, skin); } };
+    if (a.cat === 'shot') { person(14, 11, true, tone); ballAt(15, 5); for (let i = 0; i < 4; i++) G.set(22 + i, 6 - i, '#ffffff'); }
+    else if (a.cat === 'dunk') { G.rect(4, 3, 14, 9, '#f4f6f8'); G.rect(8, 6, 6, 4, null); G.rect(8, 6, 6, 1, '#e2453a'); G.span(12, 6, 16, '#ff6a1f'); for (let x = 7; x < 16; x += 2) G.set(x, 13, '#f4f1ea'); ballAt(11, 9); person(20, 12, true, tone); for (let i = 0; i < 3; i++) G.span(26 + i, 24, 27, '#ffffff'); }
+    else if (a.cat === 'celeb') { person(16, 11, true, tone); for (let i = 0; i < 14; i++) G.set(3 + (i * 7) % 26, 2 + (i * 5) % 9, ['#ffd84d', '#ff3fd0', '#36e6ff', '#5fd38a'][i % 4]); }
+    else { ballAt(20, 22); for (let i = 0; i < 3; i++) G.span(18 + i * 3, 4 + i * 2, 13 + i, tone); G.rect(6, 26, 4, 2, '#f4f1ea'); G.rect(12, 28, 4, 2, '#f4f1ea'); }
+    G.outline(IK); return G.svg('aisvg');
+  });
+}
+// ---- furniture: a little drawing of the actual piece
+function furnIconSVG(f) {
+  return icon('fu' + f.id, () => {
+    const G = PXG(40, 30), c = f.c || '#8a94a6', c2 = f.c2 || dk(c, .75), wood = '#8a5a32', s = f.slot;
+    if (s === 'couch') { const w = f.big ? 34 : 28, x0 = 20 - w / 2; G.rect(x0, 9, w, 8, c2); G.rect(x0 + 2, 16, w - 4, 5, c); G.rect(x0, 15, 4, 8, c2); G.rect(x0 + w - 4, 15, 4, 8, c2); G.rect(x0 + 2, 23, 2, 3, wood); G.rect(x0 + w - 4, 23, 2, 3, wood); G.span(16, x0 + 2, x0 + w - 3, lt(c, .25)); G.set(20, 18, dk(c, .8)); if (f.big) G.rect(x0 + w - 10, 16, 6, 7, c); }
+    else if (s === 'tv') { const w = Math.min(34, (f.w || 6) * 4.5); G.rect(20 - w / 2, 4, w, w * .55, '#0a0b10'); G.rect(20 - w / 2 + 1, 5, w - 2, w * .55 - 2, '#2a7fd6'); G.rect(20 - w / 2 + 2, 6, 4, 1, '#bfe3f5'); G.rect(17, 4 + w * .55, 6, 3, '#2a2f3a'); G.rect(12, 7 + w * .55, 16, 2, wood); }
+    else if (s === 'rug') { G.rect(4, 8, 32, 16, c); G.rect(6, 10, 28, 12, c2); G.rect(8, 12, 24, 8, c); if (f.court) { G.rect(19, 8, 1, 16, '#ffffff'); G.rect(4, 13, 4, 6, c2); G.rect(32, 13, 4, 6, c2); } for (let x = 4; x < 36; x += 2) { G.set(x, 7, '#f4f1ea'); G.set(x, 24, '#f4f1ea'); } }
+    else if (s === 'lamp') { G.shape([[16, 23], [15, 24], [14, 25], [13, 26], [12, 27]], 3, c); G.span(4, 16, 18, lt(c, .3)); G.rect(19, 8, 2, 16, '#5a6478'); G.rect(15, 24, 10, 2, '#5a6478'); for (let r = 0; r < 3; r++) G.span(9 + r, 10 - r * 2, 30 + r * 2, null); }
+    else if (s === 'plant') { G.rect(15, 20, 10, 7, '#9a5a3a'); G.span(20, 14, 25, '#b06a42'); if (f.id === 'plant_palm') { for (let i = -8; i <= 8; i += 4) for (let k = 0; k < 9; k++) G.set(20 + i * k / 8, 18 - k + Math.abs(i * k) / 16, c); G.rect(19, 10, 2, 10, '#7a5232'); } else { G.shape([[18, 22], [15, 25], [13, 27], [12, 28], [13, 27], [15, 25], [16, 24]], 8, c); for (let k = 0; k < 6; k++) G.set(15 + k * 2, 10 + (k % 3) * 3, lt(c, .3)); } }
+    else if (s === 'art') { G.rect(8, 3, 24, 20, f.id === 'art_record' ? '#16181f' : '#c9963a'); G.rect(10, 5, 20, 16, f.id === 'art_record' ? '#2a2f3a' : c); if (f.id === 'art_record') { G.shape([[17, 23], [15, 25], [14, 26], [14, 26], [14, 26], [15, 25], [17, 23]], 9, '#0a0b10'); G.rect(19, 12, 2, 2, c); } else { G.shape([[18, 22], [16, 24], [14, 26]], 10, lt(c, .35)); G.rect(10, 16, 20, 5, dk(c, .7)); } }
+    else if (s === 'fridge') { G.rect(12, 2, 16, 26, c); G.rect(12, 11, 16, 1, dk(c, .65)); G.rect(25, 5, 1, 4, dk(c, .5)); G.rect(25, 14, 1, 6, dk(c, .5)); G.rect(13, 3, 2, 7, lt(c, .3)); }
+    else if (s === 'table') { G.rect(6, 10, 28, 6, c); G.span(10, 6, 33, lt(c, .25)); G.rect(8, 16, 2, 9, dk(c, .6)); G.rect(30, 16, 2, 9, dk(c, .6)); G.rect(1, 13, 4, 8, '#7a4a22'); G.rect(35, 13, 4, 8, '#7a4a22'); }
+    else if (s === 'bed') { const w = f.big ? 34 : 28, x0 = 20 - w / 2; G.rect(x0, 4, w, 22, '#5a3a22'); G.rect(x0 + 2, 6, w - 4, 5, c2); G.rect(x0 + 2, 11, w - 4, 13, c); G.span(11, x0 + 2, x0 + w - 3, lt(c, .3)); G.rect(x0 + 4, 7, 8, 3, '#f4f1ea'); if (f.big) G.rect(x0 + w - 12, 7, 8, 3, '#f4f1ea'); }
+    else if (s === 'desk') { G.rect(4, 14, 32, 4, c); G.span(14, 4, 35, lt(c, .25)); G.rect(6, 18, 2, 8, dk(c, .6)); G.rect(32, 18, 2, 8, dk(c, .6)); G.rect(13, 3, 14, 9, '#0a0b10'); G.rect(14, 4, 12, 7, f.rgb ? '#ff3fd0' : '#2a7fd6'); G.rect(19, 12, 2, 2, '#2a2f3a'); if (f.rgb) G.span(18, 4, 35, '#36e6ff'); }
+    else if (s === 'game') { if (f.id === 'game_arcade') { G.rect(12, 2, 16, 26, c); G.rect(14, 4, 12, 9, '#0a0b10'); G.rect(15, 5, 10, 7, '#36e6ff'); G.rect(13, 15, 14, 4, dk(c, .7)); G.set(16, 16, '#ff3fd0'); G.set(22, 16, '#ffd84d'); G.set(23, 17, '#5fd38a'); } else { G.rect(8, 8, 24, 13, '#0a0b10'); G.rect(9, 9, 22, 11, '#2a2f3a'); G.rect(12, 20, 16, 4, '#5a3a22'); G.rect(14, 24, 12, 4, c); G.set(16, 25, '#ffffff'); G.set(23, 25, '#ffffff'); } }
+    else if (s === 'poster') { G.rect(10, 2, 20, 26, c); G.rect(12, 4, 16, 16, lt(c, .2)); G.rect(17, 7, 6, 10, IK); G.rect(18, 5, 4, 3, '#c88a5a'); G.rect(12, 22, 16, 2, '#ffffff'); }
+    else if (s === 'trophy') { G.rect(4, 6, 32, 20, c); G.rect(5, 7, 30, 18, dk(c, .55)); for (let i = 0; i < 4; i++) { const x = 8 + i * 7; G.rect(x, 10, 5, 4, i ? '#ffc94d' : '#c9d1de'); G.rect(x + 2, 14, 1, 3, i ? '#ffc94d' : '#c9d1de'); G.rect(x + 1, 17, 3, 1, i ? '#e0b04a' : '#9aa3b5'); } G.span(19, 5, 34, lt(c, .3)); }
+    else if (s === 'hoop') { G.rect(16, 3, 18, 12, '#f4f6f8'); G.rect(21, 7, 8, 5, null); G.rect(21, 7, 8, 1, '#e2453a'); G.span(15, 20, 30, c); for (let x = 21; x < 30; x += 2) G.rect(x, 16, 1, 4, '#f4f1ea'); G.rect(31, 15, 2, 13, '#5a6478'); }
+    else G.rect(8, 6, 24, 18, c);
+    G.outline(IK); return G.svg('fusvg');
+  });
+}
 
 // ================= save =================
 const KEY = 'dreamball-save-v3', OLD_KEY = 'dreamball-save-v2';
@@ -5055,13 +5229,14 @@ const CW = 120, CHH = 170;                       // city size in feet
 const CITY_B = [
   {id:'nba',     n:'NBA ARENA',     x0:41, y0:3,  x1:79,  y1:37,  fd:13, door:60,  wall:'#23263a', roof:'#8a95a8', trim:'#ffc94d', sign:'#120e18', stage:'nba'},
   {id:'college', n:'DREAM STATE U', x0:83, y0:6,  x1:117, y1:37,  fd:11, door:100, wall:'#e8e0cc', roof:'#2d4fd6', trim:'#2d4fd6', sign:'#2d4fd6', stage:'college'},
-  {id:'shoes',   n:'KICKS',         x0:3,  y0:80, x1:25,  y1:106, fd:9,  door:14,  wall:'#2a2f3a', roof:'#4a5068', trim:'#ff6a1f', sign:'#ff6a1f', store:true, aw:['#ff6a1f', '#ffffff']},
-  {id:'jerseys', n:'JERSEYS',       x0:28, y0:80, x1:50,  y1:106, fd:9,  door:39,  wall:'#1f3a6b', roof:'#2d4fd6', trim:'#ffffff', sign:'#e2453a', store:true, aw:['#e2453a', '#ffffff']},
-  {id:'clothes', n:'THREADS',       x0:70, y0:80, x1:92,  y1:106, fd:9,  door:81,  wall:'#efe3c2', roof:'#7a2f1f', trim:'#7a2f1f', sign:'#2a1a12', store:true, aw:['#3fae4f', '#f4f1ea']},
-  {id:'moves',   n:'MOVES STUDIO',  x0:95, y0:80, x1:117, y1:106, fd:9,  door:106, wall:'#2a1a55', roof:'#5a3aa8', trim:'#ff3fd0', sign:'#36e6ff', store:true, aw:['#ff3fd0', '#36e6ff']},
+  {id:'shoes',   n:'KICKS',         x0:2,  y0:76, x1:26,  y1:106, fd:16,  door:14,  wall:'#2a2f3a', roof:'#4a5068', trim:'#ff6a1f', sign:'#ff6a1f', store:true, aw:['#ff6a1f', '#ffffff']},
+  {id:'jerseys', n:'JERSEYS',       x0:28, y0:76, x1:50,  y1:106, fd:16,  door:39,  wall:'#1f3a6b', roof:'#2d4fd6', trim:'#ffffff', sign:'#e2453a', store:true, aw:['#e2453a', '#ffffff']},
+  {id:'clothes', n:'THREADS',       x0:70, y0:76, x1:92,  y1:106, fd:16,  door:81,  wall:'#efe3c2', roof:'#7a2f1f', trim:'#7a2f1f', sign:'#2a1a12', store:true, aw:['#3fae4f', '#f4f1ea']},
+  {id:'moves',   n:'MOVES STUDIO',  x0:94, y0:76, x1:118, y1:106, fd:16,  door:106, wall:'#2a1a55', roof:'#5a3aa8', trim:'#ff3fd0', sign:'#36e6ff', store:true, aw:['#ff3fd0', '#36e6ff']},
   {id:'home',    n:'HOME',          x0:4,  y0:128, x1:32, y1:162, fd:16, door:18,  wall:'#d9c2a0', roof:'#7a2f1f', trim:'#ffffff', sign:'#7a2f1f', house:true},
-  {id:'market',  n:'MARKET',        x0:90, y0:132, x1:117, y1:162, fd:10, door:103, wall:'#3a7d44', roof:'#2a5a32', trim:'#ffd84d', sign:'#ffd84d', store:true, aw:['#ffd84d', '#3a7d44']}
+  {id:'market',  n:'MARKET',        x0:88, y0:128, x1:118, y1:162, fd:17, door:103, wall:'#3a7d44', roof:'#2a5a32', trim:'#ffd84d', sign:'#ffd84d', store:true, aw:['#ffd84d', '#3a7d44']}
 ];
+const DOOR_HALF = B => B.id === 'nba' ? 6 : B.house ? 2.6 : B.id === 'market' ? 4.5 : 3.6;   // half the door width in feet
 const ROADS_H = [[40, 52], [110, 122]], ROAD_V = [54, 66, 52, 110];
 const CITY = {me:null, npcs:[], cars:[], key:'', cv:null, cam:{x:60, y:116}, near:null, tgt:null, steer:null, t:0, scene:'city'};
 // the current place you're walking around: the city, your house (2 floors) or a school
@@ -5145,12 +5320,22 @@ function paintBuilding(g, B, X, Y) {
       else if (B.id === 'moves') { g.fillStyle = ['#ff3fd0', '#36e6ff', '#ffd84d'][i]; g.fillRect(gx + 2, gy2 - 3, 2, 2); g.fillRect(gx + 1, gy2 - 1, 4, 3); g.fillRect(gx + (i % 2 ? 0 : 4), gy2 - 3, 1, 3); g.fillRect(gx + 1, gy2 + 2, 1, 3); g.fillRect(gx + 4, gy2 + 2, 1, 3); }
     }
   }
-  // door
+  // door: a big entrance centred on the spot you walk into
   if (B.door != null) {
-    const dx = X(B.door), dw = B.id === 'nba' ? 14 : 8, dh = Math.min(12, yb - yf - 2);
-    g.fillStyle = OUT; g.fillRect(dx - dw / 2 - 1, yb - dh - 1, dw + 2, dh + 1); g.fillStyle = B.store ? '#2a2f3a' : shadeHex(B.wall, .5); g.fillRect(dx - dw / 2, yb - dh, dw, dh);
-    g.fillStyle = B.trim; g.fillRect(dx - 1, yb - dh, 1, dh); g.fillRect(dx + dw / 2 - 2, yb - dh / 2, 1, 1);
-    g.fillStyle = '#d8d2c4'; g.fillRect(dx - dw / 2 - 2, yb, dw + 4, 2);                                  // step
+    const half = DOOR_HALF(B), dl = X(B.door - half), dr = X(B.door + half), dw = dr - dl, dh = Math.min(Math.round((yb - yf) * (B.store ? .62 : .55)), Math.round(dw * 1.3));
+    g.fillStyle = OUT; g.fillRect(dl - 2, yb - dh - 2, dw + 4, dh + 2);
+    g.fillStyle = B.store || B.id === 'nba' ? '#5a6478' : shadeHex(B.wall, .45); g.fillRect(dl - 1, yb - dh - 1, dw + 2, dh + 1);          // frame
+    const glassy = B.store || B.id === 'nba' || B.id === 'college';
+    for (const side of [0, 1]) {
+      const px = side ? dl + (dw >> 1) + 1 : dl + 1, pw = (dw >> 1) - 2;
+      g.fillStyle = glassy ? '#bfe3f5' : shadeHex(B.wall, .62); g.fillRect(px, yb - dh + 1, pw, dh - 1);
+      if (glassy) { g.fillStyle = 'rgba(255,236,190,.45)'; g.fillRect(px, yb - Math.round(dh * .55), pw, Math.round(dh * .55)); g.fillStyle = 'rgba(255,255,255,.6)'; for (let i = 0; i < Math.min(pw, dh) - 2; i += 1) g.fillRect(px + 1 + i, yb - dh + 2 + i, 1, 1); }
+      else { g.fillStyle = shadeHex(B.wall, .5); g.fillRect(px + 1, yb - dh + 3, pw - 2, 1); g.fillRect(px + 1, yb - (dh >> 1), pw - 2, 1); }
+      g.fillStyle = B.trim; g.fillRect(side ? px + 1 : px + pw - 2, yb - Math.round(dh * .5), 1, Math.max(2, Math.round(dh * .18)));   // handles
+    }
+    g.fillStyle = OUT; g.fillRect(dl + (dw >> 1) - 1, yb - dh, 2, dh);                                                       // centre seam
+    g.fillStyle = B.trim; g.fillRect(dl - 1, yb - dh - 4, dw + 2, 2);                                                        // lintel
+    g.fillStyle = '#d8d2c4'; g.fillRect(dl - 4, yb, dw + 8, 2); g.fillStyle = B.store ? B.aw[0] : '#7a2f1f'; g.fillRect(dl, yb + 2, dw, 2);   // step + mat
   }
   // sign
   if (B.n) {
@@ -5162,6 +5347,39 @@ function paintBuilding(g, B, X, Y) {
   if (false) { g.fillStyle = '#6b6b6b'; g.fillRect(x1 - 4, yt - 10, 1, 12); g.fillStyle = '#e2453a'; g.fillRect(x1 - 3, yt - 10, 6, 4); g.fillStyle = '#ffffff'; g.fillRect(x1 - 3, yt - 8, 6, 1); }
   if (!B.n && !B.store) { g.fillStyle = '#d9c2a8'; g.fillRect(Math.round((x0 + x1) / 2) - 3, yb - 9, 6, 9); }
 }
+
+// ---------- cars: a 3/4-view pixel car (sedan, taxi, SUV, sports, pickup, van) ----------
+function drawCar(g, cx, cy, car) {
+  const k = cam.k, f = car.sp >= 0 ? 1 : -1, t = car.type || 'sedan', c = car.c;
+  const L = Math.round((t === 'van' || t === 'suv' ? 12 : t === 'sports' ? 11.5 : 11) * k * .6), D = Math.round(4.8 * k * FS * .62), H = Math.round((t === 'suv' || t === 'van' ? 2.6 : t === 'sports' ? 1.5 : 2) * k * .62);
+  const x0 = Math.round(cx - L / 2), top = cy - H - D;
+  const X = (u, w) => f > 0 ? x0 + Math.round(u * L) : x0 + L - Math.round(u * L) - w;     // u: 0 = rear, 1 = front
+  const R = (u0, u1, y, h, col) => { const w = Math.max(1, Math.round((u1 - u0) * L)); g.fillStyle = col; g.fillRect(X(u0, w), y, w, h); };
+  const lit = mixHex(c, '#ffffff', .3), shd = shadeHex(c, .72), shd2 = shadeHex(c, .55), glass = '#8fd0f0', glassD = '#4a7fa8';
+  g.fillStyle = 'rgba(10,8,20,.32)'; g.fillRect(x0 + 2, cy - 1, L, 4);                                          // shadow
+  const wheel = (u) => { const w = Math.max(4, Math.round(L * .14)); g.fillStyle = OUT; g.fillRect(X(u, w) - 1, cy - 3, w + 2, 5); g.fillStyle = '#22252f'; g.fillRect(X(u, w), cy - 2, w, 3); g.fillStyle = '#9aa3b5'; g.fillRect(X(u, w) + (w >> 1) - 1, cy - 1, 2, 1); };
+  R(.12, .27, top - 1, 2, OUT); R(.72, .87, top - 1, 2, OUT);                                                    // far-side tyres peeking out
+  g.fillStyle = OUT; g.fillRect(x0 - 1, top - 1, L + 2, D + H + 2);                                             // outline
+  R(0, 1, top, D, c); R(0, 1, top + D, H, shd); R(0, 1, top + D + H - 1, 1, shd2);                               // roof plane + side
+  R(0, 1, top, 1, lit); g.fillStyle = BG_CUT; R(0, .02, top, 1, '#3a3d45'); R(.98, 1, top, 1, '#3a3d45'); R(0, .02, top + D + H - 1, 1, '#3a3d45'); R(.98, 1, top + D + H - 1, 1, '#3a3d45');   // rounded corners
+  // cabin / glass by body type
+  const cab = {sedan:[.24, .64, .74], taxi:[.24, .64, .74], suv:[.12, .66, .78], sports:[.3, .58, .68], pickup:[.48, .74, .84], van:[.06, .8, .9]}[t] || [.24, .64, .74];
+  R(cab[0], cab[1], top + 1, D - 2, lit); R(cab[1], cab[2], top + 1, D - 2, glass); R(cab[1], cab[1] + .03, top + 1, D - 2, '#cdeaf8'); R(cab[0] - .07, cab[0], top + 1, D - 2, glassD);   // roof, windscreen, rear glass
+  R(cab[0], cab[2] - .02, top + D + 1, Math.max(2, H - 3), glassD); R(cab[0] + .02, cab[0] + .1, top + D + 1, 1, glass);                    // side windows
+  R((cab[0] + cab[2]) / 2, (cab[0] + cab[2]) / 2 + .015, top + D, H, shd2);                                    // door pillar
+  if (t === 'van') for (const u of [.25, .45, .65]) R(u, u + .015, top + D, H, shd2);
+  if (t === 'pickup') { R(.04, .44, top + 1, D - 2, shd); R(.05, .43, top + 2, D - 4, shadeHex(c, .62)); for (const u of [.12, .22, .32]) R(u, u + .01, top + 2, D - 4, shd2); }
+  if (t === 'taxi') { R(.4, .52, top - 3, 3, OUT); R(.41, .51, top - 2, 2, '#f4f1ea'); R(.43, .49, top - 2, 1, '#16181f'); for (let u = .05; u < .95; u += .06) R(u, u + .03, top + D + (H >> 1), 1, (Math.round(u / .06) % 2) ? '#16181f' : '#f4f1ea'); }
+  if (t === 'sports') { R(0, 1, top + Math.round(D * .35), 1, '#f4f1ea'); R(0, 1, top + Math.round(D * .6), 1, '#f4f1ea'); R(0, .06, top - 2, 2, shd2); }
+  if (t === 'suv') { R(.16, .62, top - 1, 1, '#9aa3b5'); }
+  // lights, bumpers, handles
+  R(.965, 1, top + 1, 2, '#fff6c0'); R(.965, 1, top + D - 3, 2, '#fff6c0'); R(.97, 1, top + D + 1, 2, '#ffd84d');           // headlights
+  R(0, .03, top + 1, 2, '#e2453a'); R(0, .03, top + D - 3, 2, '#e2453a'); R(0, .025, top + D + 1, 2, '#ff6a5a');            // tail lights
+  R(.92, 1, top + D + H - 2, 1, '#c9d1de'); R(0, .08, top + D + H - 2, 1, '#c9d1de');                                       // bumpers
+  R(.5, .54, top + D + 2, 1, shd2);
+  wheel(.13); wheel(.72);
+}
+const BG_CUT = '#3a3d45';
 
 // ---------- walking routes around buildings (breadth-first search on a 2 ft grid) ----------
 const GS = 2;
@@ -5191,7 +5409,7 @@ function cityPath(fx, fy, tx, ty) {
   return out;
 }
 const CITY_SCENE = {w:CW, h:CHH, bg:'#4f9a42', paint:() => paintCity(), solid:(x, y) => citySolid(x, y), npcs:() => CITY.npcs,
-  spots:() => CITY_B.filter(B => B.door != null).map(B => ({key:'c:' + B.id, x:B.door, y:B.y1 + 2.5, rx:4, ry:2.5, label:B.n, lock:cityLocked(B), go:() => enterBuilding(B.id)}))};
+  spots:() => CITY_B.filter(B => B.door != null).map(B => ({key:'c:' + B.id, x:B.door, y:B.y1 + 2.5, rx:DOOR_HALF(B) + 1, ry:2.6, label:B.n, lock:cityLocked(B), go:() => enterBuilding(B.id)}))};
 function goScene(id, x, y) {
   CITY.scene = id; CITY.key = ''; CITY.path = null; CITY.tgt = null; CITY.steer = null; CITY.near = null;
   if (CITY.me) { CITY.me.x = x; CITY.me.y = y; CITY.me.vx = CITY.me.vy = 0; CITY.cam.x = x; CITY.cam.y = y; }
@@ -5216,7 +5434,8 @@ function citySetup() {
         {n:'', c:'#000', d:'#000', trim:'#000', numc:'#fff', outfit:{top:['tee', 'hoodie', 'tee', 'jacket'][i % 4], topC:shirts[i % 8], bot:['shorts', 'jeans', 'joggers'][i % 3], botC:['#1d1f2a', '#3a5a9e', '#6d7179'][i % 3], hat:['none', 'cap', 'none', 'beanie'][i % 4], hatC:shirts[(i + 3) % 8]}}, '');
       n.path = pth; n.u = R(); n.dir = 1; n.sp = 4.5 + R() * 2; CITY.npcs.push(n);
     });
-    for (let i = 0; i < 4; i++) CITY.cars.push({lane:i % 2, road:i < 2 ? 0 : 1, x:R() * CW, c:['#e2453a', '#3d8bfd', '#ffd84d', '#f4f1ea'][i], sp:(i % 2 ? -1 : 1) * (16 + R() * 8)});
+    const CARS = [['sedan', '#e2453a'], ['taxi', '#ffcf2a'], ['suv', '#2a2f3a'], ['sports', '#3d8bfd'], ['pickup', '#f4f1ea'], ['van', '#3fae4f']];
+    for (let i = 0; i < 6; i++) CITY.cars.push({lane:i % 2, road:i < 3 ? 0 : 1, x:R() * CW, type:CARS[i][0], c:CARS[i][1], sp:(i % 2 ? -1 : 1) * (14 + R() * 9)});
   }
 }
 function cityUpdate(dt) {
@@ -5267,10 +5486,8 @@ function renderCity(dt) {
   const o = CX(0, 0); g.drawImage(CITY.cv, o[0], o[1]);
   // cars
   if (CITY.scene === 'city') for (const c of CITY.cars) {
-    const [a, b] = ROADS_H[c.road], y = c.lane ? a + 3 : b - 3, s = CX(c.x, y), w = Math.round(9 * cam.k * .5), h = Math.round(4 * cam.k * FS * .55);
-    g.fillStyle = 'rgba(10,8,20,.35)'; g.fillRect(s[0] - w / 2 + 2, s[1] + 2, w, h);
-    g.fillStyle = OUT; g.fillRect(s[0] - w / 2 - 1, s[1] - h - 1, w + 2, h * 2 + 2); g.fillStyle = c.c; g.fillRect(s[0] - w / 2, s[1] - h, w, h * 2);
-    g.fillStyle = '#9fd3f5'; g.fillRect(s[0] - w / 4, s[1] - h + 1, w / 2, h - 1); g.fillStyle = OUT; g.fillRect(s[0] - w / 2 + 1, s[1] + h - 1, 3, 2); g.fillRect(s[0] + w / 2 - 4, s[1] + h - 1, 3, 2);
+    const [a, b] = ROADS_H[c.road], y = c.lane ? a + 4.2 : b - 1.6, s = CX(c.x, y);
+    drawCar(g, s[0], s[1], c);
   }
   // locked doors get a chain
   if (CITY.scene === 'city') for (const B of CITY_B) if (B.door != null && cityLocked(B)) { const s = CX(B.door, B.y1); g.fillStyle = '#ffc94d'; g.fillRect(s[0] - 6, s[1] - 7, 12, 2); g.fillStyle = OUT; g.fillRect(s[0] - 2, s[1] - 9, 4, 5); g.fillStyle = '#ffc94d'; g.fillRect(s[0] - 1, s[1] - 8, 2, 3); }
@@ -5541,24 +5758,18 @@ function storeHTML(kind) {
     return `<div class="chips">${FURN_ROOMS.map(([k, l]) => `<button class="fchip ${furnSub === k ? 'on' : ''}" data-act="furnsub" data-k="${k}">${l}</button>`).join('')}</div>
       <p class="hint">Furniture shows up in your house right away.</p>${room[2].map(slot => `<div class="sect"><h3>${slot.toUpperCase()}</h3><div class="slist">${FURN.filter(f => f.slot === slot).map(f => {
         const own = S.inv.furn.includes(f.id), on = S.home[slot] === f.id;
-        return `<div class="sitem furn"><span class="fsw" style="--c:${f.c || '#2a2f4a'};--c2:${f.c2 || f.c || '#2a2f4a'}"></span><div><b>${esc(f.n)}</b><small>${f.p ? 'Furniture' : 'Free'}</small></div>${buyBtn(f.p, 'buyfurn', `data-id="${f.id}"`, own, on)}</div>`; }).join('')}</div></div>`).join('')}`;
+        return `<div class="sitem furn"><span class="fic">${furnIconSVG(f)}</span><div><b>${esc(f.n)}</b><small>${f.p ? 'Furniture' : 'Free'}</small></div>${buyBtn(f.p, 'buyfurn', `data-id="${f.id}"`, own, on)}</div>`; }).join('')}</div></div>`).join('')}`;
   }
   if (kind === 'st_moves') {
     const list = ANIMS.filter(a => a.cat === moveSub);
     return `<div class="chips">${Object.entries(ANIM_CAT).map(([k, l]) => `<button class="fchip ${moveSub === k ? 'on' : ''}" data-act="mvsub" data-k="${k}">${l}</button>`).join('')}</div>
       <div class="slist">${list.map(a => {
       const own = S.inv.anims.includes(a.id), on = a.cat === 'move' ? own : S.gear[a.cat] === a.id;
-      return `<div class="sitem anim"><span class="aic ${a.cat}">${{shot:'🏀', dunk:'💥', celeb:'🙌', move:'💨'}[a.cat]}</span><div><b>${esc(a.n)}</b><small>${esc(a.d)}${a.rel ? ` · Release ${a.rel < .8 ? 'Quick' : a.rel < .88 ? 'Smooth' : 'Slow'}` : ''}</small></div>${a.cat === 'move' && own ? '<span class="own on">LEARNED</span>' : buyBtn(a.p, 'buyanim', `data-id="${a.id}"`, own, on)}</div>`; }).join('')}</div>`;
+      return `<div class="sitem anim"><span class="aic ${a.cat}">${animIconSVG(a)}</span><div><b>${esc(a.n)}</b><small>${esc(a.d)}${a.rel ? ` · Release ${a.rel < .8 ? 'Quick' : a.rel < .88 ? 'Smooth' : 'Slow'}` : ''}</small></div>${a.cat === 'move' && own ? '<span class="own on">LEARNED</span>' : buyBtn(a.p, 'buyanim', `data-id="${a.id}"`, own, on)}</div>`; }).join('')}</div>`;
   }
   return '';
 }
-function clothSVG(c) {
-  const k = c.c, d = shadeHex(c.c, .7);
-  if (c.slot === 'top') return pixSVG(c.type === 'hoodie' ? ['..oooo..', '.ohaaho.', 'oaaaaaao', 'oaoaaoao', 'oaoaaoao', 'oaaddaao', '.oaaaao.', '.oooooo.'] : c.type === 'tank' ? ['.o....o.', '.oa..ao.', '.oaaaao.', '.oaaaao.', '.oaaaao.', '.oaaaao.', '.oaaaao.', '.oooooo.'] : ['.oo..oo.', 'oaaooaao', 'oaaaaaao', 'oooaaooo', '..oaao..', '..oaao..', '..oaao..', '..oooo..'].map(r => r.replace(/\./g, '.')), {o:'#120e18', a:k, h:d, d}, 'cl');
-  if (c.slot === 'bot') return pixSVG(c.type === 'shorts' ? ['oooooooo', 'oaaaaaao', 'oaaooaao', 'oaao.oao', 'oooo.ooo'] : ['oooooooo', 'oaaaaaao', 'oaaooaao', 'oaao.oao', 'oaao.oao', 'oaao.oao', 'oaao.oao', 'oooo.ooo'], {o:'#120e18', a:k}, 'cl');
-  if (c.type === 'none') return pixSVG(['.oooo.', 'o....o', 'o.oo.o', 'o....o', '.oooo.'], {o:'#5a6086'}, 'cl');
-  return pixSVG(c.type === 'cap' ? ['..oooo..', '.oaaaao.', 'oaaaaaao', 'oooooooooo'.slice(0, 8), '......oo'] : c.type === 'bucket' ? ['..oooo..', '.oaaaao.', '.oaaaao.', 'oooooooo'] : c.type === 'durag' ? ['.oooooo.', 'oaaaaaao', 'oaaaaaao', 'oaooooo.', 'oo......'] : ['...oo...', '.oaaaao.', 'oaaaaaao', 'oddddddo', 'oooooooo'], {o:'#120e18', a:k, d}, 'cl');
-}
+function clothSVG(c) { return clothIconSVG(c); }
 function storeAct(a, d) {
   if (a === 'buyshoe') {
     const i = +d.m, own = S.shoes.find(s => s.m === i);
@@ -6941,7 +7152,7 @@ function frame(now) {
 }
 requestAnimationFrame(frame);
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') save(); });
-window.__dream = {G, get S() { return S; }, enterClass, sitInClass, get CLASS_SEATS() { return CLASS_SEATS; }, storeSetup, WALLET, upgradeStat, get CR() { return CR; }, get CLS() { return CLS; }, openClass, goScene, SCENES, CITY, cityGo, userPass, passTarget, userCallBall, userCut, slotSummary, cityUpdate, renderCity, act, update, endReplay, homeUpdate, renderHome, drawDoll, drawBall, startLook, playCard, releaseMeter, cardUsable, players, CARDS, CHARS, buildPerson, lookOf, FR, userContest, userPassTo, userDrive, userHandsUp, userHandler, subIn, teamTotals, gameScore, SET, saveSet, showShotFb, userShootDown, userDribble, userSteal, scrOf:p => { const s = PX(p.x, p.y, 3.2); return toCss(s[0], s[1]); }};
+window.__dream = {G, get S() { return S; }, openPanel, enterClass, sitInClass, get CLASS_SEATS() { return CLASS_SEATS; }, storeSetup, WALLET, upgradeStat, get CR() { return CR; }, get CLS() { return CLS; }, openClass, goScene, SCENES, CITY, cityGo, userPass, passTarget, userCallBall, userCut, slotSummary, cityUpdate, renderCity, act, update, endReplay, homeUpdate, renderHome, drawDoll, drawBall, startLook, playCard, releaseMeter, cardUsable, players, CARDS, CHARS, buildPerson, lookOf, FR, userContest, userPassTo, userDrive, userHandsUp, userHandler, subIn, teamTotals, gameScore, SET, saveSet, showShotFb, userShootDown, userDribble, userSteal, scrOf:p => { const s = PX(p.x, p.y, 3.2); return toCss(s[0], s[1]); }};
 
 })();
 </script>
