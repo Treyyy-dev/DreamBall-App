@@ -1034,6 +1034,8 @@ svg.crest.px,.who svg.crest,.mhead svg.crest,.fr svg.crest{image-rendering:pixel
 .coach small{font-family:var(--display);font-size:9px;color:var(--muted)}
 .fsw{width:44px;height:30px;background:linear-gradient(135deg,var(--c) 0 60%,var(--c2) 60%);box-shadow:0 0 0 2px #120e18}
 .sitem.furn{grid-template-columns:48px 1fr auto}
+/* Baller Road and Rank League live in the phone now */
+.home .road{display:none!important}
 
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0;-webkit-text-size-adjust:100%;overscroll-behavior:none;touch-action:manipulation}
@@ -5187,7 +5189,7 @@ function advanceStage() {
 const PH_MAP = ['xxxxxxxxx', 'x..x....x', 'x..x.xx.x', 'xxxx.xx.x', 'x....xx.x', 'x.xxxxxxx', 'x.x.....x', 'x.x..x..x', 'xxxxxxxxx'];
 const PH_SAVE = ['xxxxxxxx.', 'x.xxxx.x.', 'x.xxxx.xx', 'x......xx', 'x.xxxxx.x', 'x.x...x.x', 'x.xxxxx.x', 'xxxxxxxxx'];
 const PH_APPS = [
-  ['player', 'PLAYER', '#3d8bfd', () => PXI(PX_ICONS.team, '')], ['career', 'CAREER', '#e2702c', () => PXI(PX_ICONS.story, '')],
+  ['player', 'PLAYER', '#3d8bfd', () => PXI(PX_ICONS.team, '')],
   ['road', 'BALLER ROAD', '#5a3aa8', () => pixSVG(TROPHY_MAP, {o:'#120e18', y:'#ffc94d', Y:'#fff3b0'}, 'ic')], ['map', 'MAP', '#2fa85a', () => PXI(PH_MAP, '')],
   ['locker', 'LOCKER', '#19a2b4', () => PXI(PX_ICONS.packs, '')], ['shop', 'SHOP', '#f2c230', () => PXI(PX_ICONS.shop, '')],
   ['settings', 'SETTINGS', '#5a6478', () => PXI(PX_ICONS.gear, '')], ['saves', 'SAVES', '#7a2f1f', () => PXI(PH_SAVE, '')],
