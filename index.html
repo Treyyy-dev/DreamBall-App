@@ -2108,6 +2108,7 @@ function applyMove(p, card, lv, user) {
 function doPass(p, m, opt) {
   const b = G.ball; opt = opt || {};
   if (b.state !== 'held' || b.owner !== p || p.gather || p.finish || !m) return false;
+  p.passPose = .3; p.passYaw = Math.atan2(m.x - p.x, m.y - p.y);
   b.state = 'pass'; b.owner = null; b.to = m; b.z = 3; b.passer = p; b.lob = !!opt.lob; b.hot = opt.hot || 0; b.burst = !!opt.burst; b.fin = opt.fin || null; b.shoot = !!opt.shoot;
   b.speed = opt.lob ? 30 : 44;
   let stealMul = opt.steal == null ? 1 : opt.steal;
@@ -3230,6 +3231,7 @@ function poseOf(a, dt) {
   const sp = a.runInPlace != null ? a.runInPlace : Math.hypot(a.vx || 0, a.vy || 0);
   let yawT = a.yaw;
   if (a.fixYaw != null) yawT = a.fixYaw;
+  else if (a.passPose > 0 && a.passYaw != null) yawT = a.passYaw;
   else if (a.finish || a.shootT > 0 || a.gather) yawT = a.aimYaw != null ? a.aimYaw : a.yaw;
   else if (a.def && sp < 9 && a.faceX != null) yawT = Math.atan2(a.faceX - a.x, a.faceY - a.y);
   else if (sp > 2.2) yawT = Math.atan2(a.vx, a.vy);
@@ -3286,6 +3288,7 @@ function poseOf(a, dt) {
     else { P.lift = Math.sin(Math.min(u, 1) * Math.PI) * 2.3; P.arms = [{s:2, f:1, y:3}, {s:-1, f:2, y:-9}]; }
     P.legs = {mode:'tuck'}; P.mouth = true;
   }
+  if (a.passPose > 0) { a.passPose -= dt; const u = clamp(1 - a.passPose / .3, 0, 1), ext = Math.round(1 + u * 3); P.arms = [{s:0, f:ext, y:2}, {s:0, f:ext, y:2}]; }
   if (a.signal > 0) { P.arms = [{s:1, f:0, y:-7}, {s:1, f:0, y:-8}]; }
   P.stars = a.stun > 0;
   a.fall = (a.fall || 0) + ((a.stun > 0 ? 1 : 0) - (a.fall || 0)) * Math.min(1, dt * (a.stun > 0 ? 9 : 3.5));
@@ -3570,6 +3573,28 @@ function drawRim(g, t) {
 const CHAIN = () => { const e = curCourt().env; return e === 'park' || e === 'street'; };
 function animateNets(dt) { for (const n of arenaG.userData.nets) if (n.userData.sw > 0) n.userData.sw = Math.max(0, n.userData.sw - dt * 1.6); }
 
+// ---------- the ball sits in the handler's hands ----------
+// Uses the hand positions the sprite reported this frame: both hands for a gather / shot / pass windup,
+// the ball-side hand for a dribble (the ball travels between that hand and the floor).
+function heldBallScreen(b) {
+  const o = b.state === 'held' ? b.owner : null, sc = o && o._scr;
+  if (!sc || !sc.hands || sc._t !== CLK) return null;
+  const hs = sc.hands, two = o.gather || o.shootT > 0 || o.finish || G.phase === 'dead';
+  let out;
+  if (two) { const x = Math.round((hs[0][0] + hs[1][0]) / 2), y = Math.round(Math.min(hs[0][1], hs[1][1]) + (o.gather || o.shootT > 0 || o.finish ? -3 : 0)); out = [x, y]; }
+  else { const k = o.ballSide > 0 ? 1 : 0, hd = hs[k], fl = PX(o.x, o.y, 0), bz = clamp((b.z || 0) / 2.6, 0, 1); out = [Math.round(hd[0]), Math.round(fl[1] - 3 + (hd[1] + 3 - (fl[1] - 3)) * bz)]; }
+  RB.held = out; RB.heldT = CLK; RB.dx = out[0] - PX(b.x, b.y, 0)[0]; RB.dy = out[1] - PX(b.x, b.y, 0)[1];
+  return out;
+}
+// when a pass or shot leaves the hands, the ball eases from the hands onto its flight path
+const RB = {st:'', t:0, held:null, heldT:-9, dx:0, dy:0};
+function releaseBlend(b, s) {
+  const age = CLK - RB.t;
+  if (!RB.held || RB.t - RB.heldT > .15 || age > .2 || (b.state !== 'shot' && b.state !== 'pass' && b.state !== 'ftshot')) return s;
+  const u = age / .2, e = u * u * (3 - 2 * u), f0 = PX(b.x, b.y, 0);
+  return [Math.round(f0[0] + RB.dx + (s[0] - f0[0] - RB.dx) * e), Math.round(f0[1] + RB.dy + (s[1] - f0[1] - RB.dy) * e)];
+}
+
 // ---------- arena frame ----------
 // the court spins to the other end so the team with the ball always attacks up the screen
 const SPIN = {on:false, t:0, to:0};
@@ -3640,12 +3665,13 @@ function renderArena(dt) {
   for (const it of items) if (it.p) { const s = PX(it.p.x, it.p.y, 0); shadowAt(g, s[0], s[1], 7); }
   if (live) { const s = PX(b.x, b.y, 0); shadowAt(g, s[0], s[1], 2); }
   if (owner && G.phase === 'live') { const s = PX(owner.x, owner.y, 0); pring(g, s[0], s[1] + 1, 10, 5, owner.t === 0 ? '#ffc94d' : '#ffffff'); }
-  const ballAir = live && (b.state === 'shot' || b.state === 'ftshot' || b.state === 'rim' || b.state === 'pass' || h > 8);
-  if (live && !ballAir) items.push({y:b.y, bias:.4, f:() => { const s = PX(b.x, b.y, h); drawBall(g, s[0], s[1]); }});
+  if (b.state !== RB.st) { RB.st = b.state; RB.t = CLK; }
+  const ballAir = live && (b.state === 'shot' || b.state === 'ftshot' || b.state === 'rim' || b.state === 'pass' || h > 8 && b.state !== 'held');
+  if (live && !ballAir) items.push({y:b.y, bias:.4, f:() => { const s = heldBallScreen(b) || PX(b.x, b.y, h); drawBall(g, s[0], s[1]); }});
   for (const it of items) it.d = depthOf(it.y) + (it.bias || 0);
   items.sort((p, q) => p.d - q.d);
-  for (const it of items) { const r2 = it.f(); if (it.p && r2) it.p._scr = r2; }
-  if (ballAir) { const s = PX(b.x, b.y, h); drawBall(g, s[0], s[1], h > 12); }
+  for (const it of items) { const r2 = it.f(); if (it.p && r2) { r2._t = CLK; it.p._scr = r2; } }
+  if (ballAir) { const s = releaseBlend(b, PX(b.x, b.y, h)); drawBall(g, s[0], s[1], h > 12); }
   { const mp = G.game ? mePlayer() : null;
     if (mp && mp.d && mp.d.en != null) { const s = PX(mp.x, mp.y, 0), e = clamp(mp.d.en / 100, 0, 1), w = 18, x0 = s[0] - w / 2, y0 = s[1] + 4;
       g.fillStyle = OUT; g.fillRect(x0 - 1, y0 - 1, w + 2, 4); g.fillStyle = '#24263f'; g.fillRect(x0, y0, w, 2);
@@ -4051,8 +4077,11 @@ function drawDoll(g, x0, y0, look, f, num, P) {
       return;
     }
     const ay = A.y > 0 ? A.y * AKD : A.y * AKU;
-    let ex = side ? sx + Math.round(A.f * AKX) : sx + Math.round(sd * A.s * AKX); const ey = shY + Math.round(ay);
-    if (!side && ey > shY + 3 && Math.abs(A.s || 0) < 1) ex = sx + sd;               // relaxed arms hang just outside the body
+    const fw = Math.max(0, A.f || 0);
+    // front/back view: reaching forward pulls the hand in front of the body (toward the middle)
+    let ex = side ? sx + Math.round(A.f * AKX) : sx + Math.round(sd * A.s * AKX) - Math.round(sd * fw * (back ? .7 : 1.4)); let ey = shY + Math.round(ay);
+    if (!side && fw < 1 && ey > shY + 3 && Math.abs(A.s || 0) < 1) ex = sx + sd;      // relaxed arms hang just outside the body
+    if (!side && fw >= 1) { ex = sd < 0 ? Math.min(ex, -2) : Math.max(ex, 1); if (!back && ey > shY) ey = Math.min(ey + 1, yHip + 1); }
     r(sx - 1, shY - 1, 3, 3, LA || C.plain && !C.tank ? (behind ? C.jerseyS : C.jersey) : armC(behind));   // shoulder / short sleeve
     const n = Math.max(1, Math.round(Math.max(Math.abs(ex - sx), Math.abs(ey - shY))));
     for (let k = 0; k <= n; k++) {
@@ -4265,7 +4294,12 @@ function drawDoll(g, x0, y0, look, f, num, P) {
   }
   // ---- near arms
   LY = 5;
-  if (side) drawArm(fl > 0 ? 1 : 0, false); else { drawArm(0, false); drawArm(1, false); }
+  if (side) drawArm(fl > 0 ? 1 : 0, false);
+  else for (const i of [0, 1]) {                         // seen from behind, arms reaching forward go behind the body
+    const A = arms[i] || {};
+    if (back && (A.f || 0) >= 1 && (A.y || 0) > -3) { const keep = LY; LY = 0; drawArm(i, true); LY = keep; }
+    else drawArm(i, false);
+  }
   // ---- render: per layer outline, colour, details; jersey number after the body
   const ox = Math.round(x0), oy = Math.round(y0 - bob);
   for (let ly = 0; ly <= 5; ly++) {
