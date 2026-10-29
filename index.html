@@ -3024,6 +3024,7 @@ function userPass() {
 // ================= pixel-art renderer (2D canvas, 3/4 top-down) =================
 const cv = $('cv'), wrap = $('wrap');
 let renderer = null, ctx = null, scene = null, camera = null;
+const MATCH_PXS = 1;                            // art-pixel size in matches (smaller players)
 let IW = 200, IH = 300, VIW = 200, VIH = 300, DPR = 1, PSZ = 2, PXS = 2, CSSPX = 1, OFFX = 0, OFFY = 0;
 const FS = .74, HS = .82;                    // floor foreshortening and height scale of the 3/4 view
 const cam = {x:25, y:47, k:3.4};
@@ -3486,7 +3487,7 @@ function paintArena(A, B, cheer, flip) {
   }
   return c;
 }
-const arenaK = () => Math.max(3.4, VIW / 36);   // a big court: the camera pans across it
+const arenaK = () => VIW / 36;   // a big court: the camera pans across it
 const arenaKeyNow = () => G.T[0].fr.n + G.T[0].fr.c + G.T[1].fr.c + curCourt().id + arenaK().toFixed(3) + (ART.stands ? 1 : 0) + (ART.side ? 1 : 0) + SET.q;
 let arenaCache = {};
 function repaintArena() {
@@ -3861,11 +3862,12 @@ function resize() {
   const r = wrap.getBoundingClientRect(), w = Math.max(50, r.width), h = Math.max(50, r.height);
   DPR = window.devicePixelRatio || 1;
   const dev = Math.max(1, w / 400);            // bigger screens get bigger art pixels, so every device looks like the phone
-  PSZ = Math.max(1, Math.round(PXS * dev * DPR));
-  VIW = Math.ceil(w * DPR / PSZ); VIH = Math.ceil(h * DPR / PSZ);
   // in a match the canvas is a square as wide as the screen's diagonal, so the court can turn
-  // to the other basket without ever showing an edge: you just see more of the stadium
+  // to the other basket without ever showing an edge: you just see more of the stadium.
+  // Matches also use finer pixels so the players are smaller on the court.
   const big = typeof mode !== 'undefined' && mode === 'match', D = Math.ceil(Math.hypot(w, h)) + 6;
+  PSZ = Math.max(1, Math.round((big ? MATCH_PXS : PXS) * dev * DPR));
+  VIW = Math.ceil(w * DPR / PSZ); VIH = Math.ceil(h * DPR / PSZ);
   IW = big ? Math.ceil(D * DPR / PSZ) : VIW; IH = big ? IW : VIH;
   if (cv.width !== IW || cv.height !== IH) { cv.width = IW; cv.height = IH; }
   CSSPX = PSZ / DPR;
