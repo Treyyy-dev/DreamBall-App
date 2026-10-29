@@ -3024,7 +3024,7 @@ function userPass() {
 // ================= pixel-art renderer (2D canvas, 3/4 top-down) =================
 const cv = $('cv'), wrap = $('wrap');
 let renderer = null, ctx = null, scene = null, camera = null;
-let IW = 200, IH = 300, DPR = 1, PSZ = 2, PXS = 2, CSSPX = 1, OFFX = 0, OFFY = 0;
+let IW = 200, IH = 300, VIW = 200, VIH = 300, DPR = 1, PSZ = 2, PXS = 2, CSSPX = 1, OFFX = 0, OFFY = 0;
 const FS = .74, HS = .82;                    // floor foreshortening and height scale of the 3/4 view
 const cam = {x:25, y:47, k:3.4};
 const camF = {x:0, z:0};
@@ -3359,7 +3359,7 @@ function drawCover(g, im, x, y, w, h, alignBottom) {
 }
 const ART_SRC = {stands:'4c696e6e-cab1-4626-a57c-25cec9f19dba', side:'b1cdb7ca-c280-4c5a-a098-17df17612d41'};   // hi-bit crowd art (Higgsfield)
 let arenaCv = null, arenaCv2 = null, arenaKey = '';
-const AP = 6, ST = 34;  // apron and stand depth (ft)
+const AP = 6, ST = 56;  // apron and stand depth (ft): deep enough to fill the screen at any spin angle
 function worldCanvas(x0, y0, x1, y1, hTop) {
   const c = document.createElement('canvas');
   c.width = Math.ceil((x1 - x0) * cam.k); c.height = Math.ceil((y1 - y0) * cam.k * FS + (hTop || 0) * cam.k * HS);
@@ -3486,7 +3486,7 @@ function paintArena(A, B, cheer, flip) {
   }
   return c;
 }
-const arenaK = () => Math.max(3.4, IW / 36);   // a big court: the camera pans across it
+const arenaK = () => Math.max(3.4, VIW / 36);   // a big court: the camera pans across it
 const arenaKeyNow = () => G.T[0].fr.n + G.T[0].fr.c + G.T[1].fr.c + curCourt().id + arenaK().toFixed(3) + (ART.stands ? 1 : 0) + (ART.side ? 1 : 0) + SET.q;
 let arenaCache = {};
 function repaintArena() {
@@ -3583,7 +3583,7 @@ function updateCamSpin(dt) {
   if (SPIN.on) {
     SPIN.t += dt; const u = Math.min(1, SPIN.t / .8), e = u * u * (3 - 2 * u);
     if (u >= .5 && CAM_FLIP !== SPIN.to) { CAM_FLIP = SPIN.to; camF.init = false; }
-    ang = e < .5 ? e * 180 : -180 + e * 180; sc = 1 - Math.sin(u * Math.PI) * .18;
+    ang = e < .5 ? e * 180 : -180 + e * 180;
     if (u >= 1) { SPIN.on = false; ang = 0; sc = 1; }
   }
   const tf = SPIN.on ? `rotate(${ang.toFixed(1)}deg) scale(${sc.toFixed(3)})` : '';
@@ -3598,7 +3598,7 @@ function renderArena(dt) {
   // camera follows the ball
   let ty = b.y + (G.poss === 0 ? -10 : 10), tx = 25 + (b.x - 25) * .8;
   if (G.phase === 'break' || G.phase === 'final') { ty = 47; tx = 25; }
-  const halfH = IH / 2 / (cam.k * FS), halfW = IW / 2 / cam.k, xr = Math.max(0, 25 + AP + 9 - halfW);
+  const halfH = VIH / 2 / (cam.k * FS), halfW = VIW / 2 / cam.k, xr = Math.max(0, 25 + AP + 9 - halfW);
   tx = clamp(tx, 25 - xr, 25 + xr);
   ty = clamp(ty, -AP - 26 + halfH, 94 + AP + 14 - halfH);
   if (halfH * 2 > 94 + 2 * AP + 22) ty = 47;
@@ -3862,7 +3862,11 @@ function resize() {
   DPR = window.devicePixelRatio || 1;
   const dev = Math.max(1, w / 400);            // bigger screens get bigger art pixels, so every device looks like the phone
   PSZ = Math.max(1, Math.round(PXS * dev * DPR));
-  IW = Math.ceil(w * DPR / PSZ); IH = Math.ceil(h * DPR / PSZ);
+  VIW = Math.ceil(w * DPR / PSZ); VIH = Math.ceil(h * DPR / PSZ);
+  // in a match the canvas is a square as wide as the screen's diagonal, so the court can turn
+  // to the other basket without ever showing an edge: you just see more of the stadium
+  const big = typeof mode !== 'undefined' && mode === 'match', D = Math.ceil(Math.hypot(w, h)) + 6;
+  IW = big ? Math.ceil(D * DPR / PSZ) : VIW; IH = big ? IW : VIH;
   if (cv.width !== IW || cv.height !== IH) { cv.width = IW; cv.height = IH; }
   CSSPX = PSZ / DPR;
   const cw = IW * CSSPX, ch = IH * CSSPX;
@@ -5698,9 +5702,11 @@ meterEl.innerHTML = '<i class="zone"></i><i class="fill"></i>'; fx.appendChild(m
 let meterHide = 0, meterP = null, meterV = 0;
 
 function setMode(m) {
+  const was = mode;
   mode = m; app.classList.toggle('home', m === 'home'); app.classList.toggle('match', m === 'match');
   arenaG.visible = m === 'match';
   if (m !== 'match' && typeof resetCamSpin === 'function') resetCamSpin();
+  if ((was === 'match') !== (m === 'match') && typeof resize === 'function') resize();
 }
 function renderTop() {
   if (!S) return;
