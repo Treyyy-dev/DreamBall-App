@@ -1013,6 +1013,27 @@ svg.crest.px,.who svg.crest,.mhead svg.crest,.fr svg.crest{image-rendering:pixel
 .ph-place small{font-family:var(--display);font-size:8px;color:#5fd38a}
 .ph-place.lock{opacity:.55}.ph-place.lock small{color:#ff8a7a}
 .ph-note{font-size:11px;color:#cfc6ff;margin:0}
+/* ===================== CLASSES, COACH, MARKET ===================== */
+.cls{display:flex;flex-direction:column;gap:12px}
+.cls-head{display:flex;justify-content:space-between;font-family:var(--display);font-size:11px;color:var(--cc)}
+.cls-head em{font-style:normal;color:var(--muted)}
+.cls-board{background:#1f3a2a;padding:22px 14px;box-shadow:0 0 0 4px #7a5a3a,0 0 0 6px #120e18;min-height:90px;display:flex;align-items:center;justify-content:center}
+.cls-board p{margin:0;font-family:var(--display);font-size:15px;line-height:1.5;color:#f4f1ea;text-align:center}
+.cls-opts{display:flex;flex-direction:column;gap:8px}
+.cls-opt{padding:13px 12px;border:0;cursor:pointer;font-family:var(--label);font-size:15px;color:#fff;background:var(--panel2);box-shadow:0 0 0 2px var(--rule);text-align:left}
+.cls-opt.ok{background:#1f9a62;box-shadow:0 0 0 2px #5fd38a}
+.cls-opt.bad{background:#a8352a;box-shadow:0 0 0 2px #ff6a5a}
+.cls-done{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:12px 0}
+.cls-done small{font-family:var(--display);font-size:10px;color:var(--muted)}
+.cls-done .grade{font-size:56px}
+.cls-done p{margin:0}
+.coach{padding:12px;margin-bottom:10px;background:#1f3a2a;box-shadow:0 -3px 0 0 #5fd38a,0 3px 0 0 #5fd38a,-3px 0 0 0 #5fd38a,3px 0 0 0 #5fd38a}
+.coach.no{background:#3a1f24;box-shadow:0 -3px 0 0 #ff6a5a,0 3px 0 0 #ff6a5a,-3px 0 0 0 #ff6a5a,3px 0 0 0 #ff6a5a}
+.coach b{font-family:var(--display);font-size:11px;color:var(--gold)}
+.coach p{margin:6px 0 4px;font-size:14px;line-height:1.4}
+.coach small{font-family:var(--display);font-size:9px;color:var(--muted)}
+.fsw{width:44px;height:30px;background:linear-gradient(135deg,var(--c) 0 60%,var(--c2) 60%);box-shadow:0 0 0 2px #120e18}
+.sitem.furn{grid-template-columns:48px 1fr auto}
 
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0;-webkit-text-size-adjust:100%;overscroll-behavior:none;touch-action:manipulation}
@@ -1113,11 +1134,11 @@ const REF_FR = {n:'Ref', city:'', c:'#f2f2f2', d:'#16181f', trim:'#16181f', numc
 const TEAM_N = 3;          // players per side (3-on-3)
 const POS_ORDER = ['PG','SG','SF','PF','C'];
 const POS_T = {
-  PG:{sht:2,drb:8,spd:8,def:-6,dnk:-6,h:.88,w:.95}, SG:{sht:8,drb:3,spd:4,def:-3,dnk:-1,h:.91,w:.97}, SF:{sht:3,drb:0,spd:2,def:2,dnk:3,h:.94,w:1},
-  PF:{sht:-3,drb:-5,spd:-2,def:7,dnk:6,h:.96,w:1.05}, C:{sht:-8,drb:-9,spd:-6,def:10,dnk:8,h:.99,w:1.1}
+  PG:{sht:2,drb:8,spd:8,def:-6,dnk:-6,sta:6,h:.88,w:.95}, SG:{sht:8,drb:3,spd:4,def:-3,dnk:-1,sta:3,h:.91,w:.97}, SF:{sht:3,drb:0,spd:2,def:2,dnk:3,sta:1,h:.94,w:1},
+  PF:{sht:-3,drb:-5,spd:-2,def:7,dnk:6,sta:-2,h:.96,w:1.05}, C:{sht:-8,drb:-9,spd:-6,def:10,dnk:8,sta:-5,h:.99,w:1.1}
 };
 const RBASE = [63, 71, 79, 87];
-const STATS = ['sht','drb','spd','def','dnk'], STATN = {sht:'Shooting', drb:'Handles', spd:'Speed', def:'Defense', dnk:'Dunking'};
+const STATS = ['sht','drb','spd','def','dnk','sta'], STATN = {sht:'Shooting', drb:'Handles', spd:'Speed', def:'Defense', dnk:'Dunking', sta:'Stamina'};
 const FIRST = ['Jaylen','Darius','Trent','Xavier','Corey','Brandon','Terrence','Quincy','Elijah','Devonte','Nate','Rico','Jamal','Tyson','Desmond','Kendall','Bryce','Caleb','Dominic','Emeka','Felix','Gabe','Jonah','Khalil','Lamar','Mason','Omari','Pierce','Reggie','Silas','Tobias','Umar','Wes','Zane','Ronnie','Andre','Keon','Mateo','Idris','Cyrus'];
 const LASTN = ['Ashby','Bellamy','Calloway','Dunmore','Easley','Faraday','Garrow','Hollis','Ivers','Jessup','Kincaid','Larkin','Merriwether','Northcutt','Ogletree','Pembrook','Quarles','Rutledge','Stroud','Thackery','Underhill','Vickers','Whitlock','Yancey','Abernathy','Crenshaw','Dorsey','Embry','Fitch','Holloway','Lockhart','Mabry','Nwosu','Okonkwo','Pryor','Rosario','Saldana','Tillman','Voss','Wingate'];
 const BASE_CHARS = [
@@ -1580,7 +1601,7 @@ const hOf = inches => clamp(.86 + (inches - H_MIN) / (H_MAX - H_MIN) * .15, .86,
 // starting ratings come from position, height and build
 function startStats(pos, hIn, build) {
   const t = POS_T[pos], tall = (hIn - 77) / 10, b = {slim:-1, normal:0, strong:1, heavy:2}[build] || 0;
-  const st = {sht:46 + t.sht, drb:46 + t.drb - tall * 4 - b, spd:46 + t.spd - tall * 5 - b * 2, def:46 + t.def + tall * 5 + b * 2, dnk:44 + t.dnk + tall * 6 + b * 2};
+  const st = {sht:46 + t.sht, drb:46 + t.drb - tall * 4 - b, spd:46 + t.spd - tall * 5 - b * 2, def:46 + t.def + tall * 5 + b * 2, dnk:44 + t.dnk + tall * 6 + b * 2, sta:50 + t.sta - b * 2 - Math.max(0, tall) * 2};
   for (const k of STATS) st[k] = clamp(Math.round(st[k]), 35, 70);
   return st;
 }
@@ -1682,6 +1703,52 @@ function streetKit() {                     // what you wear walking around the c
 const meOvr = () => ovrOf(meStats());
 const stageOf = () => STAGES[S.stage] || STAGES.hs;
 
+// ---- home furniture (Market): one item per slot, drawn in your two-story house
+const FURN = [
+  {id:'couch_gray',   slot:'couch',  n:'Gray Couch',        p:0,    c:'#8a94a6', c2:'#6d7179'},
+  {id:'couch_leather',slot:'couch',  n:'Leather Couch',     p:300,  c:'#7a4a22', c2:'#5a3418'},
+  {id:'couch_blue',   slot:'couch',  n:'Blue Sectional',    p:650,  c:'#2d4fd6', c2:'#1f3a9e', big:true},
+  {id:'couch_velvet', slot:'couch',  n:'Purple Velvet',     p:1200, c:'#7b3fc4', c2:'#5a2a9e', big:true},
+  {id:'tv_small',     slot:'tv',     n:'Small TV',          p:0,    c:'#22252f', w:6},
+  {id:'tv_big',       slot:'tv',     n:'Big Flatscreen',    p:500,  c:'#16181f', w:10},
+  {id:'tv_cinema',    slot:'tv',     n:'Cinema Wall',       p:1500, c:'#0a0b10', w:16},
+  {id:'rug_beige',    slot:'rug',    n:'Beige Rug',         p:0,    c:'#d9c2a0', c2:'#c4ab88'},
+  {id:'rug_red',      slot:'rug',    n:'Red Rug',           p:150,  c:'#c2402f', c2:'#a8352a'},
+  {id:'rug_court',    slot:'rug',    n:'Court Rug',         p:250,  c:'#d9a066', c2:'#e2453a', court:true},
+  {id:'lamp_none',    slot:'lamp',   n:'No Lamp',           p:0},
+  {id:'lamp_floor',   slot:'lamp',   n:'Floor Lamp',        p:80,   c:'#ffe6a8'},
+  {id:'lamp_neon',    slot:'lamp',   n:'Neon Lamp',         p:220,  c:'#ff3fd0'},
+  {id:'plant_none',   slot:'plant',  n:'No Plant',          p:0},
+  {id:'plant_fern',   slot:'plant',  n:'Fern',              p:60,   c:'#3fae4f'},
+  {id:'plant_palm',   slot:'plant',  n:'Palm',              p:150,  c:'#2f8a3a'},
+  {id:'art_none',     slot:'art',    n:'Bare Wall',         p:0},
+  {id:'art_dunk',     slot:'art',    n:'Dunk Poster',       p:120,  c:'#e2702c'},
+  {id:'art_record',   slot:'art',    n:'Gold Record',       p:400,  c:'#ffc94d'},
+  {id:'fridge_white', slot:'fridge', n:'White Fridge',      p:0,    c:'#f4f1ea'},
+  {id:'fridge_steel', slot:'fridge', n:'Steel Fridge',      p:350,  c:'#c9d1de'},
+  {id:'fridge_red',   slot:'fridge', n:'Retro Red Fridge',  p:300,  c:'#e2453a'},
+  {id:'table_wood',   slot:'table',  n:'Wood Table',        p:0,    c:'#9a6a3a'},
+  {id:'table_marble', slot:'table',  n:'Marble Table',      p:450,  c:'#eceae4'},
+  {id:'bed_twin',     slot:'bed',    n:'Twin Bed',          p:0,    c:'#4a6ab0', c2:'#f4f1ea'},
+  {id:'bed_queen',    slot:'bed',    n:'Queen Bed',         p:400,  c:'#2fa85a', c2:'#f4f1ea', big:true},
+  {id:'bed_king',     slot:'bed',    n:'Gold King Bed',     p:1200, c:'#c9963a', c2:'#fff6d8', big:true},
+  {id:'desk_basic',   slot:'desk',   n:'Study Desk',        p:0,    c:'#9a6a3a'},
+  {id:'desk_gaming',  slot:'desk',   n:'RGB Gaming Desk',   p:500,  c:'#16181f', rgb:true},
+  {id:'game_none',    slot:'game',   n:'No Game Setup',     p:0},
+  {id:'game_console', slot:'game',   n:'Console Setup',     p:600,  c:'#22252f'},
+  {id:'game_arcade',  slot:'game',   n:'Arcade Cabinet',    p:900,  c:'#7b3fc4'},
+  {id:'poster_none',  slot:'poster', n:'Bare Wall',         p:0},
+  {id:'poster_legend',slot:'poster', n:'Legend Poster',     p:100,  c:'#ffc94d'},
+  {id:'poster_team',  slot:'poster', n:'Team Poster',       p:100,  c:'#19a2b4'},
+  {id:'trophy_none',  slot:'trophy', n:'No Shelf',          p:0},
+  {id:'trophy_shelf', slot:'trophy', n:'Trophy Shelf',      p:250,  c:'#7a4a22'},
+  {id:'hoop_none',    slot:'hoop',   n:'No Hoop',           p:0},
+  {id:'hoop_mini',    slot:'hoop',   n:'Mini Hoop',         p:180,  c:'#ff6a1f'}
+];
+const FURNI = Object.fromEntries(FURN.map(f => [f.id, f]));
+const FURN_ROOMS = [['living', 'LIVING ROOM', ['couch', 'tv', 'rug', 'lamp', 'plant', 'art']], ['kitchen', 'KITCHEN', ['fridge', 'table']], ['bedroom', 'BEDROOM', ['bed', 'desk', 'game', 'poster']], ['fun', 'TROPHY ROOM', ['trophy', 'hoop']]];
+const HOME0 = {couch:'couch_gray', tv:'tv_small', rug:'rug_beige', lamp:'lamp_none', plant:'plant_none', art:'art_none', fridge:'fridge_white', table:'table_wood', bed:'bed_twin', desk:'desk_basic', game:'game_none', poster:'poster_none', trophy:'trophy_none', hoop:'hoop_none'};
+
 // ================= save =================
 const KEY = 'dreamball-save-v3', OLD_KEY = 'dreamball-save-v2';
 let S = null;
@@ -1713,9 +1780,11 @@ function fixSave(s) {
   s.gear = Object.assign({shoe:null, top:'tee_white', bot:'sh_black', hat:'hat_none', shot:'js_base', dunk:'dk_two', celeb:'ce_arms'}, s.gear || {});
   s.shoes = s.shoes || []; s.uid = s.uid || 1;
   s.road = s.road || {m:0, paid:false, cf:[], cp:[]};
+  s.home = Object.assign({}, HOME0, s.home || {}); s.inv.furn = s.inv.furn || FURN.filter(f => !f.p).map(f => f.id);
+  s.gpa = s.gpa || {pts:0, n:0};
   s.stage = s.stage || 'hs'; s.season = s.season || 1; s.res = s.res || []; s.done = s.done || {};
   s.me.sp = s.me.sp || 0;
-  if (s.me.st.dnk == null) s.me.st.dnk = startStats(s.me.pos, s.me.hIn, s.me.build).dnk;      // Dunking was added as a rating
+  for (const k of ['dnk', 'sta']) if (s.me.st[k] == null) s.me.st[k] = startStats(s.me.pos, s.me.hIn, s.me.build)[k];      // Dunking and Stamina were added as ratings
   s.auto = !!s.auto;
   s.seen = s.seen || Date.now();
   return s;
@@ -1903,7 +1972,7 @@ function placeForTip() {
 function startQuarter() {
   G.q++;
   G.clock = G.q > 4 ? Math.round(qLen() / 2) : qLen(); G.clockOut = false; G.banner = null; G.meter = null; G.ft = null; G.foul = null;
-  setLineups(); placeForTip(); if (G.q > 1) { autoSubs(1); if (G.auto) autoSubs(0); }
+  setLineups(); placeForTip(); if (G.q > 1) { autoSubs(1); autoSubs(0); }
   const t = (G.q % 2 === 1) ? G.firstPoss : 1 - G.firstPoss;
   setPoss(t); give(players[t][0]); G.phase = 'live';
   feed(G.q === 1 ? `Tip-off. ${G.T[t].short} ball` : `${G.T[t].short} start the ${G.q > 4 ? 'overtime' : 'quarter'} with the ball`, t);
@@ -2390,7 +2459,7 @@ function afterMake(t) {
   for (const p2 of players[G.poss]) { if (p2.i === 0) continue; const d = dist(p2, h); if (d < bd) { bd = d; best = p2; } }
   if (G.poss === 0 && G.game && !G.auto && mePlayer()) best = mePlayer();          // you take it out after their basket
   G.inbounder = best; b.state = 'dead'; b.x = h.x; b.y = h.y; b.z = 0; G.inbReady = false; G.inbWait = 0; G.inbHold = false;
-  autoSubs(1); if (G.auto) autoSubs(0);
+  autoSubs(1); autoSubs(0);                   // the coach handles subs for both teams (never you)
 }
 function updateBall(dt) {
   const b = G.ball;
@@ -2535,7 +2604,7 @@ function startMeter(card, lv) {
   let w = clamp(.035 + q * .2 + (p.d.st.sht - 60) * .0015 + (d < 5 ? .06 : 0), .035, .22) * card.win * (1 + .06 * (lv - 1));
   if (card.three && isThree(p, 0)) w *= 1.25;
   if (card.deep && d > 26) w *= 1.5;
-  w *= diff().win * (onFire(p) ? 1.3 : 1) * enF(p) * (isMe(p) && ANIM[S.gear.shot] ? ANIM[S.gear.shot].win : 1);
+  w *= diff().win * (onFire(p) ? 1.3 : 1) * enF(p) * (p.d.en < TIRED ? .7 : 1) * (isMe(p) && ANIM[S.gear.shot] ? ANIM[S.gear.shot].win : 1);
   w = clamp(w, .03, .4);
   G.meter = {p, v:0, speed:1 / (releaseTime(p.d) + (d > 22 ? .08 : 0)), g:[.8 - w/2, .8 + w/2], fade:card.fade};
   p.gather = true; p.gv = 0; p.vx *= .3; p.vy *= .3;
@@ -2680,7 +2749,8 @@ function resetGameStats() {
 }
 const gs = p => (p && p.d && p.d.gs) || (p && p.d ? (p.d.gs = STAT0()) : STAT0());
 function stl(p) { if (p) gs(p).stl++; }
-function enF(p) { const e = p && p.d && p.d.en != null ? p.d.en : 100; return e >= 60 ? 1 : .8 + .2 * e / 60; }
+function enF(p) { const e = p && p.d && p.d.en != null ? p.d.en : 100; return e >= 60 ? 1 : e >= 25 ? .84 + .16 * (e - 25) / 35 : .7 + .14 * e / 25; }
+const TIRED = 25;                                     // below this you can't dribble and your shot falls apart
 const onFire = p => !!(p && p.d && p.d.fire);
 
 // ---- hot streaks
@@ -2699,8 +2769,9 @@ function drainEnergy(dt) {
   for (const T of G.T) for (const d of T.pool || []) d.en = Math.min(100, d.en + dt * 1.6 * QLEN / qLen());
   for (const p of all) {
     if (!p.d || p.d.en == null) continue;
-    const sp = Math.hypot(p.vx, p.vy);
-    p.d.en = clamp(p.d.en - dt * (.35 + sp / 16 * .35 + (G.ball.owner === p ? .1 : 0)) * QLEN / qLen(), 0, 100);
+    const sp = Math.hypot(p.vx, p.vy), sta = p.d.st && p.d.st.sta != null ? p.d.st.sta : 70, use = 1.45 - sta / 110;
+    if (sp < 3 && G.ball.owner !== p) p.d.en = Math.min(100, p.d.en + dt * (.5 + sta / 250));      // catching your breath
+    else p.d.en = clamp(p.d.en - dt * (.25 + sp / 16 * .55 + (G.ball.owner === p ? .15 : 0)) * use * QLEN / qLen(), 0, 100);
   }
 }
 function restAll(n) { for (const T of G.T) for (const d of [...T.starters, ...T.bench]) d.en = Math.min(100, (d.en || 0) + n); }
@@ -2897,6 +2968,8 @@ function userDribble() {
   const h = userHandler();
   if (!h) return G.poss === 0 ? userCut() : userSteal();
   if (h.gather || h.finish || h.cool > 0 || h.stun > 0) return false;
+  if (h.d.en < TIRED) { popup(h.x, h.y, 'TOO TIRED', '#ff6a5a', 1.1); return false; }
+  h.d.en = Math.max(0, h.d.en - 2.5);
   const pool = DRB_BASE.concat(S && S.inv ? S.inv.anims.filter(id => ANIM[id] && ANIM[id].cat === 'move').map(id => ANIM[id].move) : []);
   G.drbN = ((G.drbN || 0) + 1 + Math.floor(Math.random() * 2)) % pool.length;
   return applyMove(h, CARD[pool[G.drbN]], 1, true);
@@ -3568,6 +3641,10 @@ function renderArena(dt) {
   items.sort((p, q) => p.d - q.d);
   for (const it of items) { const r2 = it.f(); if (it.p && r2) it.p._scr = r2; }
   if (ballAir) { const s = PX(b.x, b.y, h); drawBall(g, s[0], s[1], h > 12); }
+  { const mp = G.game ? mePlayer() : null;
+    if (mp && mp.d && mp.d.en != null) { const s = PX(mp.x, mp.y, 0), e = clamp(mp.d.en / 100, 0, 1), w = 18, x0 = s[0] - w / 2, y0 = s[1] + 4;
+      g.fillStyle = OUT; g.fillRect(x0 - 1, y0 - 1, w + 2, 4); g.fillStyle = '#24263f'; g.fillRect(x0, y0, w, 2);
+      g.fillStyle = mp.d.en < TIRED ? (Math.floor(CLK * 6) % 2 ? '#ff4d4d' : '#ffb0a0') : mp.d.en < 50 ? '#ffc94d' : '#5fd38a'; g.fillRect(x0, y0, Math.round(w * e), 2); } }
   if (G.game && !G.auto && (G.phase === 'live' || G.phase === 'dead')) { const pt = passTarget(); if (pt) { const s = PX(pt.x, pt.y, 0); pring(g, s[0], s[1] + 1, 9, 4, '#5fd38a'); pring(g, s[0], s[1] + 1, 8, 3, 'rgba(95,211,138,.5)'); } }
   if (owner && owner.t === 0 && G.phase === 'live' && owner._scr) { const tp = owner._scr.top - 4 + Math.round(Math.sin(CLK * 6)); const s = PX(owner.x, owner.y, 0); g.fillStyle = OUT; g.fillRect(s[0] - 3, tp - 1, 7, 4); g.fillStyle = '#ffc94d'; g.fillRect(s[0] - 2, tp, 5, 1); g.fillRect(s[0] - 1, tp + 1, 3, 1); g.fillRect(s[0], tp + 2, 1, 1); }
 }
@@ -4575,11 +4652,13 @@ const CITY_B = [
   {id:'jerseys', n:'JERSEYS',       x0:28, y0:80, x1:50,  y1:106, fd:9,  door:39,  wall:'#1f3a6b', roof:'#2d4fd6', trim:'#ffffff', sign:'#e2453a', store:true, aw:['#e2453a', '#ffffff']},
   {id:'clothes', n:'THREADS',       x0:70, y0:80, x1:92,  y1:106, fd:9,  door:81,  wall:'#efe3c2', roof:'#7a2f1f', trim:'#7a2f1f', sign:'#2a1a12', store:true, aw:['#3fae4f', '#f4f1ea']},
   {id:'moves',   n:'MOVES STUDIO',  x0:95, y0:80, x1:117, y1:106, fd:9,  door:106, wall:'#2a1a55', roof:'#5a3aa8', trim:'#ff3fd0', sign:'#36e6ff', store:true, aw:['#ff3fd0', '#36e6ff']},
-  {id:'apt1',    n:'',              x0:3,  y0:128, x1:30, y1:166, fd:12, door:null, wall:'#8a6a52', roof:'#4a3a32', trim:'#d8c8a8'},
-  {id:'apt2',    n:'',              x0:90, y0:128, x1:117, y1:166, fd:12, door:null, wall:'#5a6a7a', roof:'#3a4452', trim:'#c9d1de'}
+  {id:'home',    n:'HOME',          x0:4,  y0:128, x1:32, y1:162, fd:16, door:18,  wall:'#d9c2a0', roof:'#7a2f1f', trim:'#ffffff', sign:'#7a2f1f', house:true},
+  {id:'market',  n:'MARKET',        x0:90, y0:132, x1:117, y1:162, fd:10, door:103, wall:'#3a7d44', roof:'#2a5a32', trim:'#ffd84d', sign:'#ffd84d', store:true, aw:['#ffd84d', '#3a7d44']}
 ];
 const ROADS_H = [[40, 52], [110, 122]], ROAD_V = [54, 66, 52, 110];
-const CITY = {me:null, npcs:[], cars:[], key:'', cv:null, cam:{x:60, y:116}, near:null, tgt:null, steer:null, t:0};
+const CITY = {me:null, npcs:[], cars:[], key:'', cv:null, cam:{x:60, y:116}, near:null, tgt:null, steer:null, t:0, scene:'city'};
+// the current place you're walking around: the city, your house (2 floors) or a school
+const SCN = () => (CITY.scene !== 'city' && typeof SCENES !== 'undefined' && SCENES[CITY.scene]) || CITY_SCENE;
 
 function cityLocked(B) {
   if (!B.stage || !S) return false;
@@ -4673,10 +4752,12 @@ function paintBuilding(g, B, X, Y) {
 }
 
 // ---------- walking routes around buildings (breadth-first search on a 2 ft grid) ----------
-const GS = 2, GW = Math.ceil(CW / GS), GH = Math.ceil(CHH / GS);
-let cityGrid = null;
+const GS = 2;
+const cityGrids = {};
 function cityPath(fx, fy, tx, ty) {
-  if (!cityGrid) { cityGrid = new Uint8Array(GW * GH); for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) cityGrid[j * GW + i] = citySolid(i * GS + 1, j * GS + 1) ? 1 : 0; }
+  const sc = SCN(), GW = Math.ceil(sc.w / GS), GH = Math.ceil(sc.h / GS), gk = CITY.scene + ':' + (sc.gridKey ? sc.gridKey() : '');
+  let cityGrid = cityGrids[gk];
+  if (!cityGrid) { cityGrid = cityGrids[gk] = new Uint8Array(GW * GH); for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) cityGrid[j * GW + i] = sc.solid(i * GS + 1, j * GS + 1) ? 1 : 0; }
   const cell = (x, y) => [clamp(Math.floor(x / GS), 0, GW - 1), clamp(Math.floor(y / GS), 0, GH - 1)];
   const [si, sj] = cell(fx, fy); let [ti, tj] = cell(tx, ty);
   if (cityGrid[tj * GW + ti]) return null;
@@ -4697,6 +4778,14 @@ function cityPath(fx, fy, tx, ty) {
   const out = []; for (let i = 0; i < pts.length; i++) if (i === pts.length - 1 || i % 3 === 2) out.push(pts[i]);   // thin it out
   return out;
 }
+const CITY_SCENE = {w:CW, h:CHH, bg:'#4f9a42', paint:() => paintCity(), solid:(x, y) => citySolid(x, y), npcs:() => CITY.npcs,
+  spots:() => CITY_B.filter(B => B.door != null).map(B => ({key:'c:' + B.id, x:B.door, y:B.y1 + 2.5, rx:4, ry:2.5, label:B.n, lock:cityLocked(B), go:() => enterBuilding(B.id)}))};
+function goScene(id, x, y) {
+  CITY.scene = id; CITY.key = ''; CITY.path = null; CITY.tgt = null; CITY.steer = null; CITY.near = null;
+  if (CITY.me) { CITY.me.x = x; CITY.me.y = y; CITY.me.vx = CITY.me.vy = 0; CITY.cam.x = x; CITY.cam.y = y; }
+  if (S) S.city = {scene:id, sk:CITY.schoolKind, x, y};
+  renderEnter();
+}
 function cityGo(x, y) { const p = CITY.me ? cityPath(CITY.me.x, CITY.me.y, x, y) : null; CITY.path = p && p.length ? p : null; CITY.tgt = CITY.path ? CITY.path[CITY.path.length - 1] : null; }
 
 // ---------- people ----------
@@ -4704,8 +4793,8 @@ function cityPerson(look, kit, num) { return {look, kit, num, x:60, y:116, vx:0,
 function citySetup() {
   if (!S) return;
   CITY.me = CITY.me || cityPerson(null, null, 0);
-  const pos = S.city || {x:60, y:117};
-  if (!CITY.placed) { CITY.me.x = pos.x; CITY.me.y = pos.y; CITY.placed = true; CITY.cam.x = CITY.me.x; CITY.cam.y = CITY.me.y; }
+  const pos = S.city || {scene:'house2', x:8, y:21};
+  if (!CITY.placed) { CITY.scene = pos.scene && SCENES[pos.scene] ? pos.scene : 'city'; if (CITY.scene === 'school') schoolSetup(pos.sk || S.stage); CITY.me.x = pos.x; CITY.me.y = pos.y; CITY.placed = true; CITY.cam.x = CITY.me.x; CITY.cam.y = CITY.me.y; CITY.key = ''; CITY.near = null; }
   CITY.me.look = meLook(); CITY.me.kit = streetKit(); CITY.me.num = ''; CITY.me.C = null;
   if (!CITY.npcs.length) {
     const R = rng(99), paths = [[4, 38, 116, 38], [116, 54, 4, 54], [4, 108, 116, 108], [116, 124, 4, 124], [52, 54, 52, 108], [68, 108, 68, 54], [40, 140, 80, 140], [80, 160, 40, 160]];
@@ -4727,57 +4816,60 @@ function cityUpdate(dt) {
   else if (CITY.path && CITY.path.length) { const w = CITY.path[0], dx = w.x - m.x, dy = w.y - m.y, d = Math.hypot(dx, dy); if (d < 1.2) { CITY.path.shift(); if (!CITY.path.length) { CITY.path = null; CITY.tgt = null; } } else { vx = dx / d * 15; vy = dy / d * 15; } }
   const k = Math.min(1, dt * 12); m.vx += (vx - m.vx) * k; m.vy += (vy - m.vy) * k;
   const nx = m.x + m.vx * dt, ny = m.y + m.vy * dt;
-  if (!citySolid(nx, m.y)) m.x = nx; else m.vx = 0;
-  if (!citySolid(m.x, ny)) m.y = ny; else m.vy = 0;
-  for (const n of CITY.npcs) {
+  const sc = SCN();
+  if (!sc.solid(nx, m.y)) m.x = nx; else m.vx = 0;
+  if (!sc.solid(m.x, ny)) m.y = ny; else m.vy = 0;
+  for (const n of sc.npcs()) {
+    if (!n.path) continue;
     const [x0, y0, x1, y1] = n.path, L = Math.hypot(x1 - x0, y1 - y0);
     n.u += n.dir * n.sp * dt / L; if (n.u > 1 || n.u < 0) { n.dir *= -1; n.u = clamp(n.u, 0, 1); }
     const px = n.x, py = n.y; n.x = x0 + (x1 - x0) * n.u; n.y = y0 + (y1 - y0) * n.u; n.vx = (n.x - px) / Math.max(dt, 1e-3); n.vy = (n.y - py) / Math.max(dt, 1e-3);
     if (Math.hypot(n.x - m.x, n.y - m.y) < 2.6) { n.u -= n.dir * n.sp * dt / L; n.x = px; n.y = py; n.vx = n.vy = 0; }
   }
   for (const c of CITY.cars) { c.x += c.sp * dt; if (c.x > CW + 10) c.x = -10; if (c.x < -10) c.x = CW + 10; }
-  // near a door?
+  // standing at a door, a classroom, the coach or the stairs?
   let near = null;
-  for (const B of CITY_B) if (B.door != null && Math.abs(m.x - B.door) < 4 && m.y > B.y1 && m.y < B.y1 + 5) near = B;
-  if (near !== CITY.near) { CITY.near = near; renderEnter(); }
-  if (Math.random() < dt) S.city = {x:Math.round(m.x * 10) / 10, y:Math.round(m.y * 10) / 10};
+  for (const sp of sc.spots()) if (Math.abs(m.x - sp.x) < (sp.rx || 4) && Math.abs(m.y - sp.y) < (sp.ry || 2.5)) near = sp;
+  if ((near && near.key) !== (CITY.near && CITY.near.key)) { CITY.near = near; renderEnter(); }
+  if (Math.random() < dt) S.city = {scene:CITY.scene, sk:CITY.schoolKind, x:Math.round(m.x * 10) / 10, y:Math.round(m.y * 10) / 10};
 }
 function renderEnter() {
   const el = $('enterBtn'); if (!el) return;
-  const B = CITY.near;
-  if (!B || mode !== 'home') { el.hidden = true; return; }
-  const lock = cityLocked(B);
-  el.hidden = false; el.classList.toggle('lock', lock);
-  el.innerHTML = `<b>${lock ? 'LOCKED' : 'ENTER'}</b><span>${B.n}</span>`;
-  el.dataset.act = 'enter'; el.dataset.b = B.id;
+  const sp = CITY.near;
+  if (!sp || mode !== 'home') { el.hidden = true; return; }
+  el.hidden = false; el.classList.toggle('lock', !!sp.lock);
+  el.innerHTML = `<b>${sp.lock ? 'LOCKED' : sp.verb || 'ENTER'}</b><span>${sp.label}</span>`;
+  el.dataset.act = 'spot';
 }
 function renderCity(dt) {
   if (!ctx || !S || !CITY.me) return;
-  cam.k = arenaK();
-  const key = cam.k.toFixed(3) + '|' + S.stage;
-  if (CITY.key !== key || !CITY.cv) { CITY.cv = paintCity(); CITY.key = key; }
-  const m = CITY.me, halfW = IW / 2 / cam.k, halfH = IH / 2 / (cam.k * FS);
+  cam.k = arenaK() * (SCN().zoom || 1);
+  const sc = SCN(), key = CITY.scene + '|' + cam.k.toFixed(3) + '|' + S.stage + '|' + (sc.paintKey ? sc.paintKey() : '');
+  if (CITY.key !== key || !CITY.cv) { CITY.cv = sc.paint(); CITY.key = key; }
+  const m = CITY.me, halfW = IW / 2 / cam.k, halfH = IH / 2 / (cam.k * FS), CW = sc.w, CHH = sc.h;
   const kk = 1 - Math.exp(-dt * 4); CITY.cam.x += (m.x - CITY.cam.x) * kk; CITY.cam.y += (m.y - 4 - CITY.cam.y) * kk;
   CITY.cam.x = clamp(CITY.cam.x, Math.min(CW / 2, halfW), Math.max(CW / 2, CW - halfW)); CITY.cam.y = clamp(CITY.cam.y, Math.min(CHH / 2, halfH), Math.max(CHH / 2, CHH - halfH));
   const CX = (x, y) => [Math.round((x - CITY.cam.x) * cam.k + IW / 2), Math.round((y - CITY.cam.y) * cam.k * FS + IH / 2)];
-  const g = ctx; g.fillStyle = '#4f9a42'; g.fillRect(0, 0, IW, IH);
+  const g = ctx; g.fillStyle = sc.bg || '#4f9a42'; g.fillRect(0, 0, IW, IH);
   const o = CX(0, 0); g.drawImage(CITY.cv, o[0], o[1]);
   // cars
-  for (const c of CITY.cars) {
+  if (CITY.scene === 'city') for (const c of CITY.cars) {
     const [a, b] = ROADS_H[c.road], y = c.lane ? a + 3 : b - 3, s = CX(c.x, y), w = Math.round(9 * cam.k * .5), h = Math.round(4 * cam.k * FS * .55);
     g.fillStyle = 'rgba(10,8,20,.35)'; g.fillRect(s[0] - w / 2 + 2, s[1] + 2, w, h);
     g.fillStyle = OUT; g.fillRect(s[0] - w / 2 - 1, s[1] - h - 1, w + 2, h * 2 + 2); g.fillStyle = c.c; g.fillRect(s[0] - w / 2, s[1] - h, w, h * 2);
     g.fillStyle = '#9fd3f5'; g.fillRect(s[0] - w / 4, s[1] - h + 1, w / 2, h - 1); g.fillStyle = OUT; g.fillRect(s[0] - w / 2 + 1, s[1] + h - 1, 3, 2); g.fillRect(s[0] + w / 2 - 4, s[1] + h - 1, 3, 2);
   }
   // locked doors get a chain
-  for (const B of CITY_B) if (B.door != null && cityLocked(B)) { const s = CX(B.door, B.y1); g.fillStyle = '#ffc94d'; g.fillRect(s[0] - 6, s[1] - 7, 12, 2); g.fillStyle = OUT; g.fillRect(s[0] - 2, s[1] - 9, 4, 5); g.fillStyle = '#ffc94d'; g.fillRect(s[0] - 1, s[1] - 8, 2, 3); }
+  if (CITY.scene === 'city') for (const B of CITY_B) if (B.door != null && cityLocked(B)) { const s = CX(B.door, B.y1); g.fillStyle = '#ffc94d'; g.fillRect(s[0] - 6, s[1] - 7, 12, 2); g.fillStyle = OUT; g.fillRect(s[0] - 2, s[1] - 9, 4, 5); g.fillStyle = '#ffc94d'; g.fillRect(s[0] - 1, s[1] - 8, 2, 3); }
   // people, back to front
-  const ppl = [...CITY.npcs, m].sort((a, b) => a.y - b.y);
+  const ppl = [...sc.npcs(), m].sort((a, b) => a.y - b.y);
   for (const p of ppl) {
     const s = CX(p.x, p.y); if (s[0] < -20 || s[0] > IW + 20 || s[1] < -10 || s[1] > IH + 70) continue;
     shadowAt(g, s[0], s[1], 6);
     const pose = poseOf(p, dt);
+    if (p.face) pose.dir = p.face;
     drawDoll(g, s[0], s[1], p.look, p.kit, p.num, Object.assign(pose, {C:p.C}));
+    if (p.tag) { ptext(g, p.tag, s[0], s[1] - 58, 8, '#ffc94d', 'center'); }
     p.C = pose.C;
   }
   // you: a little marker over your head
@@ -4822,9 +4914,11 @@ function startOffline(i) {
 }
 function enterCity() {
   const el = setupEl(); el.hidden = true; el.innerHTML = ''; el.classList.remove('career');
+  S.city = {scene:'house2', x:8, y:21};                // every session starts at home, next to your bed
   CITY.placed = false; citySetup(); setMode('home'); renderTop(); resize();
   if (S.imported) { delete S.imported; save(); setTimeout(() => toast('Your old team\'s Basket Bucks and gear moved into this career'), 600); }
-  if (!S.welcomed) { S.welcomed = true; save(); setTimeout(() => toast('Welcome to Dream City! Walk to the High School to play your first game'), 900); }
+  if (!S.welcomed) { S.welcomed = true; save(); setTimeout(() => toast('This is your house! Head downstairs and out the front door to explore Dream City'), 900); }
+  else setTimeout(() => toast('Rise and shine! Your day starts at home'), 700);
 }
 
 // ---------- player builder ----------
@@ -4931,6 +5025,7 @@ const cityUp = e => {
   const s0 = cityDrag; cityDrag = null; CITY.steer = null;
   if (!s0 || s0.moved || mode !== 'home' || !S) return;
   const p = cityFromCss(e.clientX, e.clientY);
+  if (CITY.scene !== 'city') { const sp = SCN().spots().find(s => Math.abs(p.x - s.x) < (s.rx || 4) + 2 && Math.abs(p.y - s.y) < (s.ry || 2.5) + 3); if (sp) cityGo(sp.x, sp.y); else if (!SCN().solid(p.x, p.y)) cityGo(p.x, p.y); return; }
   for (const B of CITY_B) if (B.door != null && p.x > B.x0 && p.x < B.x1 && p.y > B.y0 && p.y < B.y1 + 4) { cityGo(B.door, B.y1 + 2.5); return; }   // tap a building: walk to its door
   if (!citySolid(p.x, p.y)) cityGo(p.x, p.y);
 };
@@ -4944,10 +5039,12 @@ window.addEventListener('keydown', e => {
 window.addEventListener('keyup', e => { const k = (e.key || '').toLowerCase(); if (k.startsWith('arrow')) CITY.steer = null; });
 
 // ---------- buildings ----------
-const BUILD_PANEL = {hs:'school', college:'school', nba:'school', shoes:'st_shoes', jerseys:'st_jerseys', clothes:'st_clothes', moves:'st_moves'};
+const BUILD_PANEL = {nba:'school', shoes:'st_shoes', jerseys:'st_jerseys', clothes:'st_clothes', moves:'st_moves', market:'st_market'};
 function enterBuilding(id) {
   const B = CITY_B.find(b => b.id === id); if (!B) return;
   if (cityLocked(B)) { toast(B.stage === 'college' ? 'Finish your high school season to get recruited' : 'Make it through college to get drafted'); return; }
+  if (id === 'hs' || id === 'college') { schoolSetup(id); goScene('school', 4, 17); toast(id === 'hs' ? 'Dream City High: go to class, then find Coach in the gym' : 'Dream State U: go to class, then find Coach in the gym'); return; }
+  if (id === 'home') { goScene('house1', 18, 29); return; }
   CITY.bld = id; openPanel(BUILD_PANEL[id]);
 }
 function careerHTML(bid) {
@@ -4994,7 +5091,7 @@ function playerHTML() {
     <button class="mbtn sec" data-act="tosaves">Switch save</button>`;
 }
 // ---------- stores ----------
-let storeSub = 'top', moveSub = 'shot';
+let storeSub = 'top', moveSub = 'shot', furnSub = 'living';
 function buyBtn(price, act, attrs, owned, on) {
   if (on) return `<span class="own on">EQUIPPED</span>`;
   if (owned) return `<button class="buy eq" data-act="${act}" ${attrs} data-own="1">Wear</button>`;
@@ -5018,6 +5115,13 @@ function storeHTML(kind) {
       <p class="hint">What you wear walking around Dream City.</p><div class="sgrid">${list.map(c => {
       const own = S.inv.clothes.includes(c.id), on = S.gear[c.slot] === c.id;
       return `<div class="stile" style="--rc:var(--rule)"><span class="sic">${clothSVG(c)}</span><b>${esc(c.n)}</b>${buyBtn(c.p, 'buycloth', `data-id="${c.id}"`, own, on)}</div>`; }).join('')}</div>`;
+  }
+  if (kind === 'st_market') {
+    const room = FURN_ROOMS.find(r => r[0] === furnSub) || FURN_ROOMS[0];
+    return `<div class="chips">${FURN_ROOMS.map(([k, l]) => `<button class="fchip ${furnSub === k ? 'on' : ''}" data-act="furnsub" data-k="${k}">${l}</button>`).join('')}</div>
+      <p class="hint">Furniture shows up in your house right away.</p>${room[2].map(slot => `<div class="sect"><h3>${slot.toUpperCase()}</h3><div class="slist">${FURN.filter(f => f.slot === slot).map(f => {
+        const own = S.inv.furn.includes(f.id), on = S.home[slot] === f.id;
+        return `<div class="sitem furn"><span class="fsw" style="--c:${f.c || '#2a2f4a'};--c2:${f.c2 || f.c || '#2a2f4a'}"></span><div><b>${esc(f.n)}</b><small>${f.p ? 'Furniture' : 'Free'}</small></div>${buyBtn(f.p, 'buyfurn', `data-id="${f.id}"`, own, on)}</div>`; }).join('')}</div></div>`).join('')}`;
   }
   if (kind === 'st_moves') {
     const list = ANIMS.filter(a => a.cat === moveSub);
@@ -5049,7 +5153,11 @@ function storeAct(a, d) {
   } else if (a === 'buyanim') {
     const an = ANIM[d.id]; if (!S.inv.anims.includes(an.id)) { if (S.gems < an.p) return; S.gems -= an.p; S.inv.anims.push(an.id); toast(`Learned ${an.n}`); buzz(20); }
     if (an.cat !== 'move') S.gear[an.cat] = an.id;
-  } else if (a === 'clsub') storeSub = d.k;
+  } else if (a === 'buyfurn') {
+    const f = FURNI[d.id]; if (!S.inv.furn.includes(f.id)) { if (S.gems < f.p) return; S.gems -= f.p; S.inv.furn.push(f.id); toast(`Bought ${f.n}. It's in your house`); buzz(20); }
+    S.home[f.slot] = f.id; CITY.key = '';
+  } else if (a === 'furnsub') furnSub = d.k;
+  else if (a === 'clsub') storeSub = d.k;
   else if (a === 'mvsub') moveSub = d.k;
   save(); renderTop(); citySetup(); renderPanel();
 }
@@ -5107,7 +5215,7 @@ function phoneAct(a, d) {
   if (a === 'phback') { phoneScreen = 'home'; $('phone').innerHTML = phoneHTML(); return; }
   if (a === 'phgo') {
     const B = CITY_B.find(b => b.id === d.b); if (!B) return;
-    closePhone(); CITY.me.x = B.door; CITY.me.y = B.y1 + 3; CITY.me.vx = CITY.me.vy = 0; CITY.path = null; CITY.tgt = null; CITY.cam.x = CITY.me.x; CITY.cam.y = CITY.me.y;
+    closePhone(); goScene('city', B.door, B.y1 + 3);
     toast(`Took a ride to ${B.n.charAt(0) + B.n.slice(1).toLowerCase()}`); return;
   }
   if (a === 'phapp') {
@@ -5120,6 +5228,198 @@ function phoneAct(a, d) {
     else if (v === 'saves') act('tosaves', {});
     else { if (v === 'career') CITY.bld = S.stage; openPanel(v); }
   }
+}
+
+// ================= inside: your two-story house and the schools (classes + the gym where coach is) =================
+// shared painter for a room: floor + walls drawn in the same 3/4 view as the city
+function roomCanvas(w, h) { const k = cam.k, c = document.createElement('canvas'); c.width = Math.ceil(w * k); c.height = Math.ceil(h * k * FS); return {c, g:c.getContext('2d'), X:x => Math.round(x * k), Y:y => Math.round(y * k * FS)}; }
+function floorWood(g, x0, y0, x1, y1, tones) { const r = prng(x0 * 31 + y0); for (let x = x0; x < x1; x += 4) { let y = y0 - ((r() * 20) | 0); while (y < y1) { const L = 14 + ((r() * 18) | 0), c = tones[(r() * tones.length) | 0]; g.fillStyle = c; g.fillRect(x, Math.max(y0, y), Math.min(4, x1 - x), Math.min(y1, y + L) - Math.max(y0, y)); g.fillStyle = 'rgba(60,30,10,.35)'; g.fillRect(x, Math.max(y0, y), 1, Math.min(y1, y + L) - Math.max(y0, y)); y += L; } } }
+function floorTiles(g, x0, y0, x1, y1, a, b, s) { for (let y = y0, j = 0; y < y1; y += s, j++) for (let x = x0, i = 0; x < x1; x += s, i++) { g.fillStyle = (i + j) % 2 ? a : b; g.fillRect(x, y, Math.min(s, x1 - x), Math.min(s, y1 - y)); } }
+function floorCarpet(g, x0, y0, x1, y1, a, b) { g.fillStyle = a; g.fillRect(x0, y0, x1 - x0, y1 - y0); const r = prng(x0 + y1); g.fillStyle = b; for (let i = 0; i < (x1 - x0) * (y1 - y0) / 10; i++) g.fillRect(x0 + ((r() * (x1 - x0)) | 0), y0 + ((r() * (y1 - y0)) | 0), 1, 1); }
+// a back wall with a face you can see (wall height = fd feet of the drawing)
+function backWall(g, X, Y, x0, x1, y0, fd, col, base) { g.fillStyle = OUT; g.fillRect(X(x0) - 1, Y(y0) - 1, X(x1) - X(x0) + 2, Y(y0 + fd) - Y(y0) + 2); g.fillStyle = col; g.fillRect(X(x0), Y(y0), X(x1) - X(x0), Y(y0 + fd) - Y(y0)); g.fillStyle = shadeHex(col, 1.08); g.fillRect(X(x0), Y(y0), X(x1) - X(x0), 2); g.fillStyle = base || shadeHex(col, .6); g.fillRect(X(x0), Y(y0 + fd) - 2, X(x1) - X(x0), 2); }
+function sideWall(g, X, Y, x0, x1, y0, y1, col) { g.fillStyle = OUT; g.fillRect(X(x0) - 1, Y(y0), X(x1) - X(x0) + 2, Y(y1) - Y(y0)); g.fillStyle = col; g.fillRect(X(x0), Y(y0), X(x1) - X(x0), Y(y1) - Y(y0)); }
+function doorOn(g, X, Y, x, yb, w, h, col) { g.fillStyle = OUT; g.fillRect(X(x - w / 2) - 1, yb - h - 1, X(x + w / 2) - X(x - w / 2) + 2, h + 1); g.fillStyle = col; g.fillRect(X(x - w / 2), yb - h, X(x + w / 2) - X(x - w / 2), h); g.fillStyle = '#ffd84d'; g.fillRect(X(x + w / 2) - 3, yb - (h >> 1), 1, 1); }
+function box(g, X, Y, x0, y0, x1, y1, col, top) { g.fillStyle = OUT; g.fillRect(X(x0) - 1, Y(y0) - 1, X(x1) - X(x0) + 2, Y(y1) - Y(y0) + 2); g.fillStyle = col; g.fillRect(X(x0), Y(y0), X(x1) - X(x0), Y(y1) - Y(y0)); if (top) { g.fillStyle = top; g.fillRect(X(x0), Y(y0), X(x1) - X(x0), Math.max(2, Math.round((Y(y1) - Y(y0)) * .45))); } }
+function inRect(x, y, r) { return x > r[0] && x < r[2] && y > r[1] && y < r[3]; }
+
+// ---------------- the house ----------------
+const HW = 44, HH = 34;
+const HOUSE_SOLID = {
+  house1: () => [[0, 0, HW, 6.5], [0, 0, 1.6, HH], [HW - 1.6, 0, HW, HH], [0, HH - 1.4, 15, HH], [21, HH - 1.4, HW, HH], [25.4, 0, 26.6, 15], [26, 5, 37.5, 9], [37.5, 5, 43, 11], [29.5, 16.5, 38.5, 21.5], [5.5, 23.5, 19.5, 28.5]],
+  house2: () => [[0, 0, HW, 6.5], [0, 0, 1.6, HH], [HW - 1.6, 0, HW, HH], [0, HH - 1.4, HW, HH], [25.4, 0, 26.6, 21], [2, 6, 11, 18.5], [15, 6, 24, 9.5], [28, 6, 40, 9]].concat(S && S.home.game !== 'game_none' ? [[16, 16, 23, 20]] : [])
+};
+function houseSolid(id) { return (x, y) => x < 1 || y < 1 || x > HW - 1 || y > HH - 1 || HOUSE_SOLID[id]().some(r => inRect(x, y, r)); }
+function drawFurn(g, X, Y, slot, f) {
+  if (!f || !f.c) return;
+  const c = f.c, c2 = f.c2 || shadeHex(c, .75);
+  if (slot === 'couch') { const w = f.big ? 16 : 13, x0 = 12.5 - w / 2; box(g, X, Y, x0, 23.5, x0 + w, 28.5, c2); box(g, X, Y, x0 + 1, 24.5, x0 + w - 1, 27.5, c, shadeHex(c, 1.12)); if (f.big) box(g, X, Y, x0 + w - 4, 20, x0 + w, 27.5, c, shadeHex(c, 1.12)); }
+  else if (slot === 'tv') { const w = f.w || 6; box(g, X, Y, 12.5 - w / 2, 1.8, 12.5 + w / 2, 5.4, '#0a0b10'); g.fillStyle = '#36a7e6'; g.fillRect(X(12.5 - w / 2) + 1, Y(1.8) + 1, X(12.5 + w / 2) - X(12.5 - w / 2) - 2, Y(5.4) - Y(1.8) - 3); g.fillStyle = 'rgba(255,255,255,.35)'; g.fillRect(X(12.5 - w / 2) + 2, Y(1.8) + 2, 4, 1); box(g, X, Y, 9, 6.6, 16, 8.2, '#5a3a22'); }
+  else if (slot === 'rug') { g.fillStyle = OUT; g.fillRect(X(5) - 1, Y(13) - 1, X(20) - X(5) + 2, Y(22) - Y(13) + 2); g.fillStyle = c; g.fillRect(X(5), Y(13), X(20) - X(5), Y(22) - Y(13)); if (f.court) { g.fillStyle = '#ffffff'; g.fillRect(X(12.5), Y(13), 1, Y(22) - Y(13)); pring(g, X(12.5), Y(17.5), 6, 4, '#ffffff'); g.fillStyle = c2; g.fillRect(X(5), Y(15.5), X(7.5) - X(5), Y(19.5) - Y(15.5)); g.fillRect(X(17.5), Y(15.5), X(20) - X(17.5), Y(19.5) - Y(15.5)); } else { g.fillStyle = c2; g.fillRect(X(6), Y(14), X(19) - X(6), 2); g.fillRect(X(6), Y(21) - 2, X(19) - X(6), 2); } }
+  else if (slot === 'lamp') { g.fillStyle = OUT; g.fillRect(X(3.5) - 1, Y(7) - 12, 3, 13); g.fillStyle = '#5a6478'; g.fillRect(X(3.5), Y(7) - 11, 1, 11); blob(g, X(3.5), Y(7) - 13, 4, 3, OUT); blob(g, X(3.5), Y(7) - 13, 3, 2, c); g.fillStyle = f.id === 'lamp_neon' ? 'rgba(255,63,208,.12)' : 'rgba(255,230,168,.14)'; blob(g, X(3.5), Y(9), 14, 8, g.fillStyle); }
+  else if (slot === 'plant') { box(g, X, Y, 21.3, 7.6, 23.7, 9.4, '#9a5a3a'); blob(g, X(22.5), Y(7.6) - 5, 6, 6, OUT); blob(g, X(22.5), Y(7.6) - 5, 5, 5, c); if (f.id === 'plant_palm') for (const dx of [-6, 6]) pline(g, X(22.5), Y(7.6) - 6, X(22.5) + dx, Y(7.6) - 12, c, 2); }
+  else if (slot === 'art') { box(g, X, Y, 4, 1.4, 8, 4.4, f.id === 'art_record' ? '#16181f' : c); if (f.id === 'art_record') { blob(g, X(6), Y(2.9), 4, 3, c); blob(g, X(6), Y(2.9), 1, 1, '#16181f'); } else { g.fillStyle = '#ffffff'; g.fillRect(X(5.5), Y(1.8) + 1, 2, 3); } }
+  else if (slot === 'fridge') { box(g, X, Y, 37.6, 2, 42.6, 10.6, c, shadeHex(c, 1.08)); g.fillStyle = shadeHex(c, .7); g.fillRect(X(37.6), Y(5.4), X(42.6) - X(37.6), 1); g.fillRect(X(38.4), Y(3), 1, 4); }
+  else if (slot === 'table') { box(g, X, Y, 30, 17, 38, 21, c, shadeHex(c, 1.15)); for (const [cx, cy] of [[28.6, 19], [39.4, 19]]) box(g, X, Y, cx - .9, cy - 1, cx + .9, cy + 1, '#7a4a22'); }
+  else if (slot === 'bed') { const w = f.big ? 10 : 8; box(g, X, Y, 2.4, 6, 2.4 + w, 18, '#5a3a22'); box(g, X, Y, 2.9, 6.5, 2 + w, 9, c2); box(g, X, Y, 2.9, 9.5, 2 + w, 17.5, c, shadeHex(c, 1.15)); }
+  else if (slot === 'desk') { box(g, X, Y, 15.5, 6.6, 23.5, 9.2, c, shadeHex(c, 1.12)); box(g, X, Y, 18, 4.4, 21, 6.6, '#0a0b10'); g.fillStyle = f.rgb ? '#ff3fd0' : '#36a7e6'; g.fillRect(X(18) + 1, Y(4.4) + 1, X(21) - X(18) - 2, 2); if (f.rgb) { g.fillStyle = '#36e6ff'; g.fillRect(X(15.5), Y(9.2), X(23.5) - X(15.5), 1); } box(g, X, Y, 18.5, 10, 20.5, 12, '#22252f'); }
+  else if (slot === 'game') { if (f.id === 'game_arcade') { box(g, X, Y, 17, 15.5, 22, 20, c, shadeHex(c, 1.2)); g.fillStyle = '#36e6ff'; g.fillRect(X(17.6), Y(16) + 1, X(21.4) - X(17.6), 3); g.fillStyle = '#ff3fd0'; g.fillRect(X(18.4), Y(18.6), 1, 1); g.fillRect(X(20.4), Y(18.6), 1, 1); } else { box(g, X, Y, 16, 16, 23, 18, '#5a3a22'); box(g, X, Y, 17, 13.6, 22, 16, '#0a0b10'); g.fillStyle = '#5fd38a'; g.fillRect(X(17) + 1, Y(13.6) + 1, X(22) - X(17) - 2, 2); box(g, X, Y, 18, 21, 21, 23.5, '#e2453a'); } }
+  else if (slot === 'poster') { box(g, X, Y, 9, 1.2, 13, 4.6, c); g.fillStyle = '#120e18'; g.fillRect(X(10.4), Y(1.8), 3, 5); g.fillStyle = '#ffffff'; g.fillRect(X(9.4), Y(4.6) - 3, X(12.6) - X(9.4), 1); }
+  else if (slot === 'trophy') { box(g, X, Y, 28, 2.4, 40, 8.6, c, shadeHex(c, 1.12)); const n = 1 + Object.keys((S && S.done) || {}).length + (S && S.stage === 'nba' ? Math.max(0, S.season - 1) : 0); for (let i = 0; i < Math.min(5, n); i++) { const tx = X(29.4 + i * 2.2); g.fillStyle = OUT; g.fillRect(tx - 1, Y(3) - 1, 5, 7); g.fillStyle = i === 0 ? '#c9d1de' : '#ffc94d'; g.fillRect(tx, Y(3), 3, 3); g.fillRect(tx + 1, Y(3) + 3, 1, 2); g.fillRect(tx - 0, Y(3) + 5, 3, 1); } }
+  else if (slot === 'hoop') { box(g, X, Y, 40.5, 12, 42.4, 18, '#9aa3b5'); box(g, X, Y, 38.6, 14, 40.4, 16, '#ffffff'); pring(g, X(39), Y(16.5), 3, 1, c); }
+}
+function paintHouse(floor) {
+  const {c, g, X, Y} = roomCanvas(HW, HH), H = (S && S.home) || HOME0, F = s => FURNI[H[s]];
+  g.fillStyle = '#0d0f22'; g.fillRect(0, 0, c.width, c.height);
+  if (floor === 1) {
+    floorWood(g, X(1.6), Y(6.5), X(25.4), Y(HH - 1.4), ['#b98a55', '#a87a48', '#c4955e', '#9e7040']);
+    floorTiles(g, X(26.6), Y(6.5), X(HW - 1.6), Y(HH - 1.4), '#e8e4dc', '#c9c2b4', Math.max(4, Math.round(cam.k * 2)));
+    backWall(g, X, Y, 0, HW, 0, 6.5, '#e6d6b8'); backWall(g, X, Y, 26, 37.5, 0, 6.5, '#d8e6e8');
+    box(g, X, Y, 26.6, 5, 37.5, 9, '#9aa3b5', '#c9d1de'); g.fillStyle = '#5a6478'; g.fillRect(X(30), Y(6) + 1, 6, 3);                   // counter + sink
+    g.fillStyle = '#9fd3f5'; g.fillRect(X(29), Y(1), X(34) - X(29), Y(4) - Y(1)); g.fillStyle = OUT; g.fillRect(X(31.5), Y(1), 1, Y(4) - Y(1));   // kitchen window
+    sideWall(g, X, Y, 25.4, 26.6, 0, 15, '#cdbb9a');
+    for (const s of ['rug', 'tv', 'art', 'lamp', 'plant', 'couch', 'fridge', 'table']) drawFurn(g, X, Y, s, F(s));
+    // stairs going up
+    for (let i = 0; i < 6; i++) { g.fillStyle = i % 2 ? '#8a5a32' : '#9a6a3a'; g.fillRect(X(36), Y(26 + i), X(42.4) - X(36), Y(27 + i) - Y(26 + i)); }
+    g.fillStyle = OUT; g.fillRect(X(36) - 1, Y(26), 1, Y(32) - Y(26)); ptext(g, 'UP', X(39.2), Y(28.4), 8, '#ffffff', 'center');
+    // front door in the bottom wall
+    g.fillStyle = '#5a3a22'; g.fillRect(X(15), Y(HH - 1.4), X(21) - X(15), Y(HH) - Y(HH - 1.4)); g.fillStyle = '#d9c2a0'; g.fillRect(X(15), Y(HH - 1.6), X(21) - X(15), 1);
+  } else {
+    floorCarpet(g, X(1.6), Y(6.5), X(25.4), Y(HH - 1.4), '#4a5a8a', '#5a6a9a');
+    floorWood(g, X(26.6), Y(6.5), X(HW - 1.6), Y(HH - 1.4), ['#a87a48', '#9e7040', '#b98a55']);
+    backWall(g, X, Y, 0, HW, 0, 6.5, '#d8d2ea'); backWall(g, X, Y, 26, HW, 0, 6.5, '#2a2f4a');
+    sideWall(g, X, Y, 25.4, 26.6, 0, 21, '#b8b2ca');
+    g.fillStyle = '#9fd3f5'; g.fillRect(X(3), Y(1), X(8) - X(3), Y(4) - Y(1)); g.fillStyle = OUT; g.fillRect(X(5.5), Y(1), 1, Y(4) - Y(1));
+    for (const s of ['bed', 'desk', 'game', 'poster', 'trophy', 'hoop']) drawFurn(g, X, Y, s, F(s));
+    ptext(g, 'TROPHY ROOM', X(35), Y(10.6), 8, '#ffc94d', 'center');
+    for (let i = 0; i < 6; i++) { g.fillStyle = i % 2 ? '#8a5a32' : '#9a6a3a'; g.fillRect(X(36), Y(26 + i), X(42.4) - X(36), Y(27 + i) - Y(26 + i)); }
+    g.fillStyle = OUT; g.fillRect(X(36) - 1, Y(26), 1, Y(32) - Y(26)); ptext(g, 'DOWN', X(39.2), Y(28.4), 8, '#ffffff', 'center');
+  }
+  sideWall(g, X, Y, 0, 1.6, 0, HH, '#3a2a22'); sideWall(g, X, Y, HW - 1.6, HW, 0, HH, '#3a2a22');
+  if (floor === 2) { g.fillStyle = '#3a2a22'; g.fillRect(X(0), Y(HH - 1.4), X(HW) - X(0), Y(HH) - Y(HH - 1.4)); }
+  else { g.fillStyle = '#3a2a22'; g.fillRect(X(0), Y(HH - 1.4), X(15) - X(0), Y(HH) - Y(HH - 1.4)); g.fillRect(X(21), Y(HH - 1.4), X(HW) - X(21), Y(HH) - Y(HH - 1.4)); }
+  return c;
+}
+const HOME_DOOR = () => CITY_B.find(b => b.id === 'home');
+const SCENES = {
+  house1: {zoom:1.9, w:HW, h:HH, bg:'#0d0f22', paint:() => paintHouse(1), paintKey:() => JSON.stringify(S.home), gridKey:() => JSON.stringify(S.home), solid:houseSolid('house1'), npcs:() => [],
+    spots:() => [{key:'h:out', x:18, y:31.5, rx:3.5, ry:2.2, verb:'GO', label:'OUTSIDE', go:() => { const B = HOME_DOOR(); goScene('city', B.door, B.y1 + 3); }},
+                 {key:'h:up', x:39, y:29, rx:3.4, ry:3.4, verb:'GO', label:'UPSTAIRS', go:() => goScene('house2', 39, 24)}]},
+  house2: {zoom:1.9, w:HW, h:HH, bg:'#0d0f22', paint:() => paintHouse(2), paintKey:() => JSON.stringify(S.home) + JSON.stringify(S.done) + S.season, gridKey:() => JSON.stringify(S.home), solid:houseSolid('house2'), npcs:() => [],
+    spots:() => [{key:'h:down', x:39, y:29, rx:3.4, ry:3.4, verb:'GO', label:'DOWNSTAIRS', go:() => goScene('house1', 39, 24)},
+                 {key:'h:bed', x:7, y:20, rx:4, ry:2, verb:'SLEEP', label:'IN YOUR BED', go:() => { toast('You took a nap. Feeling fresh!'); }}]},
+  school: {zoom:1.35, w:66, h:60, paint:() => paintSchool(), paintKey:() => CITY.schoolKind, solid:(x, y) => schoolSolid(x, y), npcs:() => SCHOOL.npcs, bg:'#0d0f22', gridKey:() => 'x',
+    spots:() => [...CLASSES.map((cl, i) => ({key:'s:' + cl.id, x:9 + i * 16, y:8.2, rx:3.2, ry:2.2, verb:'GO TO CLASS', label:cl.n.toUpperCase(), go:() => openClass(cl.id)})),
+                 {key:'s:coach', x:33, y:39.5, rx:5, ry:3, verb:'TALK TO', label:'COACH', go:() => { CITY.bld = CITY.schoolKind; openPanel('coach'); }},
+                 {key:'s:out', x:3.2, y:17, rx:2.4, ry:3.4, verb:'GO', label:'OUTSIDE', go:() => { const B = CITY_B.find(b => b.id === CITY.schoolKind); goScene('city', B.door, B.y1 + 3); }}]}
+};
+
+// ---------------- the schools ----------------
+const SCHOOL = {npcs:[], kind:''};
+function schoolSolid(x, y) {
+  if (x < 1.6 || x > 64.4 || y < 6.5 || y > 58.4) return true;
+  if (y > 25 && y < 30 && !(x > 28 && x < 38)) return true;                    // wall between hall and gym, with an opening
+  if (Math.hypot(x - 33, y - 37) < 1.4) return true;                          // coach
+  if (y > 55 && x > 29 && x < 37) return true;                                 // hoop stanchion
+  return false;
+}
+function paintSchool() {
+  const col = CITY.schoolKind === 'college', {c, g, X, Y} = roomCanvas(66, 60);
+  const wall = col ? '#e8e0cc' : '#b8c4d8', locker = col ? '#2d4fd6' : '#c2402f', gymC = col ? '#2d4fd6' : '#c2402f';
+  g.fillStyle = '#0d0f22'; g.fillRect(0, 0, c.width, c.height);
+  floorTiles(g, X(1.6), Y(6.5), X(64.4), Y(26), '#e8e4dc', '#d4cfc4', Math.max(4, Math.round(cam.k * 2.5)));
+  floorWood(g, X(1.6), Y(29), X(64.4), Y(58.4), ['#d9a066', '#cf9558', '#e2ab72', '#c88d50']);
+  // gym court lines + logo
+  g.fillStyle = '#ffffff'; g.fillRect(X(5), Y(31), X(61) - X(5), 1); g.fillRect(X(5), Y(31), 1, Y(58) - Y(31)); g.fillRect(X(61), Y(31), 1, Y(58) - Y(31));
+  g.fillStyle = gymC; g.fillRect(X(26), Y(46), X(40) - X(26), Y(58) - Y(46)); g.fillStyle = '#ffffff'; g.fillRect(X(26), Y(46), X(40) - X(26), 1); pring(g, X(33), Y(46), Math.round(5 * cam.k), Math.round(5 * cam.k * FS), '#ffffff');
+  pring(g, X(33), Y(36), Math.round(4.5 * cam.k), Math.round(4.5 * cam.k * FS), '#ffffff');
+  ptext(g, col ? 'DREAM STATE' : 'DREAM CITY HIGH', X(33), Y(33.5), 8, gymC, 'center');
+  box(g, X, Y, 30, 55.6, 36, 58.4, '#5a6478'); box(g, X, Y, 31, 53.4, 35, 55.6, '#ffffff'); pring(g, X(33), Y(53.6), 4, 2, '#ff6a1f');
+  // bleachers along the gym sides
+  for (let i = 0; i < 4; i++) { g.fillStyle = i % 2 ? '#9a6a3a' : '#a87a48'; g.fillRect(X(2), Y(32 + i * 4), X(4.6) - X(2), Y(35 + i * 4) - Y(32 + i * 4)); g.fillRect(X(61.4), Y(32 + i * 4), X(64) - X(61.4), Y(35 + i * 4) - Y(32 + i * 4)); }
+  // back wall with the four classroom doors and lockers
+  backWall(g, X, Y, 0, 66, 0, 6.5, wall);
+  for (let x = 2; x < 64; x += 2.2) { const nearDoor = [9, 25, 41, 57].some(d => Math.abs(x + 1 - d) < 4); if (nearDoor) continue; g.fillStyle = OUT; g.fillRect(X(x), Y(2.2), X(2.1) - X(0) + 1, Y(6.4) - Y(2.2)); g.fillStyle = locker; g.fillRect(X(x) + 1, Y(2.2) + 1, X(2.1) - X(0) - 1, Y(6.4) - Y(2.2) - 2); g.fillStyle = shadeHex(locker, .6); g.fillRect(X(x) + 2, Y(3), 2, 1); }
+  CLASSES.forEach((cl, i) => { const dx = 9 + i * 16; doorOn(g, X, Y, dx, Y(6.5) - 1, 4, Math.round(Y(5.6) - Y(1.4)), '#7a5a3a'); g.fillStyle = OUT; g.fillRect(X(dx) - 16, Y(0.2), 33, 9); g.fillStyle = cl.c; g.fillRect(X(dx) - 15, Y(0.2) + 1, 31, 7); ptext(g, cl.short, X(dx), Y(0.2) + 5, 8, '#ffffff', 'center'); });
+  // the wall between hall and gym (open double doors in the middle)
+  backWall(g, X, Y, 0, 28, 24.5, 4.5, wall); backWall(g, X, Y, 38, 66, 24.5, 4.5, wall);
+  ptext(g, 'GYM', X(33), Y(24.2), 8, '#ffc94d', 'center');
+  // exit door on the left wall
+  sideWall(g, X, Y, 0, 1.6, 0, 60, '#3a3f5c'); sideWall(g, X, Y, 64.4, 66, 0, 60, '#3a3f5c');
+  g.fillStyle = '#5a3a22'; g.fillRect(X(0), Y(13.5), X(1.6) - X(0) + 1, Y(20.5) - Y(13.5)); ptext(g, 'EXIT', X(4.2), Y(12.5), 8, '#ff6a5a', 'center');
+  g.fillStyle = '#3a3f5c'; g.fillRect(0, Y(58.4), c.width, c.height - Y(58.4));
+  return c;
+}
+function schoolSetup(kind) {
+  CITY.schoolKind = kind;
+  const R = rng(kind === 'hs' ? 321 : 654), shirts = ['#e2453a', '#2d4fd6', '#3fae4f', '#f2c230', '#22252f', '#ff7ab8', '#7b3fc4', '#f4f1ea'];
+  const mk = (path, i, tag) => { const n = cityPerson({skin:Math.floor(R() * SKINS.length), hair:Math.floor(R() * 6), h:.86 + R() * .1, w:.95 + R() * .08, shoe:[0xf4f1ea, 0x22252f], beard:kind !== 'hs' && R() < .3, v:i},
+    {n:'', c:'#000', d:'#000', trim:'#000', numc:'#fff', outfit:{top:['tee', 'hoodie', 'tee', 'jacket'][i % 4], topC:shirts[i % 8], bot:['jeans', 'shorts', 'joggers'][i % 3], botC:['#3a5a9e', '#1d1f2a', '#6d7179'][i % 3], hat:'none', hatC:'#000'}}, '');
+    n.path = path; n.u = R(); n.dir = 1; n.sp = path ? 3.6 + R() * 1.6 : 0; if (tag) n.tag = tag; return n; };
+  SCHOOL.npcs = [mk([6, 13, 60, 13], 0), mk([60, 18, 8, 18], 1), mk([12, 22, 54, 22], 2), mk([50, 10, 14, 10], 3), mk([10, 40, 22, 52], 4), mk([56, 50, 44, 38], 5)];
+  const coach = cityPerson({skin:5, hair:2, h:.92, w:1.08, shoe:[0x1d1f2a, 0xf4f1ea], beard:true, v:9}, {n:'', c:'#000', d:'#000', trim:'#000', numc:'#fff', outfit:{top:'jacket', topC:kind === 'hs' ? '#c2402f' : '#2d4fd6', bot:'joggers', botC:'#1d1f2a', hat:'cap', hatC:'#16181f'}}, '');
+  coach.x = 33; coach.y = 37; coach.face = 'down'; coach.tag = 'COACH'; SCHOOL.npcs.push(coach);
+  SCHOOL.npcs.forEach(n => { if (n.path) { n.x = n.path[0]; n.y = n.path[1]; } });
+}
+
+// ---------------- classes ----------------
+const CLASSES = [{id:'math', n:'Math', short:'MATH', c:'#2d4fd6'}, {id:'eng', n:'English', short:'ENGLISH', c:'#c2402f'}, {id:'sci', n:'Science', short:'SCIENCE', c:'#2fa85a'}, {id:'soc', n:'Social Studies', short:'SOCIAL', c:'#c9963a'}];
+const QBANK = {
+  eng:[['Which word is spelled correctly?', 'Definitely', ['Definately', 'Defenitly']], ['Pick the synonym for "quick".', 'Fast', ['Slow', 'Heavy']], ['Plural of "child"?', 'Children', ['Childs', 'Childes']], ['Which is a verb?', 'Run', ['Blue', 'Happy']], ['Opposite of "ancient"?', 'Modern', ['Old', 'Tired']], ['Pick the correct one.', "They're going to the game", ["Their going to the game", "There going to the game"]], ['Which word is an adjective?', 'Bright', ['Jump', 'Quickly']], ['Past tense of "throw"?', 'Threw', ['Throwed', 'Thrown']], ['Which is a complete sentence?', 'He scored the winning shot.', ['The winning shot.', 'Scored the shot.']], ['A word that sounds like another but means something else is a…', 'Homophone', ['Synonym', 'Pronoun']]],
+  sci:[['What planet is known as the Red Planet?', 'Mars', ['Venus', 'Jupiter']], ['Water boils at what °F at sea level?', '212°F', ['100°F', '180°F']], ['Plants make food from sunlight by…', 'Photosynthesis', ['Digestion', 'Evaporation']], ['What gas do we breathe in to live?', 'Oxygen', ['Helium', 'Carbon dioxide']], ['The center of an atom is the…', 'Nucleus', ['Electron', 'Shell']], ['What force pulls a basketball down?', 'Gravity', ['Magnetism', 'Friction']], ['H₂O is the formula for…', 'Water', ['Salt', 'Sugar']], ['The largest organ in the human body is the…', 'Skin', ['Heart', 'Liver']], ['Which is a mammal?', 'Dolphin', ['Shark', 'Salmon']], ['Earth goes around the Sun once every…', 'Year', ['Day', 'Month']]],
+  soc:[['What is the capital of the United States?', 'Washington, D.C.', ['New York City', 'Chicago']], ['Who was the first U.S. president?', 'George Washington', ['Abraham Lincoln', 'Thomas Jefferson']], ['How many states are in the U.S.?', '50', ['48', '52']], ['Which ocean is on the U.S. east coast?', 'Atlantic', ['Pacific', 'Indian']], ['The Declaration of Independence was signed in…', '1776', ['1812', '1865']], ['What is the capital of Texas?', 'Austin', ['Houston', 'Dallas']], ['Which continent is Egypt in?', 'Africa', ['Asia', 'Europe']], ['How many branches does the U.S. government have?', '3', ['2', '4']], ['Which is the largest continent?', 'Asia', ['Africa', 'Europe']], ['What is the capital of California?', 'Sacramento', ['Los Angeles', 'San Diego']]]
+};
+function mathQ(hard) {
+  const r = n => 1 + Math.floor(Math.random() * n), t = Math.floor(Math.random() * (hard ? 4 : 3));
+  let q, a;
+  if (t === 0) { const x = r(hard ? 90 : 40), y = r(hard ? 90 : 40); q = `${x} + ${y} = ?`; a = x + y; }
+  else if (t === 1) { const x = r(12), y = r(12); q = `${x} × ${y} = ?`; a = x * y; }
+  else if (t === 2) { const x = r(60) + 20, y = r(19); q = `${x} − ${y} = ?`; a = x - y; }
+  else { const x = r(9) + 1, b = r(20), y = x * r(9) + b; q = `Solve for x: ${x}x + ${b} = ${y}`; a = (y - b) / x; if (a % 1) return mathQ(hard); }
+  const wrong = new Set(); while (wrong.size < 2) { const w = a + (Math.random() < .5 ? -1 : 1) * r(hard ? 9 : 5); if (w !== a && w >= 0) wrong.add(w); }
+  return [q, String(a), [...wrong].map(String)];
+}
+let CLS = null;
+function openClass(id) {
+  const hard = CITY.schoolKind === 'college';
+  const pickQ = () => { if (id === 'math') return mathQ(hard); const bank = QBANK[id]; return bank[Math.floor(Math.random() * bank.length)]; };
+  const qs = []; while (qs.length < 3) { const q = pickQ(); if (!qs.some(o => o[0] === q[0])) qs.push(q); }
+  CLS = {id, qs:qs.map(([q, a, w]) => ({q, a, opts:[a, ...w].sort(() => Math.random() - .5), pick:null})), i:0, right:0, done:false};
+  openPanel('class');
+}
+function classHTML() {
+  if (!CLS) return '';
+  const cl = CLASSES.find(c => c.id === CLS.id), q = CLS.qs[CLS.i];
+  if (CLS.done) {
+    const g = ['F', 'D', 'B', 'A'][CLS.right], sp = CLS.right === 3 ? 1 : 0;
+    return `<div class="cls-done"><small>${cl.n.toUpperCase()} · CLASS OVER</small><b class="grade g${g}">${g}</b><p>${CLS.right} of 3 right${sp ? ' · +1 skill point' : ''} · +${CLS.right * 10} Basket Bucks</p>
+      <p class="hint">${S.classOk ? 'You went to class today. Coach is waiting in the gym.' : ''} GPA ${gpaText()}</p><button class="mbtn pri" data-act="close">Back to the hallway</button></div>`;
+  }
+  return `<div class="cls" style="--cc:${cl.c}"><div class="cls-head"><span>${cl.n.toUpperCase()}</span><em>QUESTION ${CLS.i + 1} OF 3</em></div>
+    <div class="cls-board"><p>${esc(q.q)}</p></div>
+    <div class="cls-opts">${q.opts.map((o, k) => `<button class="cls-opt ${q.pick != null ? (o === q.a ? 'ok' : q.pick === k ? 'bad' : '') : ''}" data-act="clsans" data-k="${k}" ${q.pick != null ? 'disabled' : ''}>${esc(o)}</button>`).join('')}</div>
+    ${q.pick != null ? `<button class="mbtn pri" data-act="clsnext">${CLS.i < 2 ? 'Next question' : 'Finish class'}</button>` : '<p class="hint">Pick the right answer.</p>'}</div>`;
+}
+const gpaText = () => S.gpa && S.gpa.n ? (S.gpa.pts / S.gpa.n).toFixed(2) : '–';
+function classAct(a, d) {
+  if (!CLS) return;
+  const q = CLS.qs[CLS.i];
+  if (a === 'clsans' && q.pick == null) { q.pick = +d.k; if (q.opts[q.pick] === q.a) { CLS.right++; buzz(15); } }
+  else if (a === 'clsnext') {
+    if (CLS.i < 2) CLS.i++;
+    else {
+      CLS.done = true; S.classOk = true; S.gpa.pts += [0, 1, 3, 4][CLS.right]; S.gpa.n++;
+      S.gems += CLS.right * 10; if (CLS.right === 3) S.me.sp += 1;
+      save(); renderTop();
+    }
+  }
+  renderPanel();
+}
+function coachHTML() {
+  const k = CITY.schoolKind || S.stage;
+  if (k !== S.stage) return careerHTML(k);
+  const ok = S.classOk;
+  return `<div class="coach ${ok ? '' : 'no'}"><b>COACH</b><p>${ok ? `"Good work in class. Let's go get a win!"` : `"No class, no game. Hit the books first: go to a class in the hallway, then come see me."`}</p><small>GPA ${gpaText()}</small></div>` + (ok ? careerHTML(k) : '');
 }
 
 // ================= UI =================
@@ -5162,12 +5462,14 @@ function renderPanel() {
   if (!tab || !S) return;
   const st = panel.scrollTop;
   const head = t => `<div class="phead"><h2>${t}</h2><button class="xbtn" data-act="close" aria-label="Close">${XIC}</button></div>`;
-  const BN = {school:CITY.bld === 'college' ? 'DREAM STATE U' : CITY.bld === 'nba' ? 'NBA ARENA' : 'HIGH SCHOOL', st_shoes:'KICKS · SHOES', st_jerseys:'JERSEY SHOP', st_clothes:'THREADS · CLOTHES', st_moves:'MOVES STUDIO'};
+  const BN = {st_market:'MARKET · FURNITURE', school:CITY.bld === 'college' ? 'DREAM STATE U' : CITY.bld === 'nba' ? 'NBA ARENA' : 'HIGH SCHOOL', st_shoes:'KICKS · SHOES', st_jerseys:'JERSEY SHOP', st_clothes:'THREADS · CLOTHES', st_moves:'MOVES STUDIO'};
   if (tab === 'player') panel.innerHTML = head('MY PLAYER') + playerHTML();
   else if (tab === 'career') panel.innerHTML = head('CAREER') + careerHTML();
   else if (tab === 'school') panel.innerHTML = head(BN.school) + careerHTML({hs:'hs', college:'college', nba:'nba'}[CITY.bld] || S.stage);
   else if (tab && tab.startsWith('st_')) panel.innerHTML = head(BN[tab]) + `<div class="wallet-line">${GEM} <b>${S.gems.toLocaleString()}</b> Basket Bucks</div>` + storeHTML(tab);
   else if (tab === 'locker') panel.innerHTML = head('LOCKER') + styleHTML();
+  else if (tab === 'class') panel.innerHTML = head(((CLASSES.find(c => CLS && c.id === CLS.id) || {}).n || 'CLASS').toUpperCase() + ' CLASS') + classHTML();
+  else if (tab === 'coach') panel.innerHTML = head(CITY.schoolKind === 'college' ? 'DREAM STATE GYM' : 'DREAM CITY HIGH GYM') + coachHTML();
   else if (tab === 'pvp') panel.innerHTML = head('ONLINE') + `<div class="locked-panel"><span class="biglock">${PXI(PX_ICONS.lock, '')}</span><b>ONLINE IS LOCKED</b><p class="hint">Online games against other players aren't open yet. Build up your career offline for now.</p></div>`;
   else if (tab === 'packs') panel.innerHTML = head('BANNERS') + packsHTML();
   else if (tab === 'shop') panel.innerHTML = head('SHOP') + shopHTML();
@@ -5538,7 +5840,8 @@ function showMatchup() {
 }
 function startStory() {
   const n = S.res.length, stg = stageOf(); if (n >= stg.games) return;
-  const sg = careerGame(n); S.city = {x:CITY.me ? CITY.me.x : 60, y:CITY.me ? CITY.me.y : 117};
+  if ((S.stage === 'hs' || S.stage === 'college') && !S.classOk) { toast('Coach says: go to class first'); return; }
+  const sg = careerGame(n); S.city = {scene:CITY.scene, sk:CITY.schoolKind, x:CITY.me ? CITY.me.x : 60, y:CITY.me ? CITY.me.y : 117};
   closePanel();
   G.game = sg; G.T = [userTeam(), genTeam(sg.ji, sg.ovr + diff().ovr, sg.seed)]; resetGameStats(); G.court = styleOf().court;
   G.score = [0, 0]; G.q = 0; G.firstPoss = Math.random() < .5 ? 0 : 1; G.done = false; G.paused = false; G.cheer = 0; G.auto = !!S.auto;
@@ -5554,14 +5857,14 @@ function startStory() {
   syncAuto();
   showMatchup();
 }
-function tipOff() { $('matchup').hidden = true; app.classList.remove('pre'); G.phase = 'idle'; startQuarter(); }
+function tipOff() { if (!G.game || G.done || G.phase !== 'pre') return; $('matchup').hidden = true; app.classList.remove('pre'); G.phase = 'idle'; startQuarter(); }
 function syncAuto() { const b = $('autoBtn'); b.classList.toggle('on', G.auto); b.setAttribute('aria-pressed', String(G.auto)); app.classList.toggle('auto', G.auto); }
 function finishStory(win, forfeit) {
   if (!G.game || G.done) return;
   G.done = true; G.meter = null; meterEl.hidden = true;
   const sg = G.game, rw = {gems:Math.round((win ? sg.win : sg.loss).gems * diff().rew)};
   S.gems += rw.gems;
-  S.res.push({w:win, s:[G.score[0], G.score[1]]});
+  S.res.push({w:win, s:[G.score[0], G.score[1]]}); if (!forfeit) S.classOk = false;
   const meD = G.T[0].starters.concat(G.T[0].bench).find(x => x.me), grade = meD && !forfeit ? gradeOf(meD) : '–', stg = stageOf();
   const spGain = forfeit ? 0 : stg.sp + (win ? 1 : 0) + (/A/.test(grade) ? 2 : /B/.test(grade) ? 1 : 0); S.me.sp += spGain;
   const promo = S.res.length >= stg.games ? advanceStage() : null;
@@ -5624,8 +5927,7 @@ function hudExtras() {
   if (sig !== rosterSig) {
     rosterSig = sig;
     ro.innerHTML = players[0].map(p => { const d = p.d; if (!d) return ''; const e = Math.round(d.en == null ? 100 : d.en);
-      return `<div class="rp ${d.fire ? 'fire' : d.streak === 2 ? 'warm' : ''}"><b>${esc(d.last)}</b>${d.fire ? pixSVG(FIRE_MAP, {o:'#c2280f', y:'#ff6a1f', Y:'#ffc94d'}, 'rp-fire') : ''}<i class="${e < 38 ? 'low' : e < 60 ? 'mid' : ''}"><u style="width:${e}%"></u></i></div>`; }).join('')
-      + `<button class="subbtn${(G.subsLeft ?? 3) <= 0 ? ' off' : ''}" data-act="subs" aria-label="Substitutions, ${G.subsLeft ?? 3} left">SUB <i>${G.subsLeft ?? 3}</i></button>`;
+      return `<div class="rp ${d.fire ? 'fire' : d.streak === 2 ? 'warm' : ''}"><b>${esc(d.last)}</b>${d.fire ? pixSVG(FIRE_MAP, {o:'#c2280f', y:'#ff6a1f', Y:'#ffc94d'}, 'rp-fire') : ''}<i class="${e < 38 ? 'low' : e < 60 ? 'mid' : ''}"><u style="width:${e}%"></u></i></div>`; }).join('');
   }
   // the two buttons swap jobs on defense
   const live = G.game && !G.auto && G.phase === 'live' && !G.done, h = userHandler(), def = live && G.poss === 1, o = G.oppShot;
@@ -5638,7 +5940,7 @@ function hudExtras() {
   else {
     const fin = h && rimShot(h), three = h && isThree(h, 0);
     const mateBall = live && !h && G.poss === 0, holder = G.ball.state === 'held' && G.ball.owner && G.ball.owner.t === 0 && !isMe(G.ball.owner);
-    L = mateBall ? ['drb', 'CUT', 'RUN TO THE RIM', false] : ['drb', 'DRIBBLE', 'CROSS HIM UP', !h || h.cool > 0 || h.gather || !!h.finish];
+    L = mateBall ? ['drb', 'CUT', 'RUN TO THE RIM', false] : h && h.d.en < TIRED ? ['drb', 'DRIBBLE', 'TOO TIRED', true] : ['drb', 'DRIBBLE', 'CROSS HIM UP', !h || h.cool > 0 || h.gather || !!h.finish];
     R = mateBall ? ['sht', 'CALL FOR IT', 'GET THE BALL', !holder] : ['sht' + (G.meter ? ' hot' : ''), fin === 'dunk' ? 'DUNK' : fin === 'layup' ? 'LAYUP' : fin ? 'FLOATER' : three ? 'SHOOT 3' : 'SHOOT', fin ? 'TAP TO ATTACK' : G.meter ? 'LET GO ON GREEN' : 'HOLD, LET GO ON GREEN', !h && !G.meter];
   }
   if (!M) { const h2 = userHandler(); M = h2 && pt && !G.meter ? ['pas', 'PASS', 'TO ' + pt.d.last.toUpperCase(), false] : ['pas', 'PASS', G.poss === 1 && live ? 'ON DEFENSE' : '', true]; }
@@ -5800,7 +6102,9 @@ function act(a, d) {
   else if (a === 'enter') enterBuilding(d.b);
   else if (a && a.startsWith('ph')) phoneAct(a, d);
   else if (a === 'upgrade') upgradeStat(d.k);
-  else if (['buyshoe', 'buyjersey', 'buycloth', 'buyanim', 'clsub', 'mvsub'].includes(a)) storeAct(a, d);
+  else if (['buyshoe', 'buyjersey', 'buycloth', 'buyanim', 'clsub', 'mvsub', 'buyfurn', 'furnsub'].includes(a)) storeAct(a, d);
+  else if (a === 'clsans' || a === 'clsnext') classAct(a, d);
+  else if (a === 'spot') { const sp = CITY.near; if (sp) { if (sp.lock) toast('Locked for now. Keep climbing!'); else sp.go(); } }
   else if (a === 'tosaves') { save(); closePanel(); S = null; CITY.placed = false; CITY.near = null; renderEnter(); showSaves(); }
   else if (a === 'tipoff') tipOff();
   else if (a === 'newseason') { S.story.season++; S.story.res = []; S.gems += 100; save(); renderTop(); renderPanel(); }
@@ -5873,7 +6177,6 @@ window.addEventListener('keydown', e => {
   else if (k === 'k') { e.preventDefault(); if (!G.auto && !G.paused) userDribble(); }
   else if (k === 'l' || k === 'p') { e.preventDefault(); if (!G.auto && !G.paused) userPass(); }
   else if (k === 'a') act('auto', {});
-  else if (k === 's') act('subs', {});
   if (KEYDIR[k]) { e.preventDefault(); keysDown.add(k); keySteer(); }
 });
 window.addEventListener('keyup', e => { const k = (e.key || '').toLowerCase(); if (KEYDIR[k]) { keysDown.delete(k); keySteer(); } if (mode === 'match' && (k === ' ' || k === 'j')) relMeter(); });
@@ -6034,7 +6337,7 @@ function frame(now) {
 }
 requestAnimationFrame(frame);
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') save(); });
-window.__dream = {G, get S() { return S; }, get CR() { return CR; }, CITY, cityGo, userPass, passTarget, userCallBall, userCut, slotSummary, cityUpdate, renderCity, act, update, endReplay, homeUpdate, renderHome, drawDoll, drawBall, startLook, playCard, releaseMeter, cardUsable, players, CARDS, CHARS, buildPerson, lookOf, FR, userContest, userPassTo, userDrive, userHandsUp, userHandler, subIn, teamTotals, gameScore, SET, saveSet, showShotFb, userShootDown, userDribble, userSteal, scrOf:p => { const s = PX(p.x, p.y, 3.2); return toCss(s[0], s[1]); }};
+window.__dream = {G, get S() { return S; }, get CR() { return CR; }, get CLS() { return CLS; }, openClass, goScene, SCENES, CITY, cityGo, userPass, passTarget, userCallBall, userCut, slotSummary, cityUpdate, renderCity, act, update, endReplay, homeUpdate, renderHome, drawDoll, drawBall, startLook, playCard, releaseMeter, cardUsable, players, CARDS, CHARS, buildPerson, lookOf, FR, userContest, userPassTo, userDrive, userHandsUp, userHandler, subIn, teamTotals, gameScore, SET, saveSet, showShotFb, userShootDown, userDribble, userSteal, scrOf:p => { const s = PX(p.x, p.y, 3.2); return toCss(s[0], s[1]); }};
 
 })();
 </script>
