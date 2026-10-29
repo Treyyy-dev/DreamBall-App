@@ -1648,15 +1648,14 @@ function capOf(me, k) {
   const base = 88 + t[k] * .9 + (k === 'def' || k === 'dnk' ? tall * 4 : k === 'spd' || k === 'drb' ? -tall * 4 : 0);
   return clamp(Math.round(base), 72, 99);
 }
-const upCost = v => v < 60 ? 1 : v < 70 ? 2 : v < 80 ? 3 : v < 90 ? 4 : 5;
+const upCost = v => (v < 60 ? 1 : v < 70 ? 2 : v < 80 ? 3 : v < 90 ? 4 : 5) * 25;     // Basket Bucks per +1
 
 // ---- career stages
 const STAGES = {
-  hs:      {n:'High School', team:'Dream City High',  games:8,  opp:[48, 60], mates:50, win:60,  loss:25, sp:3, next:'college', court:'rec'},
   college: {n:'College',     team:'Dream State',      games:10, opp:[60, 72], mates:62, win:90,  loss:35, sp:4, next:'nba',     court:'classic'},
   nba:     {n:'NBA',         team:'Dream City Kings', games:12, opp:[70, 86], mates:74, win:140, loss:50, sp:5, next:null,      court:'classic'}
 };
-const STAGE_ORDER = ['hs', 'college', 'nba'];
+const STAGE_ORDER = ['college', 'nba'];
 
 // ---- store catalogs
 const SHOE_PRICE = [150, 400, 900, 2000];
@@ -1743,7 +1742,7 @@ function streetKit() {                     // what you wear walking around the c
   return {n:S.me.last, c:T.c, d:shadeHex(T.c, .6), trim:shadeHex(T.c, .8), numc:'#ffffff', outfit:{top:T.type, topId:T.id, topC:T.c, bot:B.type, botC:B.c, hat:H.type, hatC:H.c}};
 }
 const meOvr = () => ovrOf(meStats());
-const stageOf = () => STAGES[S.stage] || STAGES.hs;
+const stageOf = () => STAGES[S.stage] || STAGES.college;
 
 // ---- home furniture (Market): one item per slot, drawn in your two-story house
 const FURN = [
@@ -1802,12 +1801,28 @@ function readSlot(i) { try { const s = JSON.parse(localStorage.getItem(SLOT_KEY(
 function legacySave() {
   try { if (localStorage.getItem(LEGACY_DONE)) return null; const s = JSON.parse(localStorage.getItem(KEY) || 'null'); return s && s.v === 3 ? s : null; } catch (e) { return null; }
 }
+// ---- one wallet for every save: Basket Bucks are shared across all three careers
+const WALLET_KEY = 'dreamball-wallet';
+const WALLET = (() => { try { const w = JSON.parse(localStorage.getItem(WALLET_KEY) || 'null'); if (w && typeof w.c === 'number') return w; } catch (e) {} return null; })() || {c:null};
+function saveWallet() { try { localStorage.setItem(WALLET_KEY, JSON.stringify(WALLET)); } catch (e) {} }
+function walletInit() {                      // first run: start from the richest existing save (or 500 for a fresh install)
+  if (WALLET.c != null) return;
+  let best = null; for (let i = 0; i < 3; i++) { const s = readSlot(i); if (s && typeof s.gems === 'number') best = Math.max(best || 0, s.gems + (s.me && s.me.sp ? s.me.sp * 25 : 0)); }
+  WALLET.c = best != null ? best : 500; saveWallet();
+}
+function bindWallet(s) {
+  walletInit();
+  if (s.me && s.me.sp) { WALLET.c += s.me.sp * 25; s.me.sp = 0; saveWallet(); }   // old skill points become Basket Bucks, once
+  delete s.gems;
+  Object.defineProperty(s, 'gems', {get:() => WALLET.c, set:v => { WALLET.c = Math.max(0, Math.round(v)); saveWallet(); }, enumerable:false, configurable:true});
+  return s;
+}
 function slotSummary(i) {
   const s = readSlot(i); if (!s) return null;
-  const st = STAGES[s.stage] || STAGES.hs, ov = ovrOf(s.me.st);
-  return {name:s.me.first + ' ' + s.me.last, pos:s.me.pos, ovr:ov, stage:st.n, season:s.season, gems:s.gems, seen:s.seen, me:s.me};
+  walletInit(); const st = STAGES[s.stage] || STAGES.college, ov = ovrOf(s.me.st);
+  return {name:s.me.first + ' ' + s.me.last, pos:s.me.pos, ovr:ov, stage:st.n, season:s.season, gems:WALLET.c, seen:s.seen, me:s.me};
 }
-function loadSlot(i) { const s = readSlot(i); if (!s) return null; S = fixSave(s); try { localStorage.setItem(LAST_KEY, String(i)); } catch (e) {} return S; }
+function loadSlot(i) { const s = readSlot(i); if (!s) return null; S = bindWallet(fixSave(s)); try { localStorage.setItem(LAST_KEY, String(i)); } catch (e) {} return S; }
 function deleteSlot(i) { try { localStorage.removeItem(SLOT_KEY(i)); } catch (e) {} }
 function load() { return null; }          // nothing loads until you pick a save slot
 function fixSave(s) {
@@ -1824,7 +1839,8 @@ function fixSave(s) {
   s.road = s.road || {m:0, paid:false, cf:[], cp:[]};
   s.home = Object.assign({}, HOME0, s.home || {}); s.inv.furn = s.inv.furn || FURN.filter(f => !f.p).map(f => f.id);
   s.gpa = s.gpa || {pts:0, n:0};
-  s.stage = s.stage || 'hs'; s.season = s.season || 1; s.res = s.res || []; s.done = s.done || {};
+  if (!s.stage || s.stage === 'hs') { s.stage = 'college'; s.season = 1; s.res = []; s.mates = null; }   // high school is gone: careers start in college
+  s.season = s.season || 1; s.res = s.res || []; s.done = s.done || {};
   s.me.sp = s.me.sp || 0;
   for (const k of ['dnk', 'sta']) if (s.me.st[k] == null) s.me.st[k] = startStats(s.me.pos, s.me.hIn, s.me.build)[k];      // Dunking and Stamina were added as ratings
   s.auto = !!s.auto;
@@ -1834,7 +1850,8 @@ function fixSave(s) {
 function save() { if (!S || S.slot == null) return; S.seen = Date.now(); try { localStorage.setItem(SLOT_KEY(S.slot), JSON.stringify(S)); } catch (e) {} }
 // a brand new career for the player you just built
 function newCareer(slot, me) {
-  S = fixSave({v:4, slot, me, gems:500, stage:'hs', season:1, res:[], shoes:[], uid:1});
+  me.sp = 0;                                  // new careers don't bring skill points: upgrades are paid in Basket Bucks
+  S = bindWallet(fixSave({v:4, slot, me, stage:'college', season:1, res:[], shoes:[], uid:1}));
   const L = legacySave();
   if (L) {                                   // carry Basket Bucks, gear and Baller Road over from the old team save, once
     S.gems += L.gems || 0;
@@ -3365,6 +3382,7 @@ function poseOf(a, dt) {
   if (a.pose === 'rope') { const k2 = CLK * 9; P.lift = Math.abs(Math.sin(k2)) * .5; P.arms = [{s:2, f:0, y:4}, {s:2, f:0, y:4}]; P.ropeA = k2 * 2; }
   if (a.pose === 'stretch') { P.legs = {mode:'wide'}; P.crouch = 2; P.arms = [{s:1, f:0, y:-7}, {s:3, f:0, y:2}]; P.dir = 'down'; }
   if (a.pose === 'ladder') { P.crouch = 1; }
+  if (a.pose === 'seat') { P.crouch = 3; P.legs = {mode:'tuck'}; P.arms = [{s:0, f:2, y:2}, {s:0, f:2, y:2}]; P.dir = 'up'; P.spin = false; }   // sitting at a desk
   void q;
   return P;
 }
@@ -5035,7 +5053,6 @@ function styleHTML() {
 const CW = 120, CHH = 170;                       // city size in feet
 // buildings: ground rectangle (roof + facade), facade depth fd, door x, and what the door opens
 const CITY_B = [
-  {id:'hs',      n:'HIGH SCHOOL',   x0:3,  y0:6,  x1:37,  y1:37,  fd:11, door:20,  wall:'#a8462f', roof:'#5a2a22', trim:'#f4f1ea', sign:'#1f3a6b', stage:'hs'},
   {id:'nba',     n:'NBA ARENA',     x0:41, y0:3,  x1:79,  y1:37,  fd:13, door:60,  wall:'#23263a', roof:'#8a95a8', trim:'#ffc94d', sign:'#120e18', stage:'nba'},
   {id:'college', n:'DREAM STATE U', x0:83, y0:6,  x1:117, y1:37,  fd:11, door:100, wall:'#e8e0cc', roof:'#2d4fd6', trim:'#2d4fd6', sign:'#2d4fd6', stage:'college'},
   {id:'shoes',   n:'KICKS',         x0:3,  y0:80, x1:25,  y1:106, fd:9,  door:14,  wall:'#2a2f3a', roof:'#4a5068', trim:'#ff6a1f', sign:'#ff6a1f', store:true, aw:['#ff6a1f', '#ffffff']},
@@ -5090,6 +5107,11 @@ function paintCity() {
   pave(72, 56, 116, 76, '#2f6fd6'); g.strokeStyle = '#f4f4f4'; g.lineWidth = 1; g.strokeRect(X(73) + .5, Y(57) + .5, X(115) - X(73), Y(75) - Y(57)); g.fillStyle = '#f4f4f4'; g.fillRect(X(94), Y(57), 1, Y(75) - Y(57));
   for (const hx of [74, 114]) { g.fillStyle = OUT; g.fillRect(X(hx) - 1, Y(64), 3, Y(68) - Y(64)); g.fillStyle = '#ff6a1f'; g.fillRect(X(hx + (hx < 90 ? 1 : -2)), Y(66), 2, 1); }
   g.fillStyle = '#5a2a7a'; g.fillRect(X(36), Y(56), X(50) - X(36), Y(76) - Y(56)); ptext(g, 'PARK', X(43), Y(66), 8, '#ffd84d', 'center');
+  // where the old high school stood: a fenced practice court and trees
+  pave(6, 12, 34, 32, '#3b4048'); g.strokeStyle = '#f4f4f4'; g.strokeRect(X(8) + .5, Y(14) + .5, X(32) - X(8), Y(30) - Y(14)); g.fillStyle = '#f4f4f4'; g.fillRect(X(20), Y(14), 1, Y(30) - Y(14));
+  for (const hx of [9, 31]) { g.fillStyle = OUT; g.fillRect(X(hx) - 1, Y(20), 3, Y(24) - Y(20)); g.fillStyle = '#ff6a1f'; g.fillRect(X(hx + (hx < 20 ? 1 : -2)), Y(22), 2, 1); }
+  g.fillStyle = '#9aa3b5'; for (let x = 6; x <= 34; x += 2) g.fillRect(X(x), Y(11), 1, Y(12) - Y(11) + 2);
+  for (let i = 0; i < 5; i++) tree(g, X(6 + i * 7), Y(36), 6, '#2f7a32', '#4fa64a');
   // trees along the bottom
   for (let i = 0; i < 8; i++) { tree(g, X(34 + i * 7), Y(126 + (i % 2) * 2), 6, '#2f7a32', '#4fa64a'); }
   for (const B of CITY_B) paintBuilding(g, B, X, Y);
@@ -5103,7 +5125,7 @@ function paintBuilding(g, B, X, Y) {
   g.fillStyle = shadeHex(B.roof, 1.15); for (let y = yt + 2; y < yf - 1; y += 4) g.fillRect(x0 + 2, y, w - 4, 1);
   g.fillStyle = shadeHex(B.roof, .75); g.fillRect(x0, yf - 2, w, 2);
   g.fillStyle = B.wall; g.fillRect(x0, yf, w, yb - yf);                                               // facade
-  if (B.id === 'hs') { g.fillStyle = shadeHex(B.wall, .82); for (let y = yf + 2; y < yb; y += 3) for (let x = x0 + ((y / 3) % 2 ? 2 : 0); x < x1; x += 5) g.fillRect(x, y, 4, 1); }
+  if (false) { g.fillStyle = shadeHex(B.wall, .82); for (let y = yf + 2; y < yb; y += 3) for (let x = x0 + ((y / 3) % 2 ? 2 : 0); x < x1; x += 5) g.fillRect(x, y, 4, 1); }
   if (B.id === 'college') { g.fillStyle = '#ffffff'; for (let x = x0 + 4; x < x1 - 2; x += 8) g.fillRect(x, yf + 3, 3, yb - yf - 3); g.fillStyle = B.roof; g.fillRect(x0, yf, w, 3); }
   // windows
   const winC = B.id === 'moves' ? '#ff3fd0' : B.id === 'nba' ? '#36e6ff' : '#9fd3f5';
@@ -5137,7 +5159,7 @@ function paintBuilding(g, B, X, Y) {
     ptext(g, B.n, sx + tw / 2, sy + 5, 8, B.id === 'college' || B.id === 'moves' ? '#ffffff' : B.id === 'nba' ? '#ffc94d' : '#ffffff', 'center');
   }
   if (B.id === 'nba') { g.fillStyle = '#ffc94d'; for (let x = x0 + 2; x < x1 - 2; x += 3) g.fillRect(x, yf + 1, 1, 1); }
-  if (B.id === 'hs') { g.fillStyle = '#6b6b6b'; g.fillRect(x1 - 4, yt - 10, 1, 12); g.fillStyle = '#e2453a'; g.fillRect(x1 - 3, yt - 10, 6, 4); g.fillStyle = '#ffffff'; g.fillRect(x1 - 3, yt - 8, 6, 1); }
+  if (false) { g.fillStyle = '#6b6b6b'; g.fillRect(x1 - 4, yt - 10, 1, 12); g.fillStyle = '#e2453a'; g.fillRect(x1 - 3, yt - 10, 6, 4); g.fillStyle = '#ffffff'; g.fillRect(x1 - 3, yt - 8, 6, 1); }
   if (!B.n && !B.store) { g.fillStyle = '#d9c2a8'; g.fillRect(Math.round((x0 + x1) / 2) - 3, yb - 9, 6, 9); }
 }
 
@@ -5173,7 +5195,7 @@ const CITY_SCENE = {w:CW, h:CHH, bg:'#4f9a42', paint:() => paintCity(), solid:(x
 function goScene(id, x, y) {
   CITY.scene = id; CITY.key = ''; CITY.path = null; CITY.tgt = null; CITY.steer = null; CITY.near = null;
   if (CITY.me) { CITY.me.x = x; CITY.me.y = y; CITY.me.vx = CITY.me.vy = 0; CITY.cam.x = x; CITY.cam.y = y; }
-  if (S) S.city = {scene:id, sk:CITY.schoolKind, x, y};
+  if (S) S.city = {scene:id, sk:CITY.schoolKind, st:CITY.storeId, cl:CITY.classId, x, y};
   renderEnter();
 }
 function cityGo(x, y) { const p = CITY.me ? cityPath(CITY.me.x, CITY.me.y, x, y) : null; CITY.path = p && p.length ? p : null; CITY.tgt = CITY.path ? CITY.path[CITY.path.length - 1] : null; }
@@ -5184,7 +5206,7 @@ function citySetup() {
   if (!S) return;
   CITY.me = CITY.me || cityPerson(null, null, 0);
   const pos = S.city || {scene:'house2', x:8, y:21};
-  if (!CITY.placed) { CITY.scene = pos.scene && SCENES[pos.scene] ? pos.scene : 'city'; if (CITY.scene === 'school') schoolSetup(pos.sk || S.stage); CITY.me.x = pos.x; CITY.me.y = pos.y; CITY.placed = true; CITY.cam.x = CITY.me.x; CITY.cam.y = CITY.me.y; CITY.key = ''; CITY.near = null; }
+  if (!CITY.placed) { CITY.scene = pos.scene && SCENES[pos.scene] ? pos.scene : 'city'; if (CITY.scene === 'school' || CITY.scene === 'school2') schoolSetup('college'); if (CITY.scene === 'store') { if (pos.st && STORE_LOOK[pos.st]) storeSetup(pos.st); else CITY.scene = 'city'; } if (CITY.scene === 'classroom') { schoolSetup('college'); if (pos.cl) { CITY.classId = pos.cl; classroomSetup(pos.cl); } else CITY.scene = 'school'; } CITY.me.x = pos.x; CITY.me.y = pos.y; CITY.placed = true; CITY.cam.x = CITY.me.x; CITY.cam.y = CITY.me.y; CITY.key = ''; CITY.near = null; }
   CITY.me.look = meLook(); CITY.me.kit = streetKit(); CITY.me.num = ''; CITY.me.C = null;
   if (!CITY.npcs.length) {
     const R = rng(99), paths = [[4, 38, 116, 38], [116, 54, 4, 54], [4, 108, 116, 108], [116, 124, 4, 124], [52, 54, 52, 108], [68, 108, 68, 54], [40, 140, 80, 140], [80, 160, 40, 160]];
@@ -5202,6 +5224,7 @@ function cityUpdate(dt) {
   CITY.t += dt;
   const m = CITY.me;
   let vx = 0, vy = 0;
+  if ((CITY.steer || CITY.path) && m.pose === 'seat') m.pose = null;
   if (CITY.steer) { vx = CITY.steer.ux * 15; vy = CITY.steer.uy * 15; CITY.tgt = null; CITY.path = null; }
   else if (CITY.path && CITY.path.length) { const w = CITY.path[0], dx = w.x - m.x, dy = w.y - m.y, d = Math.hypot(dx, dy); if (d < 1.2) { CITY.path.shift(); if (!CITY.path.length) { CITY.path = null; CITY.tgt = null; } } else { vx = dx / d * 15; vy = dy / d * 15; } }
   const k = Math.min(1, dt * 12); m.vx += (vx - m.vx) * k; m.vy += (vy - m.vy) * k;
@@ -5221,7 +5244,7 @@ function cityUpdate(dt) {
   let near = null;
   for (const sp of sc.spots()) if (Math.abs(m.x - sp.x) < (sp.rx || 4) && Math.abs(m.y - sp.y) < (sp.ry || 2.5)) near = sp;
   if ((near && near.key) !== (CITY.near && CITY.near.key)) { CITY.near = near; renderEnter(); }
-  if (Math.random() < dt) S.city = {scene:CITY.scene, sk:CITY.schoolKind, x:Math.round(m.x * 10) / 10, y:Math.round(m.y * 10) / 10};
+  if (Math.random() < dt) S.city = {scene:CITY.scene, sk:CITY.schoolKind, st:CITY.storeId, cl:CITY.classId, x:Math.round(m.x * 10) / 10, y:Math.round(m.y * 10) / 10};
 }
 function renderEnter() {
   const el = $('enterBtn'); if (!el) return;
@@ -5438,8 +5461,9 @@ window.addEventListener('keyup', e => { const k = (e.key || '').toLowerCase(); i
 const BUILD_PANEL = {nba:'school', shoes:'st_shoes', jerseys:'st_jerseys', clothes:'st_clothes', moves:'st_moves', market:'st_market'};
 function enterBuilding(id) {
   const B = CITY_B.find(b => b.id === id); if (!B) return;
-  if (cityLocked(B)) { toast(B.stage === 'college' ? 'Finish your high school season to get recruited' : 'Make it through college to get drafted'); return; }
-  if (id === 'hs' || id === 'college') { schoolSetup(id); goScene('school', 4, 17); toast(id === 'hs' ? 'Dream City High: go to class, then find Coach in the gym' : 'Dream State U: go to class, then find Coach in the gym'); return; }
+  if (cityLocked(B)) { toast('Make it through college to get drafted'); return; }
+  if (id === 'college') { schoolSetup(id); goScene('school', 4, 17); toast('Dream State U: go to class (walk in and take a seat), then find Coach in the gym'); return; }
+  if (STORE_LOOK[id]) { storeSetup(id); goScene('store', 23, 30.4); return; }
   if (id === 'home') { goScene('house1', 18, 29); return; }
   CITY.bld = id; openPanel(BUILD_PANEL[id]);
 }
@@ -5473,13 +5497,13 @@ function careerHTML(bid) {
 function playerHTML() {
   const me = S.me, st = meStats(), m = meShoe(), ov = ovrOf(st);
   const rows = STATS.map(k => {
-    const base = me.st[k], cap = capOf(me, k), cost = upCost(base), can = base < cap && me.sp >= cost, sb = (m && m.b[k]) || 0;
+    const base = me.st[k], cap = capOf(me, k), cost = upCost(base), can = base < cap && S.gems >= cost, sb = (m && m.b[k]) || 0;
     return `<div class="statl"><span>${STATN[k]}</span><div class="bar"><i style="width:${base}%"></i><i class="b" style="width:${sb}%"></i></div><span>${st[k]}${sb ? `<em>+${sb}</em>` : ''}</span>
-      <button class="upbtn ${can ? '' : 'no'}" ${can ? `data-act="upgrade" data-k="${k}"` : 'disabled'} aria-label="Upgrade ${STATN[k]}">${base >= cap ? 'MAX' : `+1 · ${cost}SP`}</button></div><div class="statsrc">Max ${cap}</div>`;
+      <button class="upbtn ${can ? '' : 'no'}" ${can ? `data-act="upgrade" data-k="${k}"` : 'disabled'} aria-label="Upgrade ${STATN[k]}">${base >= cap ? 'MAX' : `+1 · $${cost}`}</button></div><div class="statsrc">Max ${cap}</div>`;
   }).join('');
   const ga = ANIMS.filter(a => S.gear[a.cat] === a.id || (a.cat === 'shot' && S.gear.shot === a.id));
   return `<div class="mehead">${portraitSVG(meLook(), myKit(), me.num)}<div><b>${esc(me.first + ' ' + me.last)}</b><small>#${me.num} · ${me.pos} · ${ftIn(me.hIn)} · ${(BUILDS.find(b => b[0] === me.build) || BUILDS[1])[1]}</small><small>${stageOf().n}${S.stage === 'nba' ? ' · Season ' + S.season : ''}</small></div><div class="crovr"><b>${ov}</b><span>OVR</span></div></div>
-    <div class="sect"><h3>RATINGS <em>${me.sp} skill points</em></h3>${rows}<p class="hint">Earn skill points every game. Better games earn more.</p></div>
+    <div class="sect"><h3>RATINGS <em>${S.gems.toLocaleString()} Basket Bucks</em></h3>${rows}<p class="hint">Upgrades cost Basket Bucks. Your Basket Bucks are shared by all three saves. Earn them in games and in class.</p></div>
     <div class="sect"><h3>GEAR</h3><div class="gearl">
       <span>SHOES<b>${m ? esc(m.n) : 'Team-issue'}</b></span><span>JERSEY<b>${esc((JERSEY[S.style.jersey] || JERSEYS[0]).n)}</b></span>
       <span>JUMP SHOT<b>${esc(ANIM[S.gear.shot].n)}</b></span><span>DUNK<b>${esc(ANIM[S.gear.dunk].n)}</b></span><span>CELEBRATION<b>${esc(ANIM[S.gear.celeb].n)}</b></span>
@@ -5558,8 +5582,8 @@ function storeAct(a, d) {
   save(); renderTop(); citySetup(); renderPanel();
 }
 function upgradeStat(k) {
-  const me = S.me, v = me.st[k], c = upCost(v); if (v >= capOf(me, k) || me.sp < c) return;
-  me.sp -= c; me.st[k] = v + 1; save(); renderTop(); renderPanel(); buzz(10);
+  const me = S.me, v = me.st[k], c = upCost(v); if (v >= capOf(me, k) || S.gems < c) { if (S.gems < c) toast('Not enough Basket Bucks'); return; }
+  S.gems -= c; me.st[k] = v + 1; save(); renderTop(); renderPanel(); buzz(10);
 }
 // grade + skill points after a game
 function gradeOf(d) {
@@ -5572,8 +5596,7 @@ function advanceStage() {
   let msg;
   if (st.next) {
     const nxt = st.next; S.stage = nxt; S.season = 1; S.res = []; S.mates = null;
-    if (nxt === 'college') msg = `HIGH SCHOOL DONE (${w}–${l})! Dream State U offered you a scholarship. College is open in the city.`;
-    else { const pick = clamp(1 + l * 3 + Math.floor(Math.random() * 3), 1, 30); S.draft = pick; msg = `NBA DRAFT: the Dream City Kings picked you #${pick}! The NBA Arena is open.`; }
+    { const pick = clamp(1 + l * 3 + Math.floor(Math.random() * 3), 1, 30); S.draft = pick; msg = `NBA DRAFT: the Dream City Kings picked you #${pick}! The NBA Arena is open.`; }
     S.gems += 250; msg += ' +250 Basket Bucks.';
   } else { S.season++; S.res = []; S.mates = null; S.gems += 300; msg = `NBA SEASON ${S.season - 1} DONE (${w}–${l}). Season ${S.season} starts now. +300 Basket Bucks.`; }
   return msg;
@@ -5598,7 +5621,7 @@ function phoneHTML() {
     body = `<div class="ph-title"><button class="ph-back" data-act="phback" aria-label="Back">‹</button>MAP</div><div class="ph-map">${CITY_B.filter(B => B.door != null).map(B => {
       const lock = cityLocked(B); return `<button class="ph-place ${lock ? 'lock' : ''}" data-act="phgo" data-b="${B.id}"><i style="background:${B.sign}"></i><b>${B.n}</b><small>${lock ? 'LOCKED' : B.store ? 'STORE' : 'CAREER'}</small></button>`; }).join('')}</div><p class="ph-note">Tap a place to go there.</p>`;
   } else {
-    body = `<div class="ph-hi"><small>${esc(stageOf().n.toUpperCase())}${S.stage === 'nba' ? ' · S' + S.season : ''}</small><b>${esc(S.me.first + ' ' + S.me.last)}</b><span>OVR ${meOvr()} · ${S.me.sp} SP · ${S.res.filter(r => r.w).length}–${S.res.filter(r => !r.w).length}</span></div>
+    body = `<div class="ph-hi"><small>${esc(stageOf().n.toUpperCase())}${S.stage === 'nba' ? ' · S' + S.season : ''}</small><b>${esc(S.me.first + ' ' + S.me.last)}</b><span>OVR ${meOvr()} · ${S.res.filter(r => r.w).length}–${S.res.filter(r => !r.w).length}</span></div>
       <div class="ph-apps">${PH_APPS.map(([id, l, c, ic, lock]) => `<button class="ph-app ${lock ? 'lock' : ''}" data-act="phapp" data-v="${id}"><span class="ph-ic" style="--c:${c}">${ic()}${id === 'road' && n ? `<em>${n}</em>` : ''}${lock ? `<i class="ph-lk">${PXI(PX_ICONS.lock, '')}</i>` : ''}</span><small>${l}</small></button>`).join('')}</div>`;
   }
   return `<div class="ph-frame" style="--wall:${myKit().c}"><div class="ph-notch"></div><div class="ph-screen">${bar}${body}</div><button class="ph-home" data-act="phclose" aria-label="Close phone"></button></div>`;
@@ -5704,23 +5727,35 @@ const SCENES = {
   house2: {zoom:1.9, w:HW, h:HH, bg:'#0d0f22', paint:() => paintHouse(2), paintKey:() => JSON.stringify(S.home) + JSON.stringify(S.done) + S.season, gridKey:() => JSON.stringify(S.home), solid:houseSolid('house2'), npcs:() => [],
     spots:() => [{key:'h:down', x:39, y:29, rx:3.4, ry:3.4, verb:'GO', label:'DOWNSTAIRS', go:() => goScene('house1', 39, 24)},
                  {key:'h:bed', x:7, y:20, rx:4, ry:2, verb:'SLEEP', label:'IN YOUR BED', go:() => { toast('You took a nap. Feeling fresh!'); }}]},
-  school: {zoom:1.35, w:66, h:60, paint:() => paintSchool(), paintKey:() => CITY.schoolKind, solid:(x, y) => schoolSolid(x, y), npcs:() => SCHOOL.npcs, bg:'#0d0f22', gridKey:() => 'x',
-    spots:() => [...CLASSES.map((cl, i) => ({key:'s:' + cl.id, x:9 + i * 16, y:8.2, rx:3.2, ry:2.2, verb:'GO TO CLASS', label:cl.n.toUpperCase(), go:() => openClass(cl.id)})),
-                 {key:'s:coach', x:33, y:39.5, rx:5, ry:3, verb:'TALK TO', label:'COACH', go:() => { CITY.bld = CITY.schoolKind; openPanel('coach'); }},
-                 {key:'s:out', x:3.2, y:17, rx:2.4, ry:3.4, verb:'GO', label:'OUTSIDE', go:() => { const B = CITY_B.find(b => b.id === CITY.schoolKind); goScene('city', B.door, B.y1 + 3); }}]}
+  school: {zoom:1.35, w:66, h:60, paint:() => paintSchool(), paintKey:() => 'c1', solid:(x, y) => schoolSolid(x, y), npcs:() => SCHOOL.npcs, bg:'#0d0f22', gridKey:() => 'c1',
+    spots:() => [...CLASSES.slice(0, 2).map((cl, i) => ({key:'s:' + cl.id, x:CLASS_DOORS[i], y:8.2, rx:3.2, ry:2.2, verb:'GO INTO', label:cl.n.toUpperCase() + ' CLASS', go:() => enterClass(cl.id)})),
+                 {key:'s:up', x:55, y:13, rx:5, ry:4, verb:'GO', label:'UPSTAIRS', go:() => goScene('school2', 55, 19)},
+                 {key:'s:coach', x:33, y:39.5, rx:5, ry:3, verb:'TALK TO', label:'COACH', go:() => { CITY.bld = 'college'; openPanel('coach'); }},
+                 {key:'s:out', x:3.2, y:17, rx:2.4, ry:3.4, verb:'GO', label:'OUTSIDE', go:() => { const B = CITY_B.find(b => b.id === 'college'); goScene('city', B.door, B.y1 + 3); }}]},
+  school2: {zoom:1.35, w:66, h:36, paint:() => paintSchool2(), paintKey:() => 'c2', solid:(x, y) => school2Solid(x, y), npcs:() => SCHOOL.npcs2, bg:'#0d0f22', gridKey:() => 'c2',
+    spots:() => [...CLASSES.slice(2, 4).map((cl, i) => ({key:'s:' + cl.id, x:CLASS_DOORS[i], y:8.2, rx:3.2, ry:2.2, verb:'GO INTO', label:cl.n.toUpperCase() + ' CLASS', go:() => enterClass(cl.id)})),
+                 {key:'s:down', x:55, y:13, rx:5, ry:4, verb:'GO', label:'DOWNSTAIRS', go:() => goScene('school', 55, 19)}]},
+  classroom: {zoom:1.7, w:46, h:40, paint:() => paintClassroom(), paintKey:() => CITY.classId || 'math', solid:(x, y) => classSolid(x, y), npcs:() => CLASSROOM.npcs, bg:'#0d0f22', gridKey:() => 'cr',
+    spots:() => [...CLASS_SEATS.filter(st => !st.taken).map((st, i) => ({key:'cr:seat' + i, x:st.x, y:st.y, rx:1.6, ry:1.4, verb:'SIT', label:'IN THIS SEAT', go:() => sitInClass(st)})),
+                 {key:'cr:out', x:42.5, y:37.5, rx:3, ry:2.2, verb:'GO', label:'BACK TO THE HALL', go:() => leaveClass()}]},
+  store: {zoom:1.7, w:46, h:34, paint:() => paintStore(), paintKey:() => CITY.storeId || 'shoes', solid:(x, y) => storeSolid(x, y), npcs:() => STORE.npcs, bg:'#0d0f22', gridKey:() => 'st:' + CITY.storeId,
+    spots:() => [{key:'st:clerk', x:37, y:13, rx:5, ry:2.4, verb:'SHOP', label:'AT THE COUNTER', go:() => { CITY.bld = CITY.storeId; openPanel(BUILD_PANEL[CITY.storeId]); }},
+                 {key:'st:browse', x:15, y:20, rx:5, ry:3.5, verb:'BROWSE', label:(STORE_LOOK[CITY.storeId] || {}).browse || 'THE DISPLAYS', go:() => { CITY.bld = CITY.storeId; openPanel(BUILD_PANEL[CITY.storeId]); }},
+                 {key:'st:out', x:23, y:31.6, rx:3.4, ry:2.2, verb:'GO', label:'OUTSIDE', go:() => { const B = CITY_B.find(b => b.id === CITY.storeId); goScene('city', B.door, B.y1 + 3); }}]}
 };
 
 // ---------------- the schools ----------------
-const SCHOOL = {npcs:[], kind:''};
+const SCHOOL = {npcs:[], npcs2:[], kind:''};
 function schoolSolid(x, y) {
   if (x < 1.6 || x > 64.4 || y < 6.5 || y > 58.4) return true;
   if (y > 25 && y < 30 && !(x > 28 && x < 38)) return true;                    // wall between hall and gym, with an opening
   if (Math.hypot(x - 33, y - 37) < 1.4) return true;                          // coach
   if (y > 55 && x > 29 && x < 37) return true;                                 // hoop stanchion
+  if (x > 47.5 && x < 62.5 && y < 12) return true;                              // the staircase (walk up to its foot)
   return false;
 }
 function paintSchool() {
-  const col = CITY.schoolKind === 'college', {c, g, X, Y} = roomCanvas(66, 60);
+  const col = true, {c, g, X, Y} = roomCanvas(66, 60);
   const wall = col ? '#e8e0cc' : '#b8c4d8', locker = col ? '#2d4fd6' : '#c2402f', gymC = col ? '#2d4fd6' : '#c2402f';
   g.fillStyle = '#0d0f22'; g.fillRect(0, 0, c.width, c.height);
   floorTiles(g, X(1.6), Y(6.5), X(64.4), Y(26), '#e8e4dc', '#d4cfc4', Math.max(4, Math.round(cam.k * 2.5)));
@@ -5729,14 +5764,15 @@ function paintSchool() {
   g.fillStyle = '#ffffff'; g.fillRect(X(5), Y(31), X(61) - X(5), 1); g.fillRect(X(5), Y(31), 1, Y(58) - Y(31)); g.fillRect(X(61), Y(31), 1, Y(58) - Y(31));
   g.fillStyle = gymC; g.fillRect(X(26), Y(46), X(40) - X(26), Y(58) - Y(46)); g.fillStyle = '#ffffff'; g.fillRect(X(26), Y(46), X(40) - X(26), 1); pring(g, X(33), Y(46), Math.round(5 * cam.k), Math.round(5 * cam.k * FS), '#ffffff');
   pring(g, X(33), Y(36), Math.round(4.5 * cam.k), Math.round(4.5 * cam.k * FS), '#ffffff');
-  ptext(g, col ? 'DREAM STATE' : 'DREAM CITY HIGH', X(33), Y(33.5), 8, gymC, 'center');
+  ptext(g, 'DREAM STATE', X(33), Y(33.5), 8, gymC, 'center');
   box(g, X, Y, 30, 55.6, 36, 58.4, '#5a6478'); box(g, X, Y, 31, 53.4, 35, 55.6, '#ffffff'); pring(g, X(33), Y(53.6), 4, 2, '#ff6a1f');
   // bleachers along the gym sides
   for (let i = 0; i < 4; i++) { g.fillStyle = i % 2 ? '#9a6a3a' : '#a87a48'; g.fillRect(X(2), Y(32 + i * 4), X(4.6) - X(2), Y(35 + i * 4) - Y(32 + i * 4)); g.fillRect(X(61.4), Y(32 + i * 4), X(64) - X(61.4), Y(35 + i * 4) - Y(32 + i * 4)); }
   // back wall with the four classroom doors and lockers
   backWall(g, X, Y, 0, 66, 0, 6.5, wall);
-  for (let x = 2; x < 64; x += 2.2) { const nearDoor = [9, 25, 41, 57].some(d => Math.abs(x + 1 - d) < 4); if (nearDoor) continue; g.fillStyle = OUT; g.fillRect(X(x), Y(2.2), X(2.1) - X(0) + 1, Y(6.4) - Y(2.2)); g.fillStyle = locker; g.fillRect(X(x) + 1, Y(2.2) + 1, X(2.1) - X(0) - 1, Y(6.4) - Y(2.2) - 2); g.fillStyle = shadeHex(locker, .6); g.fillRect(X(x) + 2, Y(3), 2, 1); }
-  CLASSES.forEach((cl, i) => { const dx = 9 + i * 16; doorOn(g, X, Y, dx, Y(6.5) - 1, 4, Math.round(Y(5.6) - Y(1.4)), '#7a5a3a'); g.fillStyle = OUT; g.fillRect(X(dx) - 16, Y(0.2), 33, 9); g.fillStyle = cl.c; g.fillRect(X(dx) - 15, Y(0.2) + 1, 31, 7); ptext(g, cl.short, X(dx), Y(0.2) + 5, 8, '#ffffff', 'center'); });
+  for (let x = 2; x < 46; x += 2.2) { const nearDoor = CLASS_DOORS.some(d => Math.abs(x + 1 - d) < 4); if (nearDoor) continue; g.fillStyle = OUT; g.fillRect(X(x), Y(2.2), X(2.1) - X(0) + 1, Y(6.4) - Y(2.2)); g.fillStyle = locker; g.fillRect(X(x) + 1, Y(2.2) + 1, X(2.1) - X(0) - 1, Y(6.4) - Y(2.2) - 2); g.fillStyle = shadeHex(locker, .6); g.fillRect(X(x) + 2, Y(3), 2, 1); }
+  stairs(g, X, Y, true);
+  CLASSES.slice(0, 2).forEach((cl, i) => { const dx = CLASS_DOORS[i]; doorOn(g, X, Y, dx, Y(6.5) - 1, 4, Math.round(Y(5.6) - Y(1.4)), '#7a5a3a'); g.fillStyle = OUT; g.fillRect(X(dx) - 16, Y(0.2), 33, 9); g.fillStyle = cl.c; g.fillRect(X(dx) - 15, Y(0.2) + 1, 31, 7); ptext(g, cl.short, X(dx), Y(0.2) + 5, 8, '#ffffff', 'center'); });
   // the wall between hall and gym (open double doors in the middle)
   backWall(g, X, Y, 0, 28, 24.5, 4.5, wall); backWall(g, X, Y, 38, 66, 24.5, 4.5, wall);
   ptext(g, 'GYM', X(33), Y(24.2), 8, '#ffc94d', 'center');
@@ -5746,13 +5782,48 @@ function paintSchool() {
   g.fillStyle = '#3a3f5c'; g.fillRect(0, Y(58.4), c.width, c.height - Y(58.4));
   return c;
 }
+const CLASS_DOORS = [13, 31];
+// a wide staircase in the top-right corner of a college floor
+function stairs(g, X, Y, up) {
+  g.fillStyle = OUT; g.fillRect(X(47.5) - 1, Y(0.5) - 1, X(62.5) - X(47.5) + 2, Y(12) - Y(0.5) + 2);
+  for (let i = 0; i < 9; i++) { const y0 = up ? 0.5 + i * 1.28 : 0.5 + i * 1.28; g.fillStyle = i % 2 ? '#8a6a4a' : '#9a7a56'; g.fillRect(X(47.5), Y(y0), X(62.5) - X(47.5), Y(y0 + 1.28) - Y(y0)); g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(X(47.5), Y(y0 + 1.28) - 1, X(62.5) - X(47.5), 1); }
+  g.fillStyle = '#5a6478'; g.fillRect(X(47.5), Y(0.5), 2, Y(12) - Y(0.5)); g.fillRect(X(62.5) - 2, Y(0.5), 2, Y(12) - Y(0.5));
+  ptext(g, up ? '2ND FLOOR' : '1ST FLOOR', X(55), Y(14.4), 8, '#ffc94d', 'center'); ptext(g, up ? '▲' : '▼', X(55), Y(6), 8, '#ffffff', 'center');
+}
+// floor 2: two more classrooms, a study lounge with windows over the quad
+function school2Solid(x, y) {
+  if (x < 1.6 || x > 64.4 || y < 6.5 || y > 34.4) return true;
+  if (x > 47.5 && x < 62.5 && y < 12) return true;
+  return LOUNGE.some(r => inRect(x, y, r));
+}
+const LOUNGE = [[6, 24, 16, 28], [22, 24, 32, 28], [38, 23, 44, 27], [52, 22, 56, 32], [59, 22, 63, 32]];
+function paintSchool2() {
+  const {c, g, X, Y} = roomCanvas(66, 36), wall = '#e8e0cc';
+  g.fillStyle = '#0d0f22'; g.fillRect(0, 0, c.width, c.height);
+  floorTiles(g, X(1.6), Y(6.5), X(64.4), Y(20), '#e8e4dc', '#d4cfc4', Math.max(4, Math.round(cam.k * 2.5)));
+  floorCarpet(g, X(1.6), Y(20), X(64.4), Y(34.4), '#2d4a7a', '#35558a');
+  backWall(g, X, Y, 0, 66, 0, 6.5, wall);
+  for (let x = 2; x < 46; x += 2.2) { if (CLASS_DOORS.some(d => Math.abs(x + 1 - d) < 4)) continue; g.fillStyle = OUT; g.fillRect(X(x), Y(2.2), X(2.1) - X(0) + 1, Y(6.4) - Y(2.2)); g.fillStyle = '#2d4fd6'; g.fillRect(X(x) + 1, Y(2.2) + 1, X(2.1) - X(0) - 1, Y(6.4) - Y(2.2) - 2); }
+  stairs(g, X, Y, false);
+  CLASSES.slice(2, 4).forEach((cl, i) => { const dx = CLASS_DOORS[i]; doorOn(g, X, Y, dx, Y(6.5) - 1, 4, Math.round(Y(5.6) - Y(1.4)), '#7a5a3a'); g.fillStyle = OUT; g.fillRect(X(dx) - 16, Y(0.2), 33, 9); g.fillStyle = cl.c; g.fillRect(X(dx) - 15, Y(0.2) + 1, 31, 7); ptext(g, cl.short, X(dx), Y(0.2) + 5, 8, '#ffffff', 'center'); });
+  // study lounge: couches, coffee tables, bookshelves, vending machine
+  g.fillStyle = '#5a6478'; g.fillRect(X(1.6), Y(20), X(64.4) - X(1.6), 1); ptext(g, 'STUDY LOUNGE', X(33), Y(21.6), 8, '#ffc94d', 'center');
+  for (const [x0, y0, x1, y1] of LOUNGE.slice(0, 2)) { box(g, X, Y, x0, y0, x1, y1, '#6a3a22'); box(g, X, Y, x0 + .6, y0 + .6, x1 - .6, y1 - 1.4, '#8a4a2a', '#a65a34'); }
+  box(g, X, Y, 38, 23, 44, 27, '#c9963a', '#e0b04a'); box(g, X, Y, 39.6, 23.6, 41, 24.6, '#f4f1ea'); box(g, X, Y, 41.6, 24.2, 43, 25.4, '#2d4fd6');   // table with books
+  box(g, X, Y, 52, 22, 56, 32, '#5a3a22'); for (let y = 23; y < 31; y += 2) for (let x = 52.4; x < 55.6; x += .9) { g.fillStyle = ['#e2453a', '#2d4fd6', '#3fae4f', '#f2c230', '#f4f1ea'][Math.round(x * 3 + y) % 5]; g.fillRect(X(x), Y(y), 2, Y(y + 1.6) - Y(y)); }
+  box(g, X, Y, 59, 22, 63, 32, '#2a2f3a'); g.fillStyle = '#36a7e6'; g.fillRect(X(59.6), Y(23), X(62.4) - X(59.6), Y(29) - Y(23)); for (let y = 23.6; y < 28.6; y += 1.4) for (let x = 60; x < 62; x += 1) { g.fillStyle = ['#e2453a', '#ffd84d', '#3fae4f'][Math.round(x + y) % 3]; g.fillRect(X(x), Y(y), 2, 2); }
+  sideWall(g, X, Y, 0, 1.6, 0, 36, '#3a3f5c'); sideWall(g, X, Y, 64.4, 66, 0, 36, '#3a3f5c');
+  g.fillStyle = '#3a3f5c'; g.fillRect(0, Y(34.4), c.width, c.height - Y(34.4));
+  return c;
+}
 function schoolSetup(kind) {
-  CITY.schoolKind = kind;
+  CITY.schoolKind = 'college'; kind = 'college';
   const R = rng(kind === 'hs' ? 321 : 654), shirts = ['#e2453a', '#2d4fd6', '#3fae4f', '#f2c230', '#22252f', '#ff7ab8', '#7b3fc4', '#f4f1ea'];
   const mk = (path, i, tag) => { const n = cityPerson({skin:Math.floor(R() * SKINS.length), hair:Math.floor(R() * 6), h:.86 + R() * .1, w:.95 + R() * .08, shoe:[0xf4f1ea, 0x22252f], beard:kind !== 'hs' && R() < .3, v:i},
     {n:'', c:'#000', d:'#000', trim:'#000', numc:'#fff', outfit:{top:['tee', 'hoodie', 'tee', 'jacket'][i % 4], topC:shirts[i % 8], bot:['jeans', 'shorts', 'joggers'][i % 3], botC:['#3a5a9e', '#1d1f2a', '#6d7179'][i % 3], hat:'none', hatC:'#000'}}, '');
     n.path = path; n.u = R(); n.dir = 1; n.sp = path ? 3.6 + R() * 1.6 : 0; if (tag) n.tag = tag; return n; };
-  SCHOOL.npcs = [mk([6, 13, 60, 13], 0), mk([60, 18, 8, 18], 1), mk([12, 22, 54, 22], 2), mk([50, 10, 14, 10], 3), mk([10, 40, 22, 52], 4), mk([56, 50, 44, 38], 5)];
+  SCHOOL.npcs = [mk([6, 15, 44, 15], 0), mk([60, 19, 8, 19], 1), mk([12, 22, 54, 22], 2), mk([42, 10, 14, 10], 3), mk([10, 40, 22, 52], 4), mk([56, 50, 44, 38], 5)];
+  SCHOOL.npcs2 = [mk([6, 14, 44, 14], 6), mk([40, 18, 8, 18], 7), mk([20, 31, 48, 31], 8)];
   const coach = cityPerson({skin:5, hair:2, h:.92, w:1.08, shoe:[0x1d1f2a, 0xf4f1ea], beard:true, v:9}, {n:'', c:'#000', d:'#000', trim:'#000', numc:'#fff', outfit:{top:'jacket', topC:kind === 'hs' ? '#c2402f' : '#2d4fd6', bot:'joggers', botC:'#1d1f2a', hat:'cap', hatC:'#16181f'}}, '');
   coach.x = 33; coach.y = 37; coach.face = 'down'; coach.tag = 'COACH'; SCHOOL.npcs.push(coach);
   SCHOOL.npcs.forEach(n => { if (n.path) { n.x = n.path[0]; n.y = n.path[1]; } });
@@ -5777,7 +5848,7 @@ function mathQ(hard) {
 }
 let CLS = null;
 function openClass(id) {
-  const hard = CITY.schoolKind === 'college';
+  const hard = true;
   const pickQ = () => { if (id === 'math') return mathQ(hard); const bank = QBANK[id]; return bank[Math.floor(Math.random() * bank.length)]; };
   const qs = []; while (qs.length < 3) { const q = pickQ(); if (!qs.some(o => o[0] === q[0])) qs.push(q); }
   CLS = {id, qs:qs.map(([q, a, w]) => ({q, a, opts:[a, ...w].sort(() => Math.random() - .5), pick:null})), i:0, right:0, done:false};
@@ -5788,8 +5859,8 @@ function classHTML() {
   const cl = CLASSES.find(c => c.id === CLS.id), q = CLS.qs[CLS.i];
   if (CLS.done) {
     const g = ['F', 'D', 'B', 'A'][CLS.right], sp = CLS.right === 3 ? 1 : 0;
-    return `<div class="cls-done"><small>${cl.n.toUpperCase()} · CLASS OVER</small><b class="grade g${g}">${g}</b><p>${CLS.right} of 3 right${sp ? ' · +1 skill point' : ''} · +${CLS.right * 10} Basket Bucks</p>
-      <p class="hint">${S.classOk ? 'You went to class today. Coach is waiting in the gym.' : ''} GPA ${gpaText()}</p><button class="mbtn pri" data-act="close">Back to the hallway</button></div>`;
+    return `<div class="cls-done"><small>${cl.n.toUpperCase()} · CLASS OVER</small><b class="grade g${g}">${g}</b><p>${CLS.right} of 3 right${sp ? ' · perfect score bonus' : ''} · +${CLS.right * 10 + (sp ? 25 : 0)} Basket Bucks</p>
+      <p class="hint">${S.classOk ? 'You went to class today. Coach is waiting in the gym.' : ''} GPA ${gpaText()}</p><button class="mbtn pri" data-act="close">Done</button></div>`;
   }
   return `<div class="cls" style="--cc:${cl.c}"><div class="cls-head"><span>${cl.n.toUpperCase()}</span><em>QUESTION ${CLS.i + 1} OF 3</em></div>
     <div class="cls-board"><p>${esc(q.q)}</p></div>
@@ -5805,7 +5876,7 @@ function classAct(a, d) {
     if (CLS.i < 2) CLS.i++;
     else {
       CLS.done = true; S.classOk = true; S.gpa.pts += [0, 1, 3, 4][CLS.right]; S.gpa.n++;
-      S.gems += CLS.right * 10; if (CLS.right === 3) S.me.sp += 1;
+      S.gems += CLS.right * 10 + (CLS.right === 3 ? 25 : 0);
       save(); renderTop();
     }
   }
@@ -5816,6 +5887,151 @@ function coachHTML() {
   if (k !== S.stage) return careerHTML(k);
   const ok = S.classOk;
   return `<div class="coach ${ok ? '' : 'no'}"><b>COACH</b><p>${ok ? `"Good work in class. Let's go get a win!"` : `"No class, no game. Hit the books first: go to a class in the hallway, then come see me."`}</p><small>GPA ${gpaText()}</small></div>` + (ok ? careerHTML(k) : '');
+}
+
+// ---------------- a college lecture hall: tiered desks, whiteboard, projector, the professor ----------------
+const CLASSROOM = {npcs:[]};
+const CR_ROWS = [15, 20, 25, 30], CR_XL = [6.5, 9.5, 12.5, 15.5, 18.5], CR_XR = [27.5, 30.5, 33.5, 36.5, 39.5];
+let CLASS_SEATS = [];
+function classSolid(x, y) {
+  if (x < 1.6 || x > 44.4 || y < 6.5 || y > 38.6) return true;
+  for (const ry of CR_ROWS) if (y > ry && y < ry + 1.6 && (x > 4.5 && x < 20.5 || x > 25.5 && x < 41.5)) return true;
+  if (y > 7.6 && y < 9.6 && x > 21 && x < 25) return true;                          // podium
+  return false;
+}
+function paintClassroom() {
+  const cl = CLASSES.find(c => c.id === CITY.classId) || CLASSES[0], {c, g, X, Y} = roomCanvas(46, 40);
+  g.fillStyle = '#0d0f22'; g.fillRect(0, 0, c.width, c.height);
+  // stage at the front, then tiers of carpet that step up toward the back
+  floorWood(g, X(1.6), Y(6.5), X(44.4), Y(12.6), ['#c4955e', '#b98a55', '#cf9f68']);
+  CR_ROWS.forEach((ry, i) => { floorCarpet(g, X(1.6), Y(ry - 2.4), X(44.4), Y(ry + 3), i % 2 ? '#5a2a3a' : '#642f40', '#6f3848'); g.fillStyle = 'rgba(0,0,0,.28)'; g.fillRect(X(1.6), Y(ry - 2.4), X(44.4) - X(1.6), 2); g.fillStyle = 'rgba(255,255,255,.08)'; g.fillRect(X(1.6), Y(ry - 2.4) + 2, X(44.4) - X(1.6), 1); });
+  floorCarpet(g, X(1.6), Y(33), X(44.4), Y(38.6), '#5a2a3a', '#6f3848');
+  // aisle steps down the middle
+  for (let y = 12.6; y < 38.6; y += 1.3) { g.fillStyle = (Math.round(y / 1.3) % 2) ? '#8a7a6a' : '#9a8a7a'; g.fillRect(X(21), Y(y), X(25) - X(21), Y(y + 1.3) - Y(y)); }
+  // front wall: dark wood panels, a long whiteboard, the projector screen, a clock and a pennant
+  backWall(g, X, Y, 0, 46, 0, 6.5, '#5a3a22'); for (let x = 1; x < 46; x += 4) { g.fillStyle = '#4a2e1a'; g.fillRect(X(x), Y(0.4), 1, Y(6.2) - Y(0.4)); }
+  box(g, X, Y, 3, 0.8, 22, 5.2, '#f4f6f8'); g.fillStyle = '#7a8496'; g.fillRect(X(3), Y(5.2), X(22) - X(3), 2);
+  const r = prng(cl.id.length * 7 + 3); g.fillStyle = cl.id === 'math' ? '#2d4fd6' : cl.id === 'sci' ? '#2f8a4a' : cl.id === 'eng' ? '#c2402f' : '#7a5a2a';
+  for (let row = 0; row < 3; row++) { let x = X(4); const y = Y(1.6 + row * 1.2); while (x < X(20)) { const w = 2 + ((r() * 7) | 0); g.fillRect(x, y, w, 1); if (r() < .3) g.fillRect(x + 1, y - 1, 1, 3); x += w + 2; } }
+  box(g, X, Y, 26, 0.6, 42, 5.6, '#1a1e2c'); g.fillStyle = cl.c; g.fillRect(X(26.6), Y(1) + 1, X(41.4) - X(26.6), Y(5.2) - Y(1) - 2);
+  ptext(g, cl.short, X(34), Y(2.4), 8, '#ffffff', 'center'); g.fillStyle = 'rgba(255,255,255,.7)'; g.fillRect(X(29), Y(3.6), X(39) - X(29), 1); g.fillRect(X(30), Y(4.4), X(38) - X(30), 1);
+  blob(g, X(44), Y(2), 4, 3, OUT); blob(g, X(44), Y(2), 3, 2, '#f4f1ea'); g.fillStyle = OUT; g.fillRect(X(44), Y(2) - 2, 1, 2); g.fillRect(X(44), Y(2), 2, 1);
+  g.fillStyle = OUT; g.fillRect(X(23) - 1, Y(0.4), 8, 10); g.fillStyle = '#2d4fd6'; g.fillRect(X(23), Y(0.4) + 1, 6, 6); g.fillStyle = '#ffd84d'; g.fillRect(X(23) + 1, Y(0.4) + 3, 4, 1);
+  // podium
+  box(g, X, Y, 21, 7.6, 25, 9.6, '#6a4428', '#8a5a34'); g.fillStyle = '#c9d1de'; g.fillRect(X(22.4), Y(7.6) + 1, X(23.6) - X(22.4), 1);
+  // long desks with laptops and chairs behind them
+  for (const ry of CR_ROWS) for (const [x0, x1, xs] of [[4.5, 20.5, CR_XL], [25.5, 41.5, CR_XR]]) {
+    box(g, X, Y, x0, ry, x1, ry + 1.6, '#7a5232', '#a0703f');
+    for (const sx of xs) { if (r() < .55) { g.fillStyle = OUT; g.fillRect(X(sx) - 4, Y(ry) - 1, 8, 4); g.fillStyle = '#c9d1de'; g.fillRect(X(sx) - 3, Y(ry), 6, 2); g.fillStyle = '#36a7e6'; g.fillRect(X(sx) - 2, Y(ry), 4, 1); }
+      box(g, X, Y, sx - .9, ry + 2.2, sx + .9, ry + 3.2, '#2a2f3a', '#3a4050'); }
+  }
+  // windows down the right wall, exit door bottom right
+  sideWall(g, X, Y, 0, 1.6, 0, 40, '#4a2e1a'); sideWall(g, X, Y, 44.4, 46, 0, 40, '#4a2e1a');
+  for (let y = 10; y < 34; y += 7) { g.fillStyle = '#9fd3f5'; g.fillRect(X(44.4) + 1, Y(y), X(46) - X(44.4) - 2, Y(y + 4) - Y(y)); }
+  g.fillStyle = '#3a2a22'; g.fillRect(0, Y(38.6), c.width, c.height - Y(38.6));
+  g.fillStyle = '#7a5a3a'; g.fillRect(X(40), Y(38.6), X(45) - X(40), Y(40) - Y(38.6)); ptext(g, 'EXIT', X(42.5), Y(37.2), 8, '#ff6a5a', 'center');
+  return c;
+}
+function classroomSetup(id) {
+  const R = rng(id.length * 131 + 7), shirts = ['#e2453a', '#2d4fd6', '#3fae4f', '#f2c230', '#22252f', '#ff7ab8', '#7b3fc4', '#f4f1ea', '#c9963a'];
+  CLASS_SEATS = []; CLASSROOM.npcs = [];
+  for (const ry of CR_ROWS) for (const sx of [...CR_XL, ...CR_XR]) {
+    const taken = R() < .55, st = {x:sx, y:ry + 2.9, taken};
+    CLASS_SEATS.push(st);
+    if (taken) {
+      const i = CLASSROOM.npcs.length, n = cityPerson({skin:Math.floor(R() * SKINS.length), hair:Math.floor(R() * 6), h:.86 + R() * .1, w:.95 + R() * .08, shoe:[0xf4f1ea, 0x22252f], beard:R() < .25, v:i},
+        {n:'', c:'#000', d:'#000', trim:'#000', numc:'#fff', outfit:{top:['hoodie', 'tee', 'jacket', 'long'][i % 4], topC:shirts[i % 9], bot:'jeans', botC:'#3a5a9e', hat:'none', hatC:'#000'}}, '');
+      n.x = sx; n.y = ry + 2.9; n.face = 'up'; n.pose = 'seat'; CLASSROOM.npcs.push(n);
+    }
+  }
+  const prof = cityPerson({skin:2, hair:3, h:.93, w:1.02, shoe:[0x5a3a22, 0x2a1a12], beard:true, beardT:'full', v:1}, {n:'', c:'#000', d:'#000', trim:'#000', numc:'#fff', outfit:{top:'jacket', topC:'#5a4a3a', bot:'jeans', botC:'#2a2f3a', hat:'none', hatC:'#000'}}, '');
+  prof.x = 18; prof.y = 9.5; prof.face = 'down'; prof.tag = 'PROFESSOR'; prof.path = [12, 9.6, 19.5, 9.6]; prof.u = .5; prof.dir = 1; prof.sp = 1.6;
+  CLASSROOM.npcs.push(prof);
+}
+function enterClass(id) {
+  CITY.classId = id; classroomSetup(id);
+  goScene('classroom', 42.5, 36.2);
+  toast('Find an open seat and sit down');
+}
+function sitInClass(st) {
+  const m = CITY.me; if (m) { m.x = st.x; m.y = st.y; m.vx = m.vy = 0; m.yaw = Math.PI; m.pose = 'seat'; CITY.path = null; CITY.tgt = null; }
+  openClass(CITY.classId);
+}
+function leaveClass() {
+  const i = CLASSES.findIndex(c => c.id === CITY.classId), up = i >= 2;
+  goScene(up ? 'school2' : 'school', CLASS_DOORS[i % 2], 9.6);
+}
+
+// ---------------- walk-in stores ----------------
+const STORE = {npcs:[]};
+const STORE_LOOK = {
+  shoes:   {n:'KICKS', floor:['#3a2a22', '#33241e', '#42302a'], wall:'#2a2f3a', acc:'#ff6a1f', browse:'THE SHOE WALL', solids:[[7, 15.5, 14, 18.5], [18, 15.5, 25, 18.5], [6, 26, 14, 27.6]]},
+  jerseys: {n:'JERSEYS', tile:['#c9cfda', '#b8bfcc'], wall:'#1f3a6b', acc:'#e2453a', browse:'THE JERSEY RACKS', solids:[[7, 15, 13, 18.6], [18, 15, 24, 18.6], [4, 24, 6, 28]]},
+  clothes: {n:'THREADS', floor:['#d9b88a', '#cfae80', '#e2c296'], wall:'#efe3c2', acc:'#3fae4f', browse:'THE CLOTHING RACKS', solids:[[6, 15, 14, 16.8], [17, 15, 25, 16.8], [37, 22, 44.4, 32.4]]},
+  moves:   {n:'MOVES STUDIO', floor:['#ecc690', '#e4ba80', '#f2d09e'], wall:'#2a1a55', acc:'#ff3fd0', browse:'THE DANCE FLOOR', solids:[[2, 8, 5, 12], [26, 8, 29, 12]]},
+  market:  {n:'MARKET', tile:['#e8e4dc', '#d4cfc4'], wall:'#3a7d44', acc:'#ffd84d', browse:'THE SHOWROOM', solids:[[5, 14, 15, 17.6], [34, 19, 42, 27], [3, 28, 7, 32.4], [26, 24, 31, 28]]}
+};
+function storeSolid(x, y) {
+  if (x < 1.6 || x > 44.4 || y < 6.5 || y > 32.6) return true;
+  if (x > 31 && x < 43 && y > 8.4 && y < 11.2) return true;                         // counter
+  return ((STORE_LOOK[CITY.storeId] || {}).solids || []).some(r => inRect(x, y, r));
+}
+function paintStore() {
+  const id = CITY.storeId || 'shoes', L = STORE_LOOK[id], {c, g, X, Y} = roomCanvas(46, 34), r = prng(id.length * 53 + 11);
+  g.fillStyle = '#0d0f22'; g.fillRect(0, 0, c.width, c.height);
+  if (L.tile) floorTiles(g, X(1.6), Y(6.5), X(44.4), Y(32.6), L.tile[0], L.tile[1], Math.max(4, Math.round(cam.k * 2.4))); else floorWood(g, X(1.6), Y(6.5), X(44.4), Y(32.6), L.floor);
+  backWall(g, X, Y, 0, 46, 0, 6.5, L.wall);
+  g.fillStyle = L.acc; g.fillRect(X(0), Y(6.5) - 3, c.width, 1);                                     // accent strip
+  const bright = ['#e2453a', '#2d4fd6', '#3fae4f', '#f2c230', '#f4f1ea', '#16181f', '#ff7ab8', '#7b3fc4', '#36b6e6', '#ff6a1f'];
+  if (id === 'shoes') {
+    for (let row = 0; row < 3; row++) { g.fillStyle = '#5a6478'; g.fillRect(X(2), Y(1.8 + row * 1.6), X(29) - X(2), 1);
+      for (let x = 2.6; x < 28.4; x += 2.2) { const cc = bright[(r() * bright.length) | 0]; g.fillStyle = OUT; g.fillRect(X(x) - 1, Y(1.8 + row * 1.6) - 4, 9, 5); g.fillStyle = '#f8f6f0'; g.fillRect(X(x), Y(1.8 + row * 1.6) - 3, 7, 3); g.fillStyle = cc; g.fillRect(X(x) + 1, Y(1.8 + row * 1.6) - 3, 4, 2); } }
+    for (const [x0, y0, x1, y1] of L.solids.slice(0, 2)) { box(g, X, Y, x0, y0, x1, y1, '#f4f1ea', '#ffffff'); for (let x = x0 + .8; x < x1 - 1; x += 2.2) { g.fillStyle = OUT; g.fillRect(X(x) - 1, Y(y0) - 3, 9, 5); g.fillStyle = '#f8f6f0'; g.fillRect(X(x), Y(y0) - 2, 7, 3); g.fillStyle = bright[(r() * bright.length) | 0]; g.fillRect(X(x) + 1, Y(y0) - 2, 4, 2); } }
+    box(g, X, Y, 6, 26, 14, 27.6, '#7a5232', '#a0703f');
+  } else if (id === 'jerseys') {
+    const jer = (x, y, j, num) => { g.fillStyle = OUT; g.fillRect(x - 1, y - 1, 12, 13); g.fillStyle = j.c; g.fillRect(x, y, 10, 11); g.fillStyle = j.d; g.fillRect(x, y, 2, 4); g.fillRect(x + 8, y, 2, 4); g.fillStyle = (JERSEYS[0] && j.c) ? '#0d0f22' : j.c; g.fillRect(x + 3, y, 4, 1); ptext(g, String(num), x + 5, y + 6, 8, j.numc, 'center'); };
+    for (let i = 0; i < 9; i++) jer(X(2.6 + i * 3), Y(1.2), JERSEYS[i % JERSEYS.length], (i * 7 + 3) % 40);
+    for (const [x0, y0, x1, y1] of L.solids.slice(0, 2)) { box(g, X, Y, x0, y0 + 2.4, x1, y1, '#9aa3b5', '#c9d1de'); g.fillStyle = '#5a6478'; g.fillRect(X(x0), Y(y0), X(x1) - X(x0), 1); for (let k = 0; k < 3; k++) jer(X(x0 + .4 + k * 1.9), Y(y0) + 1, JERSEYS[(k + (x0 | 0)) % JERSEYS.length], k * 11 + 1); }
+    box(g, X, Y, 4.4, 26.6, 5.6, 28, '#5a6478'); jer(X(3.6), Y(24) - 2, JERSEYS[4], 23);                                                    // mannequin
+  } else if (id === 'clothes') {
+    for (let s2 = 0; s2 < 3; s2++) { g.fillStyle = '#7a5232'; g.fillRect(X(2), Y(2 + s2 * 1.5), X(29) - X(2), 2);
+      for (let x = 2.4; x < 28.6; x += 1.6) { g.fillStyle = OUT; g.fillRect(X(x) - 1, Y(2 + s2 * 1.5) - 4, 7, 5); g.fillStyle = bright[(r() * bright.length) | 0]; g.fillRect(X(x), Y(2 + s2 * 1.5) - 3, 5, 3); } }
+    for (const [x0, y0, x1] of L.solids.slice(0, 2)) { g.fillStyle = '#5a6478'; g.fillRect(X(x0), Y(y0), X(x1) - X(x0), 2); for (let x = x0 + .3; x < x1 - .5; x += .9) { const cc = bright[(r() * bright.length) | 0]; g.fillStyle = OUT; g.fillRect(X(x) - 1, Y(y0) + 1, 5, Y(y0 + 1.8) - Y(y0) + 2); g.fillStyle = cc; g.fillRect(X(x), Y(y0) + 2, 3, Y(y0 + 1.8) - Y(y0)); } }
+    box(g, X, Y, 37, 22, 44.4, 32.4, '#2a1a12'); for (const y0 of [22.6, 27.6]) { g.fillStyle = '#c2402f'; g.fillRect(X(37.6), Y(y0), X(43.8) - X(37.6), Y(y0 + 4.2) - Y(y0)); g.fillStyle = 'rgba(0,0,0,.25)'; for (let x = 38; x < 43.6; x += 1) g.fillRect(X(x), Y(y0), 1, Y(y0 + 4.2) - Y(y0)); } ptext(g, 'FITTING', X(40.7), Y(21), 8, '#2a1a12', 'center');
+    g.fillStyle = OUT; g.fillRect(X(1.6), Y(14) - 1, 5, Y(24) - Y(14) + 2); g.fillStyle = '#bfe3f5'; g.fillRect(X(1.6) + 1, Y(14), 3, Y(24) - Y(14)); g.fillStyle = '#ffffff'; g.fillRect(X(1.6) + 2, Y(15), 1, 6);            // mirror
+  } else if (id === 'moves') {
+    g.fillStyle = '#bfe3f5'; g.fillRect(X(1), Y(0.6), X(45) - X(1), Y(5.8) - Y(0.6)); g.fillStyle = 'rgba(255,255,255,.55)'; for (let x = 3; x < 45; x += 9) { g.fillRect(X(x), Y(0.8), 2, Y(5.6) - Y(0.8)); g.fillRect(X(x + 2), Y(0.8), 1, Y(5.6) - Y(0.8)); }
+    g.fillStyle = OUT; for (let x = 1; x < 46; x += 11) g.fillRect(X(x), Y(0.6), 1, Y(5.8) - Y(0.6));
+    g.fillStyle = '#ff3fd0'; g.fillRect(X(0), Y(6.5) - 5, c.width, 1); g.fillStyle = '#36e6ff'; g.fillRect(X(0), Y(6.5) - 4, c.width, 1);
+    for (const [x0, y0, x1, y1] of L.solids) { box(g, X, Y, x0, y0, x1, y1, '#16181f', '#2a2f3a'); blob(g, X((x0 + x1) / 2), Y(y0 + 1.6), 3, 3, '#5a6478'); blob(g, X((x0 + x1) / 2), Y(y0 + 1.6), 1, 1, '#9aa3b5'); }
+    pring(g, X(15), Y(20), Math.round(7 * cam.k), Math.round(7 * cam.k * FS), 'rgba(255,63,208,.5)'); pring(g, X(15), Y(20), Math.round(5 * cam.k), Math.round(5 * cam.k * FS), 'rgba(54,230,255,.45)');
+  } else if (id === 'market') {
+    for (let s2 = 0; s2 < 2; s2++) { g.fillStyle = '#7a5232'; g.fillRect(X(2), Y(2.4 + s2 * 2), X(29) - X(2), 2); for (let x = 2.6; x < 28.4; x += 2.4) { g.fillStyle = OUT; g.fillRect(X(x) - 1, Y(2.4 + s2 * 2) - 6, 8, 7); g.fillStyle = bright[(r() * bright.length) | 0]; g.fillRect(X(x), Y(2.4 + s2 * 2) - 5, 6, 5); } }
+    box(g, X, Y, 5, 14, 15, 17.6, '#2d4fd6'); box(g, X, Y, 5.6, 14.6, 14.4, 16.6, '#3b65e8', '#5a7ef0');                                     // couch
+    box(g, X, Y, 34, 19, 42, 27, '#5a3a22'); box(g, X, Y, 34.5, 19.5, 41.5, 21.4, '#f4f1ea'); box(g, X, Y, 34.5, 21.8, 41.5, 26.5, '#7b3fc4', '#9a5ad8');   // bed
+    box(g, X, Y, 3.6, 30.4, 6.4, 32.4, '#9a5a3a'); blob(g, X(5), Y(30.4) - 6, 7, 6, OUT); blob(g, X(5), Y(30.4) - 6, 6, 5, '#3fae4f');                    // plant
+    box(g, X, Y, 26, 24, 31, 28, '#c9963a', '#e0b04a'); g.fillStyle = OUT; g.fillRect(X(28.5) - 1, Y(24) - 14, 3, 12); blob(g, X(28.5), Y(24) - 15, 5, 3, OUT); blob(g, X(28.5), Y(24) - 15, 4, 2, '#ffd84d');   // table + lamp
+    g.fillStyle = OUT; g.fillRect(X(8) - 1, Y(19) - 1, X(14) - X(8) + 2, Y(21.6) - Y(19) + 2); g.fillStyle = '#e2453a'; g.fillRect(X(8), Y(19), X(14) - X(8), Y(21.6) - Y(19));   // rug
+    for (const [px, py] of [[10, 13.4], [38, 18.4], [28.5, 23.4]]) { g.fillStyle = OUT; g.fillRect(X(px) - 1, Y(py) - 1, 9, 5); g.fillStyle = '#ffd84d'; g.fillRect(X(px), Y(py), 7, 3); g.fillStyle = OUT; g.fillRect(X(px) + 1, Y(py) + 1, 5, 1); }   // price tags
+  }
+  // sales counter with a register (top right) and a sign
+  box(g, X, Y, 31, 8.4, 43, 11.2, '#6a4428', '#8a5a34'); box(g, X, Y, 39, 7.4, 41.6, 8.8, '#2a2f3a'); g.fillStyle = '#5fd38a'; g.fillRect(X(39.4), Y(7.4) + 1, 4, 1);
+  g.fillStyle = OUT; g.fillRect(X(31) - 1, Y(0.6) - 1, X(43) - X(31) + 2, 11); g.fillStyle = L.acc; g.fillRect(X(31), Y(0.6), X(43) - X(31), 9); ptext(g, L.n, X(37), Y(0.6) + 5, 8, lumOf(L.acc) > .6 ? '#16181f' : '#ffffff', 'center');
+  sideWall(g, X, Y, 0, 1.6, 0, 34, shadeHex(L.wall, .7)); sideWall(g, X, Y, 44.4, 46, 0, 34, shadeHex(L.wall, .7));
+  g.fillStyle = shadeHex(L.wall, .6); g.fillRect(0, Y(32.6), X(20), c.height - Y(32.6)); g.fillRect(X(26), Y(32.6), c.width - X(26), c.height - Y(32.6));
+  g.fillStyle = '#9fd3f5'; g.fillRect(X(20), Y(32.6), X(26) - X(20), Y(34) - Y(32.6)); ptext(g, 'EXIT', X(23), Y(31.2), 8, '#ff6a5a', 'center');
+  return c;
+}
+function storeSetup(id) {
+  CITY.storeId = id;
+  const R = rng(id.length * 977 + 5), shirts = ['#e2453a', '#2d4fd6', '#3fae4f', '#f2c230', '#22252f', '#ff7ab8', '#7b3fc4', '#f4f1ea'], L = STORE_LOOK[id];
+  const mk = (path, i) => { const n = cityPerson({skin:Math.floor(R() * SKINS.length), hair:Math.floor(R() * 6), h:.86 + R() * .1, w:.95 + R() * .08, shoe:[0xf4f1ea, 0x22252f], beard:R() < .3, v:i},
+    {n:'', c:'#000', d:'#000', trim:'#000', numc:'#fff', outfit:{top:['tee', 'hoodie', 'jacket'][i % 3], topC:shirts[(i * 3 + id.length) % 8], bot:['jeans', 'joggers', 'shorts'][i % 3], botC:['#3a5a9e', '#24262e', '#1d1f2a'][i % 3], hat:i % 2 ? 'cap' : 'none', hatC:shirts[(i + 2) % 8]}}, '');
+    n.path = path; n.u = R(); n.dir = 1; n.sp = 2.6 + R() * 1.4; n.x = path[0]; n.y = path[1]; return n; };
+  STORE.npcs = [mk([5, 13, 28, 13], 0), mk([28, 22, 8, 22], 1)];
+  if (id === 'moves') STORE.npcs.push(mk([10, 24, 20, 24], 2));
+  const clerk = cityPerson({skin:Math.floor(R() * SKINS.length), hair:Math.floor(R() * 6), h:.9, w:1, shoe:[0xf4f1ea, 0x22252f], v:9}, {n:'', c:'#000', d:'#000', trim:'#000', numc:'#fff', outfit:{top:'tee', topC:L.acc, bot:'jeans', botC:'#24262e', hat:'none', hatC:'#000'}}, '');
+  clerk.x = 37; clerk.y = 8.2; clerk.face = 'down'; clerk.tag = 'CLERK'; STORE.npcs.push(clerk);
 }
 
 // ================= UI =================
@@ -5837,7 +6053,7 @@ function renderTop() {
   const f = myKit();
   $('crest').innerHTML = jerseySVG(f, 'crest');
   $('tname').textContent = S.me.first + ' ' + S.me.last;
-  $('tsub').textContent = `${stageOf().n}${S.stage === 'nba' ? ' S' + S.season : ''} · OVR ${meOvr()} · ${S.me.sp} SP`;
+  $('tsub').textContent = `${stageOf().n}${S.stage === 'nba' ? ' S' + S.season : ''} · OVR ${meOvr()}`;
   const short = n => n >= 1e6 ? (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'M' : n >= 1e4 ? (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'K' : n.toLocaleString();
   $('gems').textContent = short(S.gems);
   const rs = document.documentElement.style;
@@ -5863,7 +6079,7 @@ function renderPanel() {
   const BN = {st_market:'MARKET · FURNITURE', school:CITY.bld === 'college' ? 'DREAM STATE U' : CITY.bld === 'nba' ? 'NBA ARENA' : 'HIGH SCHOOL', st_shoes:'KICKS · SHOES', st_jerseys:'JERSEY SHOP', st_clothes:'THREADS · CLOTHES', st_moves:'MOVES STUDIO'};
   if (tab === 'player') panel.innerHTML = head('MY PLAYER') + playerHTML();
   else if (tab === 'career') panel.innerHTML = head('CAREER') + careerHTML();
-  else if (tab === 'school') panel.innerHTML = head(BN.school) + careerHTML({hs:'hs', college:'college', nba:'nba'}[CITY.bld] || S.stage);
+  else if (tab === 'school') panel.innerHTML = head(BN.school) + careerHTML({college:'college', nba:'nba'}[CITY.bld] || S.stage);
   else if (tab && tab.startsWith('st_')) panel.innerHTML = head(BN[tab]) + `<div class="wallet-line">${GEM} <b>${S.gems.toLocaleString()}</b> Basket Bucks</div>` + storeHTML(tab);
   else if (tab === 'locker') panel.innerHTML = head('LOCKER') + styleHTML();
   else if (tab === 'class') panel.innerHTML = head(((CLASSES.find(c => CLS && c.id === CLS.id) || {}).n || 'CLASS').toUpperCase() + ' CLASS') + classHTML();
@@ -6238,7 +6454,7 @@ function showMatchup() {
 }
 function startStory() {
   const n = S.res.length, stg = stageOf(); if (n >= stg.games) return;
-  if ((S.stage === 'hs' || S.stage === 'college') && !S.classOk) { toast('Coach says: go to class first'); return; }
+  if (S.stage === 'college' && !S.classOk) { toast('Coach says: go to class first'); return; }
   const sg = careerGame(n); S.city = {scene:CITY.scene, sk:CITY.schoolKind, x:CITY.me ? CITY.me.x : 60, y:CITY.me ? CITY.me.y : 117};
   closePanel();
   G.game = sg; G.T = [userTeam(), genTeam(sg.ji, sg.ovr + diff().ovr, sg.seed)]; resetGameStats(); G.court = styleOf().court;
@@ -6264,14 +6480,14 @@ function finishStory(win, forfeit) {
   S.gems += rw.gems;
   S.res.push({w:win, s:[G.score[0], G.score[1]]}); if (!forfeit) S.classOk = false;
   const meD = G.T[0].starters.concat(G.T[0].bench).find(x => x.me), grade = meD && !forfeit ? gradeOf(meD) : '–', stg = stageOf();
-  const spGain = forfeit ? 0 : stg.sp + (win ? 1 : 0) + (/A/.test(grade) ? 2 : /B/.test(grade) ? 1 : 0); S.me.sp += spGain;
+  const spGain = forfeit ? 0 : (stg.sp + (win ? 1 : 0) + (/A/.test(grade) ? 2 : /B/.test(grade) ? 1 : 0)) * 25; S.gems += spGain;
   const promo = S.res.length >= stg.games ? advanceStage() : null;
   const lv0 = roadLvl(); if (!forfeit) S.road.m = (S.road.m || 0) + 1; const lvUp = roadLvl() > lv0;
   save(); renderRoad();
   const r = $('result');
   r.innerHTML = `<h2 style="color:${win ? 'var(--good)' : 'var(--bad)'}">${win ? 'WIN' : 'LOSS'}</h2>
     <div class="line">${esc(G.T[0].short)} ${G.score[0]} – ${G.score[1]} ${G.T[1].short}</div>
-    ${forfeit ? '<p class="hint">You forfeited this game.</p>' : `<div class="mygame"><small>YOUR GAME</small><b>${lineOf(meD)}</b><span class="grade g${grade[0]}">${grade}</span><em>+${spGain} skill points</em></div>` + potgHTML(win ? 0 : 1) + boxHTML(0)}
+    ${forfeit ? '<p class="hint">You forfeited this game.</p>' : `<div class="mygame"><small>YOUR GAME</small><b>${lineOf(meD)}</b><span class="grade g${grade[0]}">${grade}</span><em>+${spGain} Basket Bucks for your game</em></div>` + potgHTML(win ? 0 : 1) + boxHTML(0)}
     ${promo ? `<div class="promo">${promo}</div>` : ''}
     <div class="rewards"><span class="cur">${GEM}<b>+${rw.gems}</b></span></div>
     ${forfeit ? '' : `<div class="rgain ${lvUp ? 'up' : ''}">${lvUp ? `BALLER ROAD LEVEL ${roadLvl()}! Rewards are waiting` : `Baller Road ${roadProg()}/${ROAD_PER} to level ${roadLvl() + 1}`}</div>`}
@@ -6734,7 +6950,7 @@ function frame(now) {
 }
 requestAnimationFrame(frame);
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') save(); });
-window.__dream = {G, get S() { return S; }, get CR() { return CR; }, get CLS() { return CLS; }, openClass, goScene, SCENES, CITY, cityGo, userPass, passTarget, userCallBall, userCut, slotSummary, cityUpdate, renderCity, act, update, endReplay, homeUpdate, renderHome, drawDoll, drawBall, startLook, playCard, releaseMeter, cardUsable, players, CARDS, CHARS, buildPerson, lookOf, FR, userContest, userPassTo, userDrive, userHandsUp, userHandler, subIn, teamTotals, gameScore, SET, saveSet, showShotFb, userShootDown, userDribble, userSteal, scrOf:p => { const s = PX(p.x, p.y, 3.2); return toCss(s[0], s[1]); }};
+window.__dream = {G, get S() { return S; }, enterClass, sitInClass, get CLASS_SEATS() { return CLASS_SEATS; }, storeSetup, WALLET, upgradeStat, get CR() { return CR; }, get CLS() { return CLS; }, openClass, goScene, SCENES, CITY, cityGo, userPass, passTarget, userCallBall, userCut, slotSummary, cityUpdate, renderCity, act, update, endReplay, homeUpdate, renderHome, drawDoll, drawBall, startLook, playCard, releaseMeter, cardUsable, players, CARDS, CHARS, buildPerson, lookOf, FR, userContest, userPassTo, userDrive, userHandsUp, userHandler, subIn, teamTotals, gameScore, SET, saveSet, showShotFb, userShootDown, userDribble, userSteal, scrOf:p => { const s = PX(p.x, p.y, 3.2); return toCss(s[0], s[1]); }};
 
 })();
 </script>
