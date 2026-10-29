@@ -1700,7 +1700,7 @@ function meDesc() {
 }
 function streetKit() {                     // what you wear walking around the city
   const g = S.gear, T = CLOTH[g.top] || CLOTH.tee_white, B = CLOTH[g.bot] || CLOTH.sh_black, H = CLOTH[g.hat] || CLOTH.hat_none;
-  return {n:S.me.last, c:T.c, d:shadeHex(T.c, .6), trim:shadeHex(T.c, .8), numc:'#ffffff', outfit:{top:T.type, topC:T.c, bot:B.type, botC:B.c, hat:H.type, hatC:H.c}};
+  return {n:S.me.last, c:T.c, d:shadeHex(T.c, .6), trim:shadeHex(T.c, .8), numc:'#ffffff', outfit:{top:T.type, topId:T.id, topC:T.c, bot:B.type, botC:B.c, hat:H.type, hatC:H.c}};
 }
 const meOvr = () => ovrOf(meStats());
 const stageOf = () => STAGES[S.stage] || STAGES.hs;
@@ -3246,6 +3246,7 @@ function poseOf(a, dt) {
   const sw = Math.round(Math.sin(a.ph) * 2 * amp);
   P.arms = [{s:0, f:sw, y:6}, {s:0, f:-sw, y:6}];
   if (sp > 1 && P.dir !== 'side') P.arms = [{s:0, f:0, y:6 - Math.max(0, sw)}, {s:0, f:0, y:6 + Math.min(0, sw)}];
+  if (a.t == null && !a.isRef && !a.pose && !(a.kit && a.kit.outfit) && sp <= 1) P.spin = true;   // off the court in a jersey: spin the ball on a finger
   if (a.def && !a.isRef) { P.crouch = 2; P.legs = sp > 1.5 ? {mode:'run', ph:a.ph, amp:.6} : {mode:'wide'}; P.arms = [{s:3, f:2, y:1}, {s:3, f:2, y:1}]; }
   if (a.handler && !a.gather) {
     const k = a.ballSide > 0 ? 1 : 0, bz = clamp((a.ballZ || 0) / 2.6, 0, 1);
@@ -3312,7 +3313,7 @@ function poseOf(a, dt) {
 function buildPerson(d, f) { return {d, f, look:d.look, num:d.num, C:null}; }
 function disposePerson(P) {}
 function drawPerson(g, P, a, pose, sx, sy) {
-  if (!P.C) P.C = dollColors(P.look, P.f);
+  if (!P.C || !P.C.chibi) P.C = hiColors(P.look, P.f);
   pose.C = P.C;
   if (pose.lying) return drawLying(g, sx, sy - (pose.liftPx || 0), P.look, P.f, pose);
   return drawDoll(g, sx, sy, P.look, P.f, P.num, pose);
@@ -3910,229 +3911,369 @@ function fireAura(g, p, sx, sy) {
   g.restore();
 }
 
-// ================= hi-bit player sprites =================
-// About 1.4x the old sprite: realistic proportions, faces, muscle + jersey shading,
-// a warm key light from the front-left and a blue rim light on the right edge.
-// Pose offsets from poseOf() were tuned for the old sprite, so they are scaled by DK.
-const DK = 1.4, AK = 1.8, RIMC = '#8fc2ff';   // DK: body/crouch scale, AK: arm reach scale
+// ================= chibi player sprites (design 2) =================
+// Big round heads with ears, huge sparkly eyes, open smiles, short bodies, big hands, V-neck jerseys
+// with white trim, striped shorts, white socks, chunky two-tone high-tops, wristbands, gold-beaded locs,
+// a finger-spun ball with sparkles, and street clothes with hands in the pockets.
+// Pose offsets from poseOf() were tuned for the old sprite, so they are scaled here.
+const DK = 1.0, RIMC = '#9fd8ff';
+const AKX = 1.3, AKD = 1.2, AKU = 1.75;                 // arm reach: sideways, down, up (over the big head)
 function hiColors(look, f) {
   const sk = hx2(SKINS[look.skin % SKINS.length]), hr = look.hairC || hx2(HAIRS[(look.skin + look.hair) % HAIRS.length]);
-  const sh = look.shoe || [0xf4f1ea, 0x22252f], shoe = hx2(sh[0]), sole = hx2(sh[1]);
+  const sh = look.shoe || [0xf4f1ea, 0x22252f], shoe = hx2(sh[0]), acc = hx2(sh[1]);
   const O = f.outfit;                                    // street clothes in the city
   const jer = O ? O.topC : f.c, sho = f.ref ? '#16181f' : O ? O.botC : f.c;
+  const lightShoe = lumOf(shoe) > .6, iris = look.eyeC && look.eyeC !== '#1a1420' ? look.eyeC : '#7a4420';
+  const pan = lightShoe ? (lumOf(acc) < .2 && !O && f.c && !f.ref ? f.c : acc) : '#f8f6f0';   // default white kicks pick up the team colour
+  const pants = O && (O.bot === 'jeans' || O.bot === 'joggers') ? O.botC : '#16181f';
   return {
+    chibi:1,
     plain:!!O, longArm:!!(O && (O.top === 'hoodie' || O.top === 'jacket' || O.top === 'long')), longLeg:!!(O && (O.bot === 'jeans' || O.bot === 'joggers')),
-    hood:!!(O && O.top === 'hoodie'), zip:!!(O && O.top === 'jacket'), hat:O && O.hat !== 'none' ? O.hat : null, hatC:O ? O.hatC : null,
-    band:look.bandC || null, beardT:look.beardT || (look.beard ? 'beard' : null), eyeC:look.eyeC || '#1a1420',
-    skin:sk, skinS:shadeHex(sk, .76), skinD:shadeHex(sk, .6), skinL:mixHex(sk, '#ffe2b8', .28), skinR:mixHex(sk, RIMC, .42),
-    hair:hr, hairD:shadeHex(hr, .55), hairL:mixHex(hr, '#b89a7a', .42), fade:mixHex(hr, sk, .5),
-    jersey:jer, jerseyS:shadeHex(jer, .74), jerseyD:shadeHex(jer, .56), jerseyL:shadeHex(jer, 1.18), jerseyR:mixHex(jer, RIMC, .38),
-    shorts:sho, shortsS:shadeHex(sho, .72), shortsR:mixHex(sho, RIMC, .35),
-    trim:f.trim, num:f.numc, shoe, shoeS:shadeHex(shoe, .72), shoeA:sole, shoeL:mixHex(shoe, '#ffffff', .35), sole:shadeHex(sole, .82), lace:mixHex(shoe, '#ffffff', .7), ref:!!f.ref,
-    sleeve:typeof look.sleeveC === 'string' ? look.sleeveC : hx2(look.sleeveC || 0x15171f), lip:mixHex(shadeHex(sk, .66), '#7a3a34', .3), eye:'#f4f1ea', pupil:look.eyeC || '#1a1420',
-    sock:'#f4f1ea', sockS:'#c3c1d2', pants:O && (O.bot === 'jeans' || O.bot === 'joggers') ? O.botC : '#16181f', pantsS:O ? shadeHex(O.botC, .72) : '#0c0d12'
+    hood:!!(O && O.top === 'hoodie'), zip:!!(O && O.top === 'jacket'), jog:!!(O && O.bot === 'joggers'), jeans:!!(O && O.bot === 'jeans'), tank:!!(O && O.top === 'tank'),
+    pockets:!!(O && (O.top === 'hoodie' || O.top === 'jacket')),
+    hat:O && O.hat !== 'none' ? O.hat : null, hatC:O ? O.hatC : null,
+    band:look.bandC || null, beardT:look.beardT || (look.beard ? 'beard' : null),
+    skin:sk, skinS:shadeHex(sk, .8), skinD:shadeHex(sk, .62), skinL:mixHex(sk, '#fff0d8', .3), skinB:mixHex(sk, '#ff8a8a', .18),
+    hair:hr, hairD:shadeHex(hr, .55), hairL:mixHex(hr, '#d8b48a', .35), fade:mixHex(hr, sk, .45), bead:'#f2b51c', beadS:'#b07812',
+    jersey:jer, jerseyS:shadeHex(jer, .8), jerseyD:shadeHex(jer, .62), jerseyL:mixHex(jer, '#ffffff', .22),
+    shorts:sho, shortsS:shadeHex(sho, .8), shortsL:mixHex(sho, '#ffffff', .2),
+    trim:f.ref ? '#f2f2f2' : O ? '#f4f1ea' : (lumOf(f.c) > .8 ? f.d || '#16181f' : '#f6f4ee'), num:f.numc, ref:!!f.ref,
+    // high-tops: white base with coloured panels (a dark shoe gets white panels instead)
+    shoe:lightShoe ? '#f8f6f0' : shoe, shoeS:lightShoe ? '#cfcbd8' : shadeHex(shoe, .75), panel:pan, panelS:shadeHex(pan, .78), sole:lightShoe ? pan : '#f8f6f0',
+    sleeve:typeof look.sleeveC === 'string' ? look.sleeveC : hx2(look.sleeveC || 0x15171f),
+    iris, irisL:mixHex(iris, '#ffd8a0', .4), pupil:'#1a0c08', eye:'#ffffff', tongue:'#ff5f6d', mouthK:'#3a1212',
+    sock:'#f8f6f0', sockS:'#cfcbd8', wrist:look.bandC || '#f6f4ee',
+    pants, pantsS:shadeHex(pants, .75), pantsL:mixHex(pants, '#ffffff', .25), cuff:mixHex(pants, '#ffffff', .4)
   };
 }
 function hiHair(look) { return hairStyle(look); }
-// a pose: same fields as the old sprite (dir, flip, lift, crouch, bob, legs, arms, mouth, stars, headDrop)
+// a pose: same fields as the old sprite (dir, flip, lift, crouch, bob, legs, arms, mouth, stars, headDrop) + spin, pocket
 function drawDoll(g, x0, y0, look, f, num, P) {
-  const C = (P.C && P.C.skinR) ? P.C : (P.C = hiColors(look, f));
-  const h = look.h || .94, w = look.w || 1;
-  const L = h >= .99 ? 16 : h >= .96 ? 15 : h >= .93 ? 14 : h >= .89 ? 13 : 12, T = h >= .99 ? 14 : h >= .96 ? 13 : 12;
-  const JW = w >= 1.08 ? 11 : w >= 1.03 ? 10 : w <= .95 ? 8 : 9;     // jersey body width (front)
+  const C = (P.C && P.C.chibi) ? P.C : (P.C = hiColors(look, f));
+  const K = OUT, h = look.h || .94, w = look.w || 1;
+  const L = h >= .99 ? 7 : h >= .95 ? 6 : h >= .91 ? 5 : 4, T = h >= .97 ? 10 : 9;
+  const JW = w >= 1.08 ? 12 : w >= 1.03 ? 11 : w <= .95 ? 9 : 10;    // jersey width (front)
   const dir = P.dir, side = dir === 'side', fl = side ? (P.flip || 1) : 1, back = dir === 'up';
   const parts = [], fine = [];
+  let LY = 0;                       // 0 legs + far arm, 1 body, 2 back hair, 3 head + face + front hair, 4 near arms, 9 effects
   const lx = (x, wd) => side && fl < 0 ? -x - wd : x;
-  const r = (x, y, wd, ht, c) => parts.push([lx(x, wd), y, wd, ht, c]);
-  const d = (x, y, wd, ht, c) => fine.push([lx(x, wd), y, wd, ht, c]);
+  const r = (x, y, wd, ht, c) => parts.push([lx(x, wd), y, wd, ht, c, LY]);
+  const d = (x, y, wd, ht, c) => fine.push([lx(x, wd), y, wd, ht, c, LY]);
+  const fx9 = (x, y, wd, ht, c) => fine.push([x, y, wd, ht, c, 9]);
   const crouch = Math.round((P.crouch || 0) * DK), bob = P.bob || 0;
-  const yHip = -3 - L + crouch, yT = yHip + 2 - T, yH = yT - 2 - 8 - Math.round((P.headDrop || 0) * DK);
+  const yHip = -12 - L + crouch, yT = yHip - T + 1, yH = yT - 13 - Math.round((P.headDrop || 0) * DK);
   const lg = P.legs || {mode:'stand'}, ph = lg.ph || 0, amp = lg.amp || 0;
-  const PL = C.ref || C.longLeg, legC = PL ? C.pants : C.skin, legS = PL ? C.pantsS : C.skinS, legL = PL ? C.pants : C.skinL, legR = PL ? C.pants : C.skinR;
-  // ---- legs + socks + sneakers
+  const PL = C.ref || C.longLeg, legC = PL ? C.pants : C.skin, legS = PL ? C.pantsS : C.skinS, legL = PL ? C.pantsL : C.skinL;
+  const pocket = (P.pocket || C.pockets && P.pocket !== false) && P.pocket !== false && !P.spin;
+  // ---- legs + socks + high-tops
+  const shoeFront = (sx, t0, sd) => {               // 7 x 5, white base with coloured panels
+    t0 -= 1;                                          // 8 x 6 high-top
+    r(sx + 1, t0, 6, 1, C.shoe); r(sx, t0 + 1, 8, 5, C.shoe);
+    d(sx + 1, t0, 2, 1, C.panel); d(sx + 5, t0, 2, 1, C.panel);                       // collar
+    d(sx + 3, t0 + 1, 2, 2, C.shoeS); d(sx + 3, t0 + 1, 1, 1, '#ffffff');             // laces
+    d(sd < 0 ? sx : sx + 5, t0 + 1, 3, 3, C.panel); d(sd < 0 ? sx : sx + 5, t0 + 3, 3, 1, C.panelS);   // side panel
+    d(sd < 0 ? sx + 5 : sx, t0 + 2, 3, 1, C.panel);                                   // stripe
+    d(sx + 1, t0 + 2, 1, 1, '#ffffff');
+    d(sx, t0 + 4, 8, 1, C.shoeS);
+    d(sx, t0 + 5, 8, 1, C.sole);                                                      // coloured outsole
+  };
   if (!side) {
     const sp = lg.mode === 'wide' ? 2 : lg.mode === 'tuck' ? -1 : 0;
     for (const sd of [-1, 1]) {
       let up = 0;
-      if (lg.mode === 'run') up = Math.round(Math.max(0, Math.sin(ph + (sd > 0 ? Math.PI : 0))) * 3 * amp);
-      if (lg.mode === 'tuck') up = 3;
-      if (lg.mode === 'sit') up = Math.round((Math.sin(ph + (sd > 0 ? Math.PI : 0)) + 1) * 2);
-      const x = sd < 0 ? -4 - sp : 1 + sp, top = yHip, len = Math.max(3, -4 - up - top);
-      r(x, top, 3, len, legC);
-      d(x + 2, top, 1, len, sd > 0 ? legR : legS);
-      d(x, top + 1, 1, len - 1, legL);
-      const knee = top + Math.round(len * .55); d(x + 1, knee, 1, 1, legL); d(x, knee + 1, 2, 1, legS);
-      if (!C.ref && !C.longLeg) { r(x, -6 - up, 3, 2, C.sock); d(x, -6 - up, 3, 1, C.plain ? C.sockS : C.trim); d(x + 2, -5 - up, 1, 1, C.sockS); }
-      const sx = sd < 0 ? x - 2 : x;                                    // sneaker: 5 wide x 4 tall in the shoe's colours
-      r(sx, -4 - up, 5, 4, C.shoe);
-      d(sx + 1, -4 - up, 3, 1, C.shoeS); d(sx + 2, -4 - up, 1, 1, C.lace);
-      d(sx, -3 - up, 1, 1, C.shoeL);
-      d(sd < 0 ? sx : sx + 1, -2 - up, 4, 1, C.shoeA);                  // accent stripe
-      d(sx, -1 - up, 5, 1, C.sole);
-      d(sd < 0 ? sx : sx + 4, -3 - up, 1, 1, sd > 0 ? mixHex(C.shoe, RIMC, .4) : C.shoeL);
+      if (lg.mode === 'run') up = Math.round(Math.max(0, Math.sin(ph + (sd > 0 ? Math.PI : 0))) * 2 * amp);
+      if (lg.mode === 'tuck') up = 2;
+      if (lg.mode === 'sit') up = Math.round((Math.sin(ph + (sd > 0 ? Math.PI : 0)) + 1) * 1.5);
+      const x = sd < 0 ? -5 - sp : 2 + sp, top = yHip + 4, bot = -5 - up, len = Math.max(2, bot - top);
+      r(x, top, 3, len, legC); d(x + 2, top, 1, len, legS); d(x, top, 1, len, legL);
+      if (C.jog) { d(sd < 0 ? x : x + 2, top, 1, len, '#f4f1ea'); }
+      if (C.jeans) { r(x - (sd < 0 ? 1 : 0), bot - 2, 4, 2, C.cuff); d(x - (sd < 0 ? 1 : 0), bot - 2, 4, 1, mixHex(C.cuff, '#ffffff', .3)); }  // rolled cuffs
+      if (!PL) { r(x, bot - 2, 3, 2, C.sock); d(x + 2, bot - 2, 1, 2, C.sockS); }
+      shoeFront(sd < 0 ? x - 3 : x - 2, bot, sd);
     }
   } else {
     for (const sd of [-1, 1]) {          // -1 = far leg (behind), 1 = near leg
       let fx = 0, up = 0;
-      if (lg.mode === 'run') { const s2 = Math.sin(ph + (sd > 0 ? 0 : Math.PI)); fx = Math.round(s2 * 4 * amp); up = s2 > .3 ? Math.round(amp * 1.5) : 0; }
+      if (lg.mode === 'run') { const s2 = Math.sin(ph + (sd > 0 ? 0 : Math.PI)); fx = Math.round(s2 * 5 * amp); up = s2 > .3 ? Math.round(amp * 1.5) : 0; }
       if (lg.mode === 'wide') fx = sd * 3;
-      if (lg.mode === 'tuck') { fx = sd > 0 ? 2 : -1; up = 3; }
-      if (lg.mode === 'sit') { fx = 3; up = Math.round((Math.sin(ph + (sd > 0 ? Math.PI : 0)) + 1) * 2); }
-      const far = sd < 0, c = far ? (PL ? C.pantsS : C.skinS) : legC, top = yHip + 1, foot = -5 - up;
-      const kx = Math.round(fx * .35 + (lg.mode === 'run' ? Math.max(0, fx) * .3 : 0)), ky = top + Math.round((foot - top) * .5);
-      seg(-1, top, kx - 1, ky, c, 3, true); seg(kx - 1, ky, fx - 1, foot, c, 3, true);
-      if (!far) d(fx + 1, ky, 1, foot - ky, legR);
-      if (!C.ref && !C.longLeg) { r(fx - 1, foot - 1, 3, 2, far ? C.sockS : C.sock); d(fx - 1, foot - 1, 3, 1, C.plain ? C.sockS : C.trim); }
-      r(fx - 1, -4 - up, 6, 4, far ? C.shoeS : C.shoe); d(fx - 1, -1 - up, 6, 1, C.sole);
-      if (!far) { d(fx, -2 - up, 4, 1, C.shoeA); d(fx + 3, -4 - up, 1, 1, C.lace); d(fx - 1, -4 - up, 2, 1, C.shoeS); }
+      if (lg.mode === 'tuck') { fx = sd > 0 ? 2 : -1; up = 2; }
+      if (lg.mode === 'sit') { fx = 2; up = Math.round((Math.sin(ph + (sd > 0 ? Math.PI : 0)) + 1) * 1.5); }
+      const far = sd < 0, top = yHip + 3, foot = -5 - up;
+      const kx = Math.round(fx * .45), ky = top + Math.round((foot - top) * .5);
+      seg(-1, top, kx - 1, ky, far ? legS : legC, 3, true); seg(kx - 1, ky, fx - 1, foot - 1, far ? legS : legC, 3, true);
+      if (!far && C.jog) seg(kx, top, fx, foot - 1, '#f4f1ea', 1, false);
+      if (C.jeans) r(fx - 2, foot - 2, 4, 2, far ? shadeHex(C.cuff, .85) : C.cuff);
+      if (!PL) r(fx - 1, foot - 2, 3, 2, far ? C.sockS : C.sock);
+      const t0 = -5 - up, sc = far ? C.shoeS : C.shoe;
+      r(fx - 2, t0 - 1, 5, 1, sc); r(fx - 2, t0, 9, 5, sc);
+      d(fx - 2, t0 + 3, 9, 1, far ? C.panelS : C.shoeS); d(fx - 2, t0 + 4, 9, 1, C.sole);
+      if (!far) { d(fx - 1, t0 + 2, 4, 1, C.panel); d(fx, t0 + 1, 2, 1, C.panel); d(fx + 3, t0 + 1, 2, 1, C.shoeS); d(fx - 2, t0, 2, 1, C.panel); d(fx + 4, t0 + 3, 2, 1, C.shoeS); }
+      else d(fx - 1, t0 + 2, 4, 1, C.panelS);
     }
   }
-  // thick line of squares (silhouette) from a to b
   function seg(ax, ay, bx, by, c, wd, out) {
     const n = Math.max(1, Math.round(Math.max(Math.abs(bx - ax), Math.abs(by - ay))));
     for (let i = 0; i <= n; i++) (out ? r : d)(Math.round(ax + (bx - ax) * i / n), Math.round(ay + (by - ay) * i / n), wd, wd > 1 ? 2 : 1, c);
   }
-  // ---- arms (far arm behind the torso in side view)
+  // ---- arms: thin and short with big round hands
   const arms = P.arms || [{s:0, f:0, y:6}, {s:0, f:0, y:6}];
   const shY = yT + 2, hands = [];
+  const LA = C.longArm, armC = (behind) => LA ? (behind ? C.jerseyS : C.jersey) : (behind ? C.skinS : C.skin);
+  const sleeveStripe = (x, y) => { if (C.zip) d(x, y, 1, 1, '#f4f1ea'); };
+  const hand = (hx, hy, behind, finger) => {
+    r(hx - 2, hy, 4, 4, behind ? C.skinS : C.skin); r(hx - 1, hy - 1, 2, 1, behind ? C.skinS : C.skin);
+    if (!behind) { d(hx + 1, hy + 1, 1, 3, C.skinS); d(hx - 2, hy + 3, 4, 1, C.skinS); d(hx - 1, hy, 1, 1, C.skinL); }
+    if (finger) { r(hx - 1, hy - 4, 2, 4, C.skin); d(hx, hy - 4, 1, 4, C.skinS); }
+  };
   const drawArm = (i, behind) => {
     const sd = i === 0 ? -1 : 1, A = arms[i];
-    let sx, ex; const ey = shY + Math.round(A.y * AK);
-    if (!side) { sx = sd * ((JW >> 1) + 2) - (sd > 0 ? 1 : 0); ex = sx + Math.round(sd * A.s * AK); }
-    else { sx = 0; ex = sx + Math.round(A.f * AK); }
-    const sleeve = look.sleeve && i === 1 && !C.longArm, LA = C.longArm, base = behind ? (LA ? C.jerseyS : C.skinS) : LA ? C.jersey : (sleeve ? C.sleeve : C.skin);
-    const n = Math.max(1, Math.round(Math.max(Math.abs(ex - sx), Math.abs(ey - shY))));
-    // shoulder cap (deltoid)
-    r(sx - 1, shY - 1, 3, 3, LA || C.plain ? (behind ? C.jerseyS : C.jersey) : behind ? C.skinS : C.skin);
-    for (let k = 0; k <= n; k++) {
-      const t = k / n, x = Math.round(sx + (ex - sx) * t), y = Math.round(shY + (ey - shY) * t), wd = t < .5 ? 3 : 2;
-      r(x - 1, y, wd, 1, t > .8 ? (behind ? C.skinS : C.skin) : base);
-      if (!behind && !(LA && t <= .8)) d(sd > 0 || side ? x - 2 + wd : x - 1, y, 1, 1, sd > 0 || side ? (sleeve ? mixHex(C.sleeve, RIMC, .3) : C.skinR) : (sleeve ? C.sleeve : C.skinL));
-      else if (!behind && LA) d(sd > 0 || side ? x - 2 + wd : x - 1, y, 1, 1, sd > 0 || side ? C.jerseyR : C.jerseyL);
+    const sx = side ? 0 : sd * ((JW >> 1) + 1) - (sd > 0 ? 1 : 0);
+    const raised = !behind && (A.pt || (P.spin && i === 1)) && !side;
+    if (raised) {                                           // index finger up, elbow out to the side
+      const elx = sx + sd * 6, ely = shY + 3, hx = sx + sd * 6, hy = shY - 5;
+      r(sx - 1, shY - 1, 3, 3, armC(false));
+      seg(sx, shY, elx, ely, armC(false), 2, true); seg(elx, ely, hx, hy + 2, C.skin, 2, true);
+      if (LA) seg(sx, shY, elx, ely, C.jersey, 2, true);
+      if (!LA) r(hx - 1, hy + 4, 3, 1, C.wrist);
+      hand(hx, hy, false, true);
+      hands[i] = [hx + .5, hy - 4]; return;
     }
-    if (!behind && !sleeve && !LA) { const mx = Math.round(sx + (ex - sx) * .3), my = Math.round(shY + (ey - shY) * .3); d(mx - 1, my, 1, 1, C.skinL); }
-    r(ex - 1, ey, 3, 3, behind ? C.skinS : C.skin); if (!behind) d(ex - 1, ey + 2, 3, 1, C.skinS);
-    hands[i] = [side ? lx(ex, 1) + .5 : ex + .5, ey + 1];
+    if (pocket && !behind && A.y >= 4 && Math.abs(A.s || 0) < 2) {   // hands in the pockets
+      if (!side) { const px = sx + sd; seg(sx, shY, px, yHip - 1, armC(false), 3, true); d(px - 1, yHip - 1, 3, 1, C.jerseyD); if (C.zip) seg(sx + (sd > 0 ? 1 : -1), shY + 1, px + (sd > 0 ? 1 : -1), yHip - 2, '#f4f1ea', 1, false); hands[i] = [px + .5, yHip]; }
+      else { seg(0, shY, -1, shY + 4, armC(false), 3, true); seg(-1, shY + 4, 2, yHip - 1, armC(false), 3, true); d(1, yHip - 1, 3, 1, C.jerseyD); if (C.zip) seg(0, shY + 1, 1, yHip - 2, '#f4f1ea', 1, false); hands[i] = [lx(2, 1) + .5, yHip]; }
+      return;
+    }
+    const ay = A.y > 0 ? A.y * AKD : A.y * AKU;
+    let ex = side ? sx + Math.round(A.f * AKX) : sx + Math.round(sd * A.s * AKX); const ey = shY + Math.round(ay);
+    if (!side && ey > shY + 3 && Math.abs(A.s || 0) < 1) ex = sx + sd;               // relaxed arms hang just outside the body
+    r(sx - 1, shY - 1, 3, 3, LA || C.plain && !C.tank ? (behind ? C.jerseyS : C.jersey) : armC(behind));   // shoulder / short sleeve
+    const n = Math.max(1, Math.round(Math.max(Math.abs(ex - sx), Math.abs(ey - shY))));
+    for (let k = 0; k <= n; k++) {
+      const t = k / n, x = Math.round(sx + (ex - sx) * t), y = Math.round(shY + (ey - shY) * t);
+      const cuffZ = LA && t > .7;
+      r(x - 1, y, 2, 1, cuffZ ? (behind ? C.jerseyD : C.jerseyS) : armC(behind));
+      if (!behind && LA && C.zip && t <= .7) sleeveStripe(x, y);
+      if (!behind && !LA && t > .15) d(sd > 0 || side ? x : x - 1, y, 1, 1, sd > 0 || side ? C.skinS : C.skinL);
+    }
+    if (!behind && !LA && (i === 1 || look.band)) d(ex - 1, ey - 1, 2, 1, C.wrist);     // wristband
+    hand(ex, ey, behind, false);
+    hands[i] = [side ? lx(ex, 1) + .5 : ex + .5, ey + 2];
   };
   if (side) drawArm(fl > 0 ? 0 : 1, true);
-  // ---- torso / jersey
+  LY = 1;
+  // ---- torso
   if (!side) {
-    const x0 = -(JW >> 1) - (JW % 2 ? 0 : 0);
+    const x0 = -(JW >> 1);
     if (C.ref) { for (let k = 0; k < JW; k++) r(x0 + k, yT, 1, T, k % 2 ? '#16181f' : '#f2f2f2'); }
     else {
-      r(x0, yT, JW, T, C.jersey);
-      d(x0 + JW - 3, yT + 2, 2, T - 2, C.jerseyS);                                     // cel shadow
-      d(x0 + JW - 1, yT + 2, 1, T - 3, C.jerseyR);                                     // rim light
-      d(x0 + 1, yT + 1, 2, 1, C.jerseyL); d(x0 + 1, yT + 2, 1, 3, C.jerseyL);           // key light
-      if (!C.plain) { d(x0, yT, 1, 3, C.trim); d(x0 + JW - 1, yT, 1, 3, C.trim); }      // armhole trim
+      r(x0 + 1, yT, JW - 2, 1, C.jersey); r(x0, yT + 1, JW, T - 1, C.jersey);
+      d(x0 + JW - 2, yT + 2, 2, T - 3, C.jerseyS); d(x0 + 1, yT + 2, 1, T - 4, C.jerseyL);
       d(x0, yT + T - 1, JW, 1, C.jerseyD);
-      if (C.hood) { r(x0 + 1, yT - 1, JW - 2, 2, C.jerseyS); if (!back) { d(-2, yT + 2, 1, 4, '#f4f1ea'); d(1, yT + 2, 1, 4, '#f4f1ea'); d(x0 + 2, yT + T - 5, JW - 4, 3, C.jerseyS); } }
-      else if (C.zip) { if (!back) d(0, yT + 1, 1, T - 2, '#d8dee8'); }
-      else if (!back) { d(-1, yT, 2, 1, C.skin); d(-2, yT, 1, 1, C.trim); d(1, yT, 1, 1, C.trim); d(-1, yT + 1, 2, 1, C.trim); }
-      else d(-2, yT, 4, 1, C.trim);
+      if (!C.plain) {                                                                   // tank: V-neck + armhole trim + hem
+        d(-2, yT, 1, 1, C.trim); d(1, yT, 1, 1, C.trim); d(-1, yT + 1, 1, 1, C.trim); d(0, yT + 1, 1, 1, C.trim); d(-1, yT, 2, 1, C.skin);
+        d(-3, yT, 1, 1, C.trim); d(2, yT, 1, 1, C.trim);
+        d(x0, yT + 1, 1, 3, C.trim); d(x0 + JW - 1, yT + 1, 1, 3, C.trim);
+        d(x0, yT + T - 2, JW, 1, C.trim);
+      } else if (C.hood) {
+        if (!back) {
+          r(x0 + 1, yT - 1, JW - 2, 2, C.jerseyS); d(x0 + 2, yT, JW - 4, 1, C.jerseyD);    // hood bunched at the neck
+          d(-2, yT + 1, 1, 4, '#f4f1ea'); d(1, yT + 1, 1, 4, '#f4f1ea'); d(-2, yT + 5, 1, 1, '#d8d4c8'); d(1, yT + 5, 1, 1, '#d8d4c8');   // drawstrings
+          d(x0 + 2, yT + T - 5, JW - 4, 3, C.jerseyS); d(x0 + 2, yT + T - 5, JW - 4, 1, C.jerseyD);   // kangaroo pocket
+        } else { r(x0 + 1, yT - 2, JW - 2, 4, C.jerseyS); d(x0 + 2, yT - 1, JW - 4, 2, C.jerseyD); }
+        d(x0, yT + T - 1, JW, 1, C.jerseyD);
+      } else if (C.zip) {                                                               // track jacket over a white hoodie
+        r(x0 + 1, yT - 1, JW - 2, 2, '#f4f1ea'); d(x0 + 2, yT, JW - 4, 1, '#d8d4c8');
+        if (!back) { d(0, yT + 1, 1, T - 2, '#f4f1ea'); d(-1, yT + 1, 1, T - 2, C.jerseyD); d(-2, yT + 2, 1, 3, '#f4f1ea'); d(2, yT + 2, 1, 3, '#f4f1ea'); }
+        d(x0, yT + T - 1, JW, 1, C.jerseyD);
+      } else if (!back) { d(-2, yT, 4, 1, C.jerseyD); d(-1, yT, 2, 1, C.skin); }          // tee collar
     }
   } else {
-    if (C.ref) { for (let k = 0; k < 7; k++) r(-3 + k, yT, 1, T, k % 2 ? '#16181f' : '#f2f2f2'); }
+    if (C.ref) { for (let k = 0; k < 8; k++) r(-4 + k, yT, 1, T, k % 2 ? '#16181f' : '#f2f2f2'); }
     else {
-      r(-3, yT, 7, T, C.jersey); d(-3, yT, 1, T, C.jerseyS); d(3, yT + 1, 1, T - 2, C.jerseyR);
-      d(2, yT, 1, 3, C.trim); d(-3, yT + T - 1, 7, 1, C.jerseyD);
+      r(-5, yT, 10, T, C.jersey); d(-5, yT, 2, T, C.jerseyS); d(2, yT + 1, 1, 3, C.jerseyL); d(-5, yT + T - 1, 10, 1, C.jerseyD);
+      if (!C.plain) { d(3, yT, 1, 2, C.trim); d(2, yT + 1, 1, 1, C.trim); d(-4, yT + T - 2, 8, 1, C.trim); d(-1, yT, 1, 3, C.trim); }
+      else if (C.hood) { r(-6, yT - 2, 5, 4, C.jerseyS); d(-5, yT - 1, 3, 2, C.jerseyD); d(2, yT + 1, 1, 4, '#f4f1ea'); d(-1, yT + T - 5, 5, 3, C.jerseyS); }
+      else if (C.zip) { r(-6, yT - 2, 5, 4, '#f4f1ea'); d(-5, yT - 1, 3, 2, '#d8d4c8'); d(3, yT, 1, T - 1, '#f4f1ea'); }
     }
   }
-  // ---- shorts
-  const SW = side ? 7 : JW, sx0 = side ? -3 : -(JW >> 1);
-  r(sx0, yHip - 2, SW, 6, C.shorts);
-  if (!C.ref && !C.plain) {
-    if (!side) { d(sx0, yHip - 2, 1, 6, C.trim); d(sx0 + SW - 1, yHip - 2, 1, 6, C.trim); d(sx0 + SW - 3, yHip - 1, 2, 5, C.shortsS); }
-    else { d(-3, yHip - 2, 1, 6, C.trim); d(3, yHip - 1, 1, 5, C.shortsR); }
-  }
-  d(sx0, yHip + 3, SW, 1, shadeHex(C.shorts, .6));
-  if (!side) d(-1, yHip + 2, 1, 2, OUT);
-  // ---- neck + head
-  const HX = side ? -3 : -4, HW = side ? 7 : 8;
-  r(-1, yT - 2, 3, 2, C.skin); d(-1, yT - 1, 3, 1, C.skinS);
-  r(HX + 1, yH, HW - 2, 1, C.skin); r(HX, yH + 1, HW, 6, C.skin); r(HX + 1, yH + 7, HW - 2, 1, C.skin);
-  if (!side) {
-    r(-5, yH + 3, 1, 2, C.skinS); r(4, yH + 3, 1, 2, C.skinS);
-    d(3, yH + 2, 1, 5, C.skinS); d(HX + HW - 2, yH + 7, 1, 1, C.skinS); d(-4, yH + 2, 1, 3, C.skinL);
-    if (!back) {
-      d(-3, yH + 2, 2, 1, C.hairD); d(1, yH + 2, 2, 1, C.hairD);                        // brows
-      d(-3, yH + 3, 1, 1, C.eye); d(-2, yH + 3, 1, 1, C.pupil); d(1, yH + 3, 1, 1, C.pupil); d(2, yH + 3, 1, 1, C.eye);
-      d(0, yH + 4, 1, 2, C.skinS); d(-1, yH + 5, 1, 1, C.skinL);                        // nose
-      if (P.mouth) { d(-2, yH + 6, 3, 1, '#3a1212'); d(-1, yH + 7, 1, 1, '#3a1212'); } else d(-2, yH + 6, 3, 1, C.lip);
-      d(-3, yH + 7, 6, 1, C.skinS);
-    } else d(-3, yH + 6, 6, 2, C.skinS);
+  // ---- shorts (white side stripe + hem) or the waist of long pants
+  const SW = side ? 10 : JW + 2, sx0 = side ? -5 : -(JW >> 1) - 1;
+  if (!C.longLeg || C.ref) {
+    r(sx0, yHip - 1, SW, 6, C.shorts);
+    d(sx0 + SW - 2, yHip, 1, 5, C.shortsS); d(sx0 + 1, yHip, 1, 3, C.shortsL);
+    if (!C.ref && !C.plain) {
+      if (!side) { d(sx0 + 1, yHip - 1, 1, 6, C.trim); d(sx0 + SW - 2, yHip - 1, 1, 6, C.trim); d(sx0, yHip + 4, SW, 1, C.trim); }
+      else { d(-2, yHip - 1, 1, 6, C.trim); d(-5, yHip + 4, 10, 1, C.trim); }
+    } else d(sx0, yHip + 4, SW, 1, C.shortsS);
+    if (!side) d(-1, yHip + 2, 1, 3, C.shortsS);
   } else {
-    r(4, yH + 4, 1, 2, C.skin);                                                        // nose
-    d(-3, yH + 2, 1, 5, C.skinS); d(3, yH + 1, 1, 6, C.skinR);
-    d(1, yH + 2, 2, 1, C.hairD); d(2, yH + 3, 1, 1, C.pupil); d(1, yH + 3, 1, 1, C.eye);
-    d(-1, yH + 3, 2, 2, C.skinS); d(-1, yH + 3, 1, 1, C.skinD);                         // ear
-    d(2, yH + 6, 2, 1, P.mouth ? '#3a1212' : C.lip); d(-2, yH + 7, 5, 1, C.skinS);
+    r(sx0 + 1, yHip - 1, SW - 2, 5, C.pants); d(sx0 + 1, yHip - 1, SW - 2, 1, C.pantsS); if (!side) d(-1, yHip + 1, 1, 3, C.pantsS);
+    if (C.jog && !side) { d(sx0 + 1, yHip, 1, 4, '#f4f1ea'); d(sx0 + SW - 2, yHip, 1, 4, '#f4f1ea'); }
   }
-  // ---- hair, beard, headband
+  // ---- hair behind the head (afro, locs, hightop)
   const st = P.style || hiHair(look), hc = C.hair, hd = C.hairD, hl = C.hairL;
-  const cap = (x, y, wd, ht) => { r(x, y, wd, ht, hc); d(x + 1, y, Math.max(1, wd - 3), 1, hl); };
+  LY = 2;
+  if (!back && !side) {
+    if (st === 'afro') {
+      for (let ry = -10; ry <= 9; ry++) { const hw = Math.round(Math.sqrt(Math.max(0, 1 - Math.pow((ry + .5) / 10.5, 2))) * 26) & ~1; if (hw > 1) r(-(hw >> 1), yH + ry, hw, 1, hc); }
+      for (let k = 0; k < 44; k++) { const ax = -12 + ((k * 7) % 24), ay = yH - 9 + ((k * 5) % 18); if (Math.pow(ax / 12.5, 2) + Math.pow((ay - yH + .5) / 10, 2) < 1) d(ax, ay, 1, 1, k % 3 ? hd : hl); }
+    } else if (st === 'locs') {
+      r(-10, yH + 1, 4, 16, hc); r(6, yH + 1, 4, 16, hc); r(-9, yH - 1, 18, 3, hc);
+      for (let y = yH + 2; y < yH + 17; y += 2) { d(-10, y, 1, 1, hd); d(-8, y + 1, 1, 1, hd); d(7, y, 1, 1, hd); d(9, y + 1, 1, 1, hd); }
+      for (const [bx, by] of [[-10, 9], [-8, 14], [-9, 16], [7, 10], [9, 15], [8, 16], [-7, 6], [6, 6]]) { d(bx, yH + by, 1, 1, C.bead); d(bx, yH + by + 1, 1, 1, C.beadS); }
+    } else if (st === 'hightop') { r(-7, yH - 8, 14, 10, hc); d(-6, yH - 8, 12, 1, hl); d(-7, yH - 3, 14, 1, hd); }
+  } else if (side && !back) {
+    if (st === 'afro') { for (let ry = -10; ry <= 9; ry++) { const hw = Math.round(Math.sqrt(Math.max(0, 1 - Math.pow((ry + .5) / 10.5, 2))) * 24); if (hw > 1) r(-14 + ((24 - hw) >> 1), yH + ry, hw, 1, hc); } for (let k = 0; k < 20; k++) d(-10 + ((k * 7) % 17), yH - 5 + ((k * 5) % 14), 1, 1, k % 3 ? hd : hl); }
+    else if (st === 'locs') { r(-10, yH - 1, 13, 4, hc); r(-11, yH + 2, 6, 15, hc); for (let y = yH + 3; y < yH + 17; y += 2) { d(-11, y, 1, 1, hd); d(-9, y + 1, 1, 1, hd); d(-7, y, 1, 1, hd); } for (const [bx, by] of [[-11, 10], [-9, 15], [-7, 12], [-10, 16], [-6, 8]]) { d(bx, yH + by, 1, 1, C.bead); d(bx, yH + by + 1, 1, 1, C.beadS); } }
+    else if (st === 'hightop') { r(-8, yH - 8, 14, 10, hc); d(-7, yH - 8, 12, 1, hl); }
+  }
+  // ---- big round head
+  LY = 3;
+  const headRows = side ? [[-4, 4], [-6, 6], [-7, 6], [-8, 6], [-8, 7], [-8, 7], [-8, 7], [-8, 7], [-8, 7], [-8, 7], [-8, 6], [-7, 6], [-6, 5], [-4, 4]]
+                        : [[-5, 4], [-7, 6], [-8, 7], [-8, 7], [-8, 7], [-8, 7], [-8, 7], [-8, 7], [-8, 7], [-8, 7], [-8, 7], [-7, 6], [-6, 5], [-4, 3]];
+  headRows.forEach(([a0, a1], i) => r(a0, yH + i, a1 - a0 + 1, 1, C.skin));
+  if (!side) {
+    r(-10, yH + 6, 2, 4, C.skin); r(8, yH + 6, 2, 4, C.skin); d(-10, yH + 7, 1, 2, C.skinS); d(9, yH + 7, 1, 2, C.skinS);   // ears
+    d(6, yH + 3, 2, 8, C.skinS); d(5, yH + 11, 2, 1, C.skinS); d(-3, yH + 13, 6, 1, C.skinS); d(-7, yH + 3, 1, 4, C.skinL);
+    if (!back) {
+      const eye = (ex, m) => {                     // 5 x 6: thick lash, white, big iris, pupil, two sparkles
+        const X = (c) => ex + (m < 0 ? c : 4 - c);
+        d(ex - (m < 0 ? 1 : 0), yH + 4, 6, 1, K); d(X(-1), yH + 3, 1, 1, K);
+        d(ex, yH + 5, 5, 5, C.iris);
+        d(X(0), yH + 5, 1, 5, C.eye); d(X(0), yH + 9, 2, 1, C.eye); d(X(4), yH + 5, 1, 1, shadeHex(C.iris, .7));
+        d(X(2), yH + 6, 1, 3, C.pupil); d(X(3), yH + 6, 1, 3, C.pupil);
+        d(X(2), yH + 6, 1, 1, '#ffffff'); d(X(3), yH + 6, 1, 1, '#ffffff'); d(X(2), yH + 7, 1, 1, '#ffffff'); d(X(4), yH + 8, 1, 1, '#ffffff');   // sparkles
+        d(X(2), yH + 9, 3, 1, C.irisL);
+      };
+      eye(-7, -1); eye(2, 1);
+      d(-7, yH + 2, 3, 1, C.hairD); d(4, yH + 2, 3, 1, C.hairD);                         // brows
+      d(-1, yH + 9, 1, 1, C.skinS);                                                      // nose
+      const mw = P.mouth ? 6 : 5, mx = -(mw >> 1) - (P.mouth ? 0 : 0);                     // big open smile: teeth, tongue
+      d(mx, yH + 10, mw, 1, C.mouthK); d(mx, yH + 11, 1, 1, C.mouthK); d(mx + mw - 1, yH + 11, 1, 1, C.mouthK);
+      d(mx + 1, yH + 11, mw - 2, 1, C.mouthK); d(mx + 1, yH + 10, mw - 2, 1, '#ffffff'); d(mx + 2, yH + 11, mw - 3, 1, C.tongue); d(mx + 1, yH + 12, mw - 2, 1, C.mouthK);
+      d(-7, yH + 10, 2, 1, C.skinB); d(4, yH + 10, 2, 1, C.skinB);                        // cheeks
+    } else d(-6, yH + 10, 12, 3, C.skinS);
+  } else {
+    r(-2, yH + 6, 3, 4, C.skin); d(-2, yH + 7, 2, 2, C.skinS); d(-1, yH + 7, 1, 1, C.skinD);   // ear
+    r(7, yH + 8, 1, 2, C.skin);                                                          // little nose
+    d(-8, yH + 3, 1, 7, C.skinS); d(-7, yH + 11, 12, 1, C.skinS);
+    d(1, yH + 4, 5, 1, K); d(5, yH + 3, 1, 1, K);                                         // lash
+    d(2, yH + 5, 4, 5, C.iris); d(1, yH + 5, 1, 5, C.eye); d(1, yH + 9, 2, 1, C.eye); d(3, yH + 6, 2, 3, C.pupil); d(3, yH + 6, 1, 2, '#ffffff'); d(5, yH + 8, 1, 1, '#ffffff'); d(3, yH + 9, 3, 1, C.irisL);
+    d(2, yH + 2, 3, 1, C.hairD);
+    d(4, yH + 11, 3, 1, C.mouthK); d(6, yH + 10, 1, 1, C.mouthK); if (P.mouth) d(4, yH + 12, 2, 1, C.tongue);
+    d(1, yH + 10, 2, 1, C.skinB);
+  }
+  // ---- front hair
+  const cap = (rows, c) => rows.forEach(([ry, a0, a1]) => r(a0, yH + ry, a1 - a0 + 1, 1, c || hc));
   if (!side && !back) {
     if (st === 'fade' || st === 'waves' || st === 'cornrows') {
-      cap(-4, yH - 1, 8, 3); d(-4, yH + 2, 1, 2, C.fade); d(3, yH + 2, 1, 2, C.fade);
-      if (st === 'waves') for (let x = -3; x < 4; x += 2) d(x, yH, 1, 1, hl);
-      if (st === 'cornrows') for (let x = -3; x < 4; x += 2) d(x, yH - 1, 1, 3, hd);
-    } else if (st === 'afro') { r(-6, yH - 4, 12, 6, hc); r(-5, yH - 5, 10, 1, hc); r(-6, yH + 2, 2, 4, hc); r(4, yH + 2, 2, 4, hc); for (let k = 0; k < 7; k++) d(-5 + ((k * 5) % 11), yH - 4 + ((k * 3) % 5), 1, 1, k % 2 ? hl : hd); d(-6, yH + 1, 12, 1, hd); }
-    else if (st === 'bald') { d(-2, yH + 1, 2, 1, mixHex(C.skin, '#ffffff', .45)); }
-    else if (st === 'hightop') { r(-4, yH - 6, 8, 8, hc); d(-3, yH - 6, 6, 1, hl); d(-4, yH - 2, 8, 1, hd); d(2, yH - 5, 1, 4, hd); d(-4, yH + 1, 8, 1, C.fade); }
-    else if (st === 'locs') { cap(-4, yH - 1, 8, 3); r(-6, yH + 1, 2, 9, hc); r(4, yH + 1, 2, 9, hc); for (let y = yH + 2; y < yH + 10; y += 2) { d(-6, y, 1, 1, hd); d(5, y, 1, 1, hd); } }
-    else if (st === 'mohawk') { r(-1, yH - 4, 3, 5, hc); d(-1, yH - 4, 1, 4, hl); d(-4, yH, 3, 2, C.fade); d(2, yH, 2, 2, C.fade); }
+      cap([[-1, -5, 4], [0, -7, 6], [1, -8, 7], [2, -8, 7], [3, -8, -6], [3, 5, 7], [4, -8, -7], [4, 6, 7]]);
+      d(-5, yH - 1, 6, 1, hl); d(-8, yH + 5, 1, 2, C.fade); d(7, yH + 5, 1, 2, C.fade); d(-7, yH + 3, 1, 1, C.fade); d(6, yH + 3, 1, 1, C.fade);
+      if (st === 'waves') for (let x = -6; x < 6; x += 3) { d(x, yH, 2, 1, hl); d(x + 1, yH + 2, 2, 1, hl); }
+      if (st === 'cornrows') for (let x = -7; x < 8; x += 2) d(x, yH - 1 + (Math.abs(x) > 5 ? 1 : 0), 1, 4 - (Math.abs(x) > 6 ? 1 : 0), hd);
+      if (st === 'cornrows') for (let x = -6; x < 7; x += 2) d(x, yH + 1, 1, 1, hl);
+    } else if (st === 'afro') { cap([[1, -7, 6], [2, -8, 7], [3, -8, -6], [3, 5, 7]]); d(-6, yH + 2, 2, 1, hl); d(2, yH + 1, 2, 1, hd); }
+    else if (st === 'bald') { d(-4, yH + 1, 3, 1, mixHex(C.skin, '#ffffff', .5)); }
+    else if (st === 'hightop') { cap([[0, -7, 6], [1, -8, 7], [2, -8, 7], [3, -8, -7], [3, 6, 7]]); d(-8, yH + 4, 1, 2, C.fade); d(7, yH + 4, 1, 2, C.fade); }
+    else if (st === 'locs') {
+      cap([[-2, -6, 5], [-1, -8, 7], [0, -9, 8], [1, -9, 8], [2, -9, 8], [3, -9, -5], [3, 4, 8], [4, -9, -6], [4, 5, 8], [5, -9, -7], [5, 6, 8]]);
+      for (let x = -7; x < 8; x += 2) d(x, yH - 1, 1, 4, hd);
+      d(-3, yH + 3, 1, 2, hc); d(2, yH + 3, 1, 2, hc); d(-1, yH + 3, 1, 1, hc);          // strands over the forehead
+      for (const [bx, by] of [[-3, 5], [2, 5], [-8, 6], [7, 6]]) d(bx, yH + by, 1, 1, C.bead);
+    }
+    else if (st === 'mohawk') { r(-1, yH - 5, 3, 7, hc); d(-1, yH - 5, 1, 6, hl); cap([[1, -7, -2], [1, 2, 6], [2, -8, -2], [2, 2, 7]], C.fade); }
   } else if (back) {
-    if (st === 'afro') { r(-6, yH - 5, 12, 12, hc); d(-5, yH + 6, 10, 1, hd); }
-    else if (st === 'hightop') { r(-4, yH - 6, 8, 12, hc); d(-3, yH - 6, 6, 1, hl); }
-    else if (st === 'locs') { r(-5, yH - 1, 10, 13, hc); for (let x = -4; x < 5; x += 2) d(x, yH + 2, 1, 10, hd); }
-    else if (st === 'mohawk') { r(-1, yH - 4, 3, 10, hc); d(-4, yH, 8, 5, C.fade); }
-    else if (st !== 'bald') { cap(-4, yH - 1, 8, 7); if (st === 'cornrows') for (let x = -3; x < 4; x += 2) d(x, yH - 1, 1, 7, hd); if (st === 'waves') for (let y = yH; y < yH + 6; y += 2) d(-3 + (y % 4 ? 1 : 0), y, 6, 1, hl); }
-    else d(-1, yH + 1, 2, 1, mixHex(C.skin, '#ffffff', .4));
+    if (st === 'afro') { for (let ry = -7; ry <= 12; ry++) { const hw = Math.round(Math.sqrt(Math.max(0, 1 - Math.pow((ry - 2.5) / 10.5, 2))) * 19); r(-(hw >> 1), yH + ry, hw, 1, hc); } }
+    else if (st === 'locs') { r(-10, yH - 2, 20, 19, hc); for (let x = -9; x < 10; x += 2) d(x, yH + 1, 1, 15, hd); for (let x = -9; x < 10; x += 3) d(x, yH + 15, 1, 1, C.bead); }
+    else if (st === 'hightop') { r(-8, yH - 8, 16, 20, hc); d(-7, yH - 8, 14, 1, hl); }
+    else if (st === 'mohawk') { r(-1, yH - 5, 3, 16, hc); r(-7, yH, 14, 9, C.fade); }
+    else if (st !== 'bald') { r(-8, yH - 1, 16, 12, hc); r(-5, yH - 1, 10, 1, hc); d(-6, yH - 1, 12, 1, hl); if (st === 'cornrows') for (let x = -7; x < 8; x += 2) d(x, yH, 1, 10, hd); if (st === 'waves') for (let y = yH + 1; y < yH + 10; y += 2) d(-6 + (y % 4 ? 1 : 0), y, 12, 1, hl); }
+    else d(-2, yH + 2, 3, 1, mixHex(C.skin, '#ffffff', .4));
   } else {
-    if (st === 'fade' || st === 'waves' || st === 'cornrows') { cap(-3, yH - 1, 7, 3); r(-3, yH + 2, 3, 3, hc); d(-2, yH + 2, 2, 2, C.fade); if (st === 'cornrows') for (let x = -2; x < 4; x += 2) d(x, yH - 1, 1, 3, hd); }
-    else if (st === 'afro') { r(-6, yH - 4, 11, 7, hc); r(-6, yH + 3, 5, 4, hc); d(-5, yH - 4, 6, 1, hl); d(-6, yH + 2, 11, 1, hd); }
-    else if (st === 'bald') d(0, yH + 1, 2, 1, mixHex(C.skin, '#ffffff', .45));
-    else if (st === 'hightop') { r(-3, yH - 6, 7, 9, hc); d(-2, yH - 6, 5, 1, hl); d(-3, yH - 2, 7, 1, hd); }
-    else if (st === 'locs') { cap(-3, yH - 1, 7, 3); r(-5, yH + 1, 4, 10, hc); for (let y = yH + 2; y < yH + 11; y += 2) d(-4, y, 1, 1, hd); }
-    else if (st === 'mohawk') { r(-1, yH - 4, 4, 5, hc); d(-3, yH, 3, 4, C.fade); }
+    if (st === 'fade' || st === 'waves' || st === 'cornrows' || st === 'hightop') {
+      cap([[-1, -4, 3], [0, -6, 5], [1, -7, 5], [2, -8, 4], [3, -8, -2], [4, -8, -3], [5, -8, -3], [6, -8, -4], [7, -8, -4]]);
+      d(-3, yH - 1, 5, 1, hl);
+      if (st === 'cornrows') for (let y = yH; y < yH + 8; y += 2) d(-8, y, 11, 1, hd);
+      if (st === 'waves') for (let y = yH + 1; y < yH + 7; y += 2) d(-7, y, 5, 1, hl);
+    }
+    else if (st === 'afro') { d(-6, yH - 5, 7, 1, hl); r(-2, yH + 1, 8, 3, hc); }
+    else if (st === 'bald') d(0, yH + 1, 3, 1, mixHex(C.skin, '#ffffff', .45));
+    else if (st === 'locs') { cap([[-1, -5, 4], [0, -7, 6], [1, -8, 6], [2, -8, 5], [3, -8, -3], [4, -8, -3]]); for (let x = -7; x < 6; x += 2) d(x, yH - 1, 1, 4, hd); d(4, yH + 3, 1, 2, hc); d(4, yH + 5, 1, 1, C.bead); }
+    else if (st === 'mohawk') { r(-3, yH - 5, 5, 7, hc); d(-2, yH - 5, 2, 6, hl); }
   }
   const BT = C.beardT;
   if (BT && !back) {
-    if (BT === 'beard') { if (!side) { d(-4, yH + 4, 1, 3, hc); d(3, yH + 4, 1, 3, hc); d(-3, yH + 7, 6, 1, hc); d(-2, yH + 5, 4, 1, hc); } else { d(-1, yH + 5, 1, 2, hc); d(0, yH + 7, 3, 1, hc); d(2, yH + 5, 2, 1, hc); } }
-    else if (BT === 'goatee') { if (!side) { d(-1, yH + 7, 2, 1, hc); d(-2, yH + 5, 4, 1, hc); } else { d(1, yH + 7, 2, 1, hc); d(2, yH + 5, 2, 1, hc); } }
-    else if (BT === 'stache') { if (!side) d(-2, yH + 5, 4, 1, hc); else d(2, yH + 5, 2, 1, hc); }
-    else if (BT === 'full') { if (!side) { d(-4, yH + 3, 1, 4, hc); d(3, yH + 3, 1, 4, hc); d(-3, yH + 6, 6, 2, hc); d(-2, yH + 5, 4, 1, hc); d(-2, yH + 8, 4, 1, hc); } else { d(-1, yH + 4, 1, 3, hc); d(0, yH + 6, 4, 2, hc); } }
+    if (!side) {
+      if (BT === 'beard' || BT === 'full') { cap([[7, -8, -7], [7, 6, 7], [8, -8, -6], [8, 5, 7], [9, -8, -5], [9, 4, 7], [10, -7, -4], [10, 3, 6], [11, -7, -4], [11, 2, 6], [12, -6, 5], [13, -4, 3], [14, -3, 2]]); d(-3, yH + 10, 4, 1, hc); }
+      if (BT === 'goatee') { r(-2, yH + 13, 3, 2, hc); d(-3, yH + 10, 4, 1, hc); }
+      if (BT === 'stache') d(-3, yH + 10, 4, 1, hc);
+    } else {
+      if (BT === 'beard' || BT === 'full') { cap([[7, -2, -1], [8, -2, 0], [9, -2, 1], [10, -1, 3], [11, 0, 3], [12, -2, 6], [13, -1, 5]]); d(4, yH + 10, 3, 1, hc); }
+      if (BT === 'goatee') r(4, yH + 12, 3, 2, hc);
+      if (BT === 'stache') d(5, yH + 10, 2, 1, hc);
+    }
   }
-  if (look.band || st === 'bald') d(side ? -3 : -4, yH + 1, side ? 7 : 8, 1, C.band || C.trim);
+  if (look.band || st === 'bald' && !C.hat) {                                           // white headband with a dark mark in the middle
+    const bc = C.band || '#f6f4ee', bs = shadeHex(bc, .82);
+    if (!side) { r(-9, yH + 2, 18, 2, bc); d(-9, yH + 3, 18, 1, bs); if (!back) d(-1, yH + 2, 2, 2, lumOf(bc) > .7 ? '#22252f' : '#f6f4ee'); }
+    else { r(-8, yH + 2, 15, 2, bc); d(-8, yH + 3, 15, 1, bs); }
+  }
   if (C.hat) {                                            // street hats
-    const hk = C.hatC, hs = shadeHex(hk, .7);
-    if (C.hat === 'cap') { r(side ? -3 : -4, yH - 2, side ? 7 : 8, 3, hk); if (!back) { if (side) r(3, yH, 3, 1, hs); else d(-4, yH + 1, 8, 1, hs); } d(side ? -2 : -1, yH - 2, 2, 1, mixHex(hk, '#ffffff', .4)); }
-    else if (C.hat === 'beanie') { r(side ? -3 : -4, yH - 3, side ? 7 : 8, 4, hk); d(side ? -3 : -4, yH, side ? 7 : 8, 1, hs); r(-1, yH - 4, 2, 1, hk); }
-    else if (C.hat === 'bucket') { r(side ? -3 : -4, yH - 3, side ? 7 : 8, 3, hk); r(side ? -4 : -6, yH, side ? 9 : 12, 1, hs); }
-    else if (C.hat === 'durag') { r(side ? -3 : -4, yH - 1, side ? 7 : 8, 3, hk); if (side || back) r(side ? -5 : -2, yH + 2, side ? 2 : 4, 4, hk); }
+    const hk = C.hatC, hs = shadeHex(hk, .72), hlt = mixHex(hk, '#ffffff', .25);
+    if (C.hat === 'cap') {
+      if (!side) { cap([[-3, -6, 5], [-2, -8, 7], [-1, -9, 8], [0, -9, 8], [1, -9, 8], [2, -9, 8]], hk); d(-6, yH - 3, 6, 1, hlt); if (!back) { r(-10, yH + 3, 20, 2, hs); d(-10, yH + 4, 20, 1, shadeHex(hk, .55)); } d(-1, yH - 3, 2, 1, hs); }
+      else { cap([[-3, -5, 3], [-2, -7, 5], [-1, -8, 6], [0, -8, 6], [1, -8, 6], [2, -8, 6]], hk); r(5, yH + 2, 6, 2, hs); d(-3, yH - 1, 4, 3, '#f6f4ee'); d(-6, yH - 2, 4, 1, hlt); }
+    }
+    else if (C.hat === 'beanie') { cap([[-4, -6, 5], [-3, -8, 7], [-2, -9, 8], [-1, -9, 8], [0, -9, 8], [1, -9, 8], [2, -9, 8]], hk); d(-9, yH + 1, 18, 2, hs); r(-1, yH - 5, 2, 1, hk); }
+    else if (C.hat === 'bucket') { cap([[-3, -6, 5], [-2, -7, 6], [-1, -8, 7], [0, -8, 7], [1, -8, 7]], hk); r(-11, yH + 2, 22, 2, hs); d(-7, yH - 2, 5, 1, hlt); }
+    else if (C.hat === 'durag') { cap([[-1, -6, 5], [0, -8, 7], [1, -9, 8], [2, -9, 8], [3, -9, -7], [3, 6, 8]], hk); d(-6, yH, 6, 1, hlt); if (side || back) r(side ? -11 : -2, yH + 3, side ? 3 : 4, 6, hk); }
   }
   if (P.stars) for (let k = 0; k < 3; k++) {          // dazed: little birds flap in a circle around his head
-    const a = CLK * 3.6 + k * 2.1, bx = Math.round(Math.cos(a) * 10), by = yH - 7 + Math.round(Math.sin(a) * 3), up = Math.floor(CLK * 9 + k * 3) % 2 === 0;
+    const a = CLK * 3.6 + k * 2.1, bx = Math.round(Math.cos(a) * 13), by = yH - 6 + Math.round(Math.sin(a) * 3), up = Math.floor(CLK * 9 + k * 3) % 2 === 0;
     const col = ['#5fc6ff', '#ffd94d', '#ff8ad0'][k], dk = shadeHex(col, .55), f = Math.sin(a) > 0 ? 1 : -1;
-    fine.push([bx - 2, by - 1, 5, 4, 'rgba(18,14,24,.75)'],                                   // soft outline so they read on any floor
-      [bx - 1, by, 3, 2, col], [bx + f * 2, by, 1, 1, col], [bx + f * 2, by - 1 + 0, 1, 1, '#120e18'],
-      [bx + f * 3, by + 1, 1, 1, '#ff9a3a'],
-      up ? [bx - 2, by - 1, 2, 1, dk] : [bx - 2, by + 2, 2, 1, dk], up ? [bx + 1, by - 1, 2, 1, dk] : [bx + 1, by + 2, 2, 1, dk]);
+    fx9(bx - 2, by - 1, 5, 4, 'rgba(18,14,24,.75)'); fx9(bx - 1, by, 3, 2, col); fx9(bx + f * 2, by, 1, 1, col); fx9(bx + f * 2, by - 1, 1, 1, '#120e18'); fx9(bx + f * 3, by + 1, 1, 1, '#ff9a3a');
+    if (up) { fx9(bx - 2, by - 1, 2, 1, dk); fx9(bx + 1, by - 1, 2, 1, dk); } else { fx9(bx - 2, by + 2, 2, 1, dk); fx9(bx + 1, by + 2, 2, 1, dk); }
   }
   // ---- near arms
+  LY = 4;
   if (side) drawArm(fl > 0 ? 1 : 0, false); else { drawArm(0, false); drawArm(1, false); }
-  // ---- render: outline pass, colour pass, fine details, number
+  // ---- render: per layer outline, colour, details; jersey number after the body
   const ox = Math.round(x0), oy = Math.round(y0 - bob);
-  g.fillStyle = OUT; for (const p of parts) g.fillRect(ox + p[0] - 1, oy + p[1] - 1, p[2] + 2, p[3] + 2);
-  for (const p of parts) { g.fillStyle = p[4]; g.fillRect(ox + p[0], oy + p[1], p[2], p[3]); }
-  for (const p of fine) { g.fillStyle = p[4]; g.fillRect(ox + p[0], oy + p[1], p[2], p[3]); }
-  if (!C.ref && !C.plain && !side && num !== '' && num != null) pnum(g, num, ox - (JW >> 1) + JW / 2 - .5, oy + yT + (back ? 2 : 3), C.num);
-  // re-draw the near arms over the number when they cross the chest
-  return {hands:hands.map(hh => hh ? [ox + hh[0], oy + hh[1]] : [ox, oy + yT]), head:[ox, oy + yH], top:oy + yH - (st === 'hightop' ? 7 : st === 'afro' ? 6 : st === 'mohawk' ? 5 : 2), shoulder:oy + shY};
+  for (let ly = 0; ly <= 4; ly++) {
+    g.fillStyle = K; for (const p of parts) if (p[5] === ly) g.fillRect(ox + p[0] - 1, oy + p[1] - 1, p[2] + 2, p[3] + 2);
+    for (const p of parts) if (p[5] === ly) { g.fillStyle = p[4]; g.fillRect(ox + p[0], oy + p[1], p[2], p[3]); }
+    for (const p of fine) if (p[5] === ly) { g.fillStyle = p[4]; g.fillRect(ox + p[0], oy + p[1], p[2], p[3]); }
+    if (ly === 1 && !C.ref && !C.plain && !side && num !== '' && num != null) pnum(g, num, ox - (JW >> 1) + JW / 2 - .5, oy + yT + (back ? 2 : 3), C.num);
+  }
+  // the spinning ball on the raised finger, with sparkles and an orbit ring
+  if (P.spin && !side && !back && hands[1]) {
+    const bx = ox + Math.round(hands[1][0] - .5), by = oy + Math.round(hands[1][1]) - 6;
+    spinBallChibi(g, bx, by);
+  }
+  for (const p of fine) if (p[5] === 9) { g.fillStyle = p[4]; g.fillRect(ox + p[0], oy + p[1], p[2], p[3]); }
+  return {hands:hands.map(hh => hh ? [ox + hh[0], oy + hh[1]] : [ox, oy + yT]), head:[ox, oy + yH], top:oy + yH - (st === 'hightop' ? 8 : st === 'afro' ? 7 : st === 'mohawk' ? 5 : st === 'locs' ? 3 : 2), shoulder:oy + shY};
+}
+function spinBallChibi(g, bx, by) {
+  const r = 5, a = CLK * 7;
+  g.fillStyle = OUT; for (let dy = -r - 1; dy <= r + 1; dy++) for (let dx = -r - 1; dx <= r + 1; dx++) if (dx * dx + dy * dy <= (r + 1) * (r + 1) + 1) g.fillRect(bx + dx, by + dy, 1, 1);
+  for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
+    if (dx * dx + dy * dy > r * r + 1) continue;
+    let c = dx + dy > 3 ? '#c85a14' : dx + dy < -4 ? '#ffb15a' : '#f0801e';
+    const sx = Math.round(Math.sin(a) * 3);
+    if (dy === 0 || dx === sx || Math.abs(dx - sx - (dx > sx ? 3 : -3)) === 0 && Math.abs(dy) > 2) c = '#3a1a08';
+    g.fillStyle = c; g.fillRect(bx + dx, by + dy, 1, 1);
+  }
+  g.fillStyle = '#fff4d8'; g.fillRect(bx - 3, by - 3, 2, 1); g.fillRect(bx - 3, by - 2, 1, 1);
+  g.fillStyle = '#ffffff';                                  // orbit ring
+  for (let k = 0; k < 18; k++) { const t = k / 18 * Math.PI * 2 + a * .6; const px = Math.round(Math.cos(t) * 9), py = Math.round(Math.sin(t) * 2.4); if (py < 0 && Math.abs(px) < 5) continue; if ((k + Math.floor(a)) % 4 === 0) continue; g.fillRect(bx + px, by + 1 + py, 1, 1); }
+  for (const [sx, sy, ph] of [[-8, -8, 0], [8, -7, 2], [10, 0, 4], [-1, -12, 1]]) {      // sparkles
+    const on = Math.floor(CLK * 5 + ph) % 3 !== 0; if (!on) continue;
+    g.fillStyle = '#ffd94d'; g.fillRect(bx + sx, by + sy - 1, 1, 3); g.fillRect(bx + sx - 1, by + sy, 3, 1); g.fillStyle = '#fff6c0'; g.fillRect(bx + sx, by + sy, 1, 1);
+  }
 }
 // lying sprite (knocked down); head to the left
 function drawLying(g, x0, y0, look, f, P) {
-  const C = (P.C && P.C.skinR) ? P.C : (P.C = hiColors(look, f));
+  const C = (P.C && P.C.chibi) ? P.C : (P.C = hiColors(look, f));
   const ox = Math.round(x0), oy = Math.round(y0), parts = [], fine = [];
   const r = (x, y, w, h, c) => parts.push([x, y, w, h, c]), d = (x, y, w, h, c) => fine.push([x, y, w, h, c]);
   const up = P.faceUp !== false;
@@ -4871,12 +5012,12 @@ function renderCity(dt) {
     const pose = poseOf(p, dt);
     if (p.face) pose.dir = p.face;
     drawDoll(g, s[0], s[1], p.look, p.kit, p.num, Object.assign(pose, {C:p.C}));
-    if (p.tag) { ptext(g, p.tag, s[0], s[1] - 58, 8, '#ffc94d', 'center'); }
+    if (p.tag) { ptext(g, p.tag, s[0], s[1] - 66, 8, '#ffc94d', 'center'); }
     p.C = pose.C;
   }
   // you: a little marker over your head
   const s = CX(m.x, m.y), bob = Math.round(Math.sin(CITY.t * 5));
-  g.fillStyle = OUT; g.fillRect(s[0] - 3, s[1] - 60 + bob, 7, 4); g.fillStyle = '#ffc94d'; g.fillRect(s[0] - 2, s[1] - 59 + bob, 5, 1); g.fillRect(s[0] - 1, s[1] - 58 + bob, 3, 1); g.fillRect(s[0], s[1] - 57 + bob, 1, 1);
+  g.fillStyle = OUT; g.fillRect(s[0] - 3, s[1] - 68 + bob, 7, 4); g.fillStyle = '#ffc94d'; g.fillRect(s[0] - 2, s[1] - 67 + bob, 5, 1); g.fillRect(s[0] - 1, s[1] - 66 + bob, 3, 1); g.fillRect(s[0], s[1] - 65 + bob, 1, 1);
   if (CITY.tgt) { const t = CX(CITY.tgt.x, CITY.tgt.y); pring(g, t[0], t[1], 5, 3, '#ffc94d'); }
   CITY.CX = CX;
 }
@@ -4973,11 +5114,11 @@ function creatorFrame(dt) {
   pell(g, 36, 79, 18, 4, '#3a4290');
   const M = CR.me, L = Object.assign({}, M.look, {h:hOf(M.hIn), w:(BUILDS.find(b => b[0] === M.build) || BUILDS[1])[2], shoe:[0xf4f1ea, 0x22252f], v:M.num});
   const turn = Math.floor(CR.t / 2.2) % 3, dir = ['down', 'side', 'up'][turn], ph = CR.t * 5;
-  const pose = {dir, flip:1, crouch:0, bob:Math.round(Math.abs(Math.sin(ph)) * .6), arms:[{s:0, f:0, y:6}, {s:2, f:2, y:4 + Math.round(Math.abs(Math.sin(ph)) * 2)}], legs:{mode:'stand'}};
+  const pose = {dir, flip:1, crouch:0, bob:0, spin:dir === 'down', arms:[{s:0, f:0, y:6}, {s:2, f:2, y:4 + Math.round(Math.abs(Math.sin(ph)) * 2)}], legs:{mode:'stand'}};
   const kit = Object.assign({}, JERSEYS[0], {n:M.last || 'YOU'});
   drawDoll(g, 36, 80, L, kit, M.num, pose);
   const bz = Math.abs(Math.sin(ph)); const hx = dir === 'side' ? 44 : dir === 'down' ? 44 : 28;
-  if (dir !== 'up') drawBall(g, hx, Math.round(80 - 4 - (1 - bz) * 14));
+  if (dir === 'side') drawBall(g, hx, Math.round(80 - 4 - (1 - bz) * 14));
 }
 function creatorAct(a, d) {
   if (!CR) return;
