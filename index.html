@@ -812,7 +812,7 @@ svg.ic.bolt{width:7px;height:auto}
 .subbtn.off{filter:grayscale(1) brightness(.6)}
 
 /* ===================== RANK LEAGUE + BALLER ROAD + STYLE ===================== */
-.road{top:calc(15% + 74px)}
+.road{top:max(8px,calc(15% - 72px))}
 .road.rank{top:15%;background:linear-gradient(180deg,#7a2a3a,#3a1220);color:#ffc94d}
 .road.rank .crown{width:30px}
 .road.rank b{color:#ffd8a8}
@@ -873,6 +873,11 @@ svg.crest.px,.who svg.crest,.mhead svg.crest,.fr svg.crest{image-rendering:pixel
 .game .av{width:24px;height:24px;flex:none;display:block}
 .next .vs .av{width:48px;height:48px;flex:none;display:block;background:#1a1d3a}
 
+.eightc{position:absolute;left:50%;top:52px;transform:translateX(-50%);z-index:3;pointer-events:none;font-family:var(--display);font-size:11px;letter-spacing:.05em;padding:5px 8px 4px;background:rgba(10,11,22,.9);color:#ffc94d;white-space:nowrap;box-shadow:0 -2px 0 0 #0a0b16,0 2px 0 0 #0a0b16,-2px 0 0 0 #0a0b16,2px 0 0 0 #0a0b16}
+.eightc b{display:inline-block;min-width:14px;margin-left:4px;color:#fff;text-align:center}
+.eightc.low{color:#ff6a5a;animation:conthot .5s steps(2) infinite}
+.shotfb:not([hidden])~.eightc{top:84px}
+
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0;-webkit-text-size-adjust:100%;overscroll-behavior:none;touch-action:manipulation}
 img{max-width:100%}
@@ -904,6 +909,7 @@ img{max-width:100%}
     <button class="pausebtn" data-act="pause" aria-label="Pause"><span class="pxi" data-i="pause"></span></button>
     <div class="banner" id="banner" hidden><h2 id="bt"></h2><p id="bs"></p></div>
     <div class="shotfb" id="shotfb" hidden></div>
+    <div class="eightc" id="eightc" hidden></div>
     <div class="roster" id="roster"></div>
     <div class="overlay half" id="half" hidden></div>
     <section class="panel" id="panel" hidden></section>
@@ -925,7 +931,7 @@ img{max-width:100%}
   <nav class="nav" id="nav" aria-label="Main menu">
     <button data-act="tab" data-tab="team"><span class="pxi" data-i="team"></span>TEAM</button>
     <button data-act="tab" data-tab="story"><span class="pxi" data-i="story"></span>STORY</button>
-    <button data-act="tab" data-tab="pvp"><span class="pxi" data-i="pvp"></span>PVP<span class="pxi lock" data-i="lock"></span></button>
+    <button data-act="tab" data-tab="pvp"><span class="pxi" data-i="pvp"></span>ONLINE<span class="pxi lock" data-i="lock"></span></button>
     <button data-act="tab" data-tab="packs"><span class="pxi" data-i="packs"></span>BANNERS</button>
     <button data-act="tab" data-tab="shop"><span class="pxi" data-i="shop"></span>SHOP</button>
   </nav>
@@ -1604,7 +1610,7 @@ function feed(text, t) {
   $('feed').querySelector('i').style.background = (t === 0 || t === 1) ? G.T[t].fr.c : '';
 }
 function whistle(text) { REF.signal = 1.6; popup(REF.x, REF.y, text || 'TWEET!', '#ffffff', 1.3); }
-function setPoss(t) { G.poss = t; G.shot = SC; for (const p of all) { p.mode = 'set'; p.hot = 0; p.attack = null; p.screen = 0; p.cut = 0; p.lobRun = null; p.uDrive = null; } }
+function setPoss(t) { G.poss = t; G.shot = SC; for (const p of all) { p.mode = 'set'; p.hot = 0; p.attack = null; p.screen = 0; p.cut = 0; p.lobRun = null; p.uDrive = null; } G.eight = 0; G.crossed = false; }
 function give(p) { const b = G.ball; b.state = 'held'; b.owner = p; b.z = 0; b.lob = false; p.decide = rand(.35, .8); p.mode = 'set'; p.lobRun = null; }
 
 function setLineups() {
@@ -1751,7 +1757,7 @@ function applyMove(p, card, lv, user) {
     G.cheer = Math.max(G.cheer, .9);
   } else if (defs[0] && dist(p, defs[0]) < 2.4 && Math.random() < .07) {
     const d = defs[0];
-    popup(d.x, d.y, 'STRIPPED', '#fff', 1.5); feed(`${nm(d)} pokes it loose from ${nm(p)}`, d.t); stl(d);
+    d.pokeT = .35; popup(d.x, d.y, 'STRIPPED', '#fff', 1.5); feed(`${nm(d)} pokes it loose from ${nm(p)}`, d.t); stl(d);
     p.move = null; give(d); setPoss(d.t);
   } else if (user) {
     feed(`${nm(p)} goes ${card.n.toLowerCase()}, defender stays home`, p.t);
@@ -1945,7 +1951,11 @@ function update(dt) {
     G.timer -= dt;
     const ib = G.inbounder;
     if (ib && G.timer < .45 && !G.clockOut) { b.x = ib.x; b.y = ib.y; if (!G.inbHold) { G.inbHold = true; popup(ib.x, ib.y, 'INBOUND', '#ffffff', 1); } }
-    if (G.timer <= -.45 && (!ib || dist(ib, G.inbPt) < 2 || G.timer < -1.9)) {
+    if (ib && ib.t === 0 && G.game && !G.auto && !G.clockOut) {          // your team inbounds by hand: tap a teammate within 5 seconds
+      if (!G.inbReady && G.timer <= -.45 && (dist(ib, G.inbPt) < 2 || G.timer < -1.9)) { G.inbReady = true; G.inbWait = 0; }
+      if (G.inbReady) { G.inbWait += dt; if (G.inbWait >= 5) inboundViolation(); }
+    }
+    else if (G.timer <= -.45 && (!ib || dist(ib, G.inbPt) < 2 || G.timer < -1.9)) {
       G.inbHold = false;
       if (G.clockOut) { endQuarter(); return; }
       if (ib) {
@@ -1970,6 +1980,10 @@ function update(dt) {
     if (!G.clockOut) { G.clock -= dt; if (G.clock <= 0) { G.clock = 0; G.clockOut = true; } }
     if (G.clockOut && b.state !== 'shot') { endQuarter(); return; }
     if (b.state === 'held' || b.state === 'pass') { G.shot -= dt; if (G.shot <= 0) violation(); }
+    if (!G.crossed && (b.state === 'held' || b.state === 'pass')) {        // 8 seconds to get it past half court
+      if (G.poss === 0 ? b.y < 47 : b.y > 47) G.crossed = true;
+      else { G.eight = (G.eight || 0) + dt; if (G.eight >= 8) { G.crossed = true; const nd = nearestDef(b.owner || b.to, true).p; whistle('8 SEC!'); popup(b.x, b.y, '8-SECOND VIOLATION', '#ff4d6a', 1.6); turnover(nd, '8-second violation'); return; } }
+    }
     G.stam = Math.min(STAM_MAX, G.stam + dt * 1.15);
     if (G.meter) { G.meter.v += dt * G.meter.speed; G.meter.p.gv = G.meter.v; if (G.meter.v >= 1.12) releaseMeter(); }
     // handler pressure: steals, press, charges
@@ -1979,7 +1993,7 @@ function update(dt) {
       if (nd.p && nd.d < 2.4 && hd.burst <= 0) {
         let ch = (.018 + (nd.p.d.st.def - hd.d.st.drb) / 1600) * dt * enF(nd.p) / enF(hd) * (hd.t === 0 ? diff().press : 1);
         if (hd.t === 1 && G.eff.press > 0) ch += .1 * dt;
-        if (Math.random() < Math.max(0, ch)) { popup(nd.p.x, nd.p.y, 'STEAL', '#fff', 1.6); stl(nd.p); turnover(nd.p); say('steal', nd.p); if (nd.p.t === 0) buzz(25); }
+        if (Math.random() < Math.max(0, ch)) { nd.p.pokeT = .35; popup(nd.p.x, nd.p.y, 'STEAL', '#fff', 1.6); stl(nd.p); turnover(nd.p); say('steal', nd.p); if (nd.p.t === 0) buzz(25); }
       }
       if (b.owner === hd && hd.t === 1 && G.eff.charge > 0 && hd.mode === 'drive' && dist(hd, HOOPS[1]) < 14 && nd.p && nd.d < 3) {
         G.eff.charge = 0; nd.p.stun = .9; whistle('CHARGE');
@@ -2000,6 +2014,7 @@ function update(dt) {
   // off-ball timers: cuts and screens
   for (const p of all) {
     if (p.uDrive) stepDrive(p, dt);
+    p.pokeT = Math.max(0, (p.pokeT || 0) - dt);
     p.stun = Math.max(0, p.stun - dt); p.contestT = Math.max(0, (p.contestT || 0) - dt); p.burst -= dt; p.cool -= dt; p.hot -= dt; p.shootT -= dt; p.lockT -= dt; p.cut -= dt; p.screen -= dt;
     p.spotT -= dt;
     if (p.spotT <= 0) { p.spot = (p.spot + (Math.random() < .5 ? 1 : 2)) % 3; p.spotT = rand(3, 6); }
@@ -2103,7 +2118,7 @@ function afterMake(t) {
   G.inbPt = {x:h.x - 4, y:by};
   let best = null, bd = 1e9;
   for (const p2 of players[G.poss]) { if (p2.i === 0) continue; const d = dist(p2, h); if (d < bd) { bd = d; best = p2; } }
-  G.inbounder = best; b.state = 'dead'; b.x = h.x; b.y = h.y; b.z = 0;
+  G.inbounder = best; b.state = 'dead'; b.x = h.x; b.y = h.y; b.z = 0; G.inbReady = false; G.inbWait = 0; G.inbHold = false;
   autoSubs(1); if (G.auto) autoSubs(0);
 }
 function updateBall(dt) {
@@ -2122,7 +2137,8 @@ function updateBall(dt) {
       else if (a === 'spin') { ang = u * Math.PI * 2 * (p.spinDir || 1); }
       else if (a === 'step') { fwd = .9; z = 1.2; }
     }
-    if (G.phase === 'dead' || G.phase === 'ftset' || G.phase === 'ft') z = 2.2;
+    if (G.phase === 'dead') z = 2.2;
+    else if (G.phase === 'ftset' || G.phase === 'ft') { z = Math.abs(Math.sin(G.time * 4.6)) * 2.6; side = p.side * 1.15; fwd = -.15; }   // dribbles at the line until the shot
     p.ballSide = side;
     let lx = side * 1.25, lf = fwd;
     if (ang) { const ca = Math.cos(ang), sa = Math.sin(ang); [lx, lf] = [lx * ca - lf * sa, lx * sa + lf * ca]; }
@@ -2571,7 +2587,27 @@ function startFTMeter() {
   meterEl.querySelector('.zone').style.height = (w / 1.12 * 100) + '%';
   return true;
 }
+// ---- manual inbound after the other team scores
+const userInbWaiting = () => !!(G.game && !G.auto && G.phase === 'dead' && G.inbReady && G.inbounder && G.inbounder.t === 0);
+function userInbound(m) {
+  const ib = G.inbounder; if (!userInbWaiting() || !m || m.t !== 0 || m === ib) return false;
+  G.inbHold = false; G.inbReady = false; G.inbWait = 0;
+  ib.x = clamp(ib.x, -2, 52); give(ib); G.phase = 'live';
+  doPass(ib, m, {steal:.3});
+  return true;
+}
+function bestInbound() {
+  const ib = G.inbounder, mates = players[0].filter(m => m !== ib);
+  return mates.sort((a, c) => (nearestDef(c).d - dist(c, ib) * .15 + (c.i === 0 ? 2 : 0)) - (nearestDef(a).d - dist(a, ib) * .15 + (a.i === 0 ? 2 : 0)))[0];
+}
+function inboundViolation() {
+  const ib = G.inbounder; G.inbHold = false; G.inbReady = false; G.inbWait = 0;
+  const d = players[1].slice().sort((a, c) => dist(a, ib) - dist(c, ib))[0];
+  G.phase = 'live'; whistle('5 SEC!'); popup(ib.x, ib.y + 2, '5-SECOND VIOLATION', '#ff4d6a', 1.6);
+  turnover(d, '5-second inbound violation');
+}
 function userShootDown() {
+  if (userInbWaiting()) return userInbound(bestInbound());
   if (userFT()) return startFTMeter();
   const h = userHandler();
   if (!h) { if (G.oppShot) return userContest(); return userHandsUp(); }
@@ -2601,7 +2637,7 @@ function userSteal() {
   if (!d) return false;
   G.stealCD = .9;
   if (dist(d, hd) > 6.5) { popup(d.x, d.y, 'TOO FAR', '#ffffff', 1); return false; }
-  d.vx += (hd.x - d.x) * 3; d.vy += (hd.y - d.y) * 3; d.contestT = .3;
+  d.vx += (hd.x - d.x) * 2; d.vy += (hd.y - d.y) * 2; d.pokeT = .35; d.contestT = 0;   // reach in with the hand, feet stay down
   const ch = .26 + (d.d.st.def - hd.d.st.drb) / 200 - Math.max(0, dist(d, hd) - 3.6) * .05 + (onFire(hd) ? -.08 : 0);
   if (Math.random() < ch) { popup(d.x, d.y, 'STEAL!', '#5fd38a', 1.8); G.cheer = 1; stl(d); buzz(25); say('steal', d); turnover(d); return true; }
   d.stun = .45; popup(d.x, d.y, 'REACH', '#ffffff', 1.1); feed(`${nm(d)} reaches and misses`, 0);
@@ -2838,6 +2874,7 @@ function poseOf(a, dt) {
     P.arms[k] = {s:2, f:3, y:4 + Math.round(bz * 2)}; P.arms[1 - k] = {s:2, f:2, y:3}; P.crouch = Math.max(P.crouch, 1);
   }
   if (a.contestT > 0 && !a.isRef) { const u = clamp(a.contestT / .7, 0, 1); P.arms = [{s:1, f:1, y:-9}, {s:1, f:1, y:-10}]; P.lift = Math.max(P.lift, Math.sin(u * Math.PI) * 1.7); P.legs = {mode:'tuck'}; P.crouch = 0; }
+  if (a.pokeT > 0 && !a.isRef) { const u = clamp(1 - a.pokeT / .35, 0, 1), ext = Math.round(Math.sin(u * Math.PI) * 4); P.arms = [{s:1, f:2, y:4}, {s:0, f:3 + ext, y:3}]; P.crouch = Math.max(P.crouch, 2); P.lift = 0; }
   if (a.move) { const u = clamp(a.move.t / a.move.dur, 0, 1); P.crouch = Math.max(P.crouch, Math.round(Math.sin(Math.PI * u) * 2)); }
   if (a.gather) { const g2 = clamp(a.gv || 0, 0, 1); P.crouch = Math.round(2 * (1 - g2)); P.arms = [{s:-1, f:2, y:-2 - Math.round(g2 * 3)}, {s:-2, f:2, y:-3 - Math.round(g2 * 4)}]; }
   if (a.shootT > 0) {
@@ -3159,7 +3196,7 @@ function renderArena(dt) {
   if (!ctx) return;
   cam.k = arenaK(); if (arenaKey !== arenaKeyNow()) repaintArena();
   animateNets(dt);
-  const b = G.ball, live = G.phase === 'live' || G.phase === 'dead';
+  const b = G.ball, live = G.phase === 'live' || G.phase === 'dead' || G.phase === 'ftset' || G.phase === 'ft';
   // camera follows the ball
   let ty = b.y + (G.poss === 0 ? -10 : 10), tx = 25 + (b.x - 25) * .55;
   if (G.phase === 'break' || G.phase === 'final') { ty = 47; tx = 25; }
@@ -3180,7 +3217,7 @@ function renderArena(dt) {
   const items = [];
   all.forEach((p, i) => {
     const P = arenaPeople[i]; if (!P) return;
-    p.def = live && p.t !== G.poss && b.state !== 'loose' && b.state !== 'rim';
+    p.def = (G.phase === 'live' || G.phase === 'dead') && p.t !== G.poss && b.state !== 'loose' && b.state !== 'rim';
     p.handler = b.state === 'held' && b.owner === p; p.ballZ = b.z;
     p.faceX = p.t !== G.poss ? b.x : HOOPS[p.t].x; p.faceY = p.t !== G.poss ? b.y : HOOPS[p.t].y;
     p.aimYaw = Math.atan2(HOOPS[p.t].x - p.x, HOOPS[p.t].y - p.y);
@@ -3197,14 +3234,14 @@ function renderArena(dt) {
   let h = .55;
   if (b.state === 'held') h = (b.owner && b.owner.gather ? 6.9 + (b.owner.gv || 0) * 1.1 : .55 + b.z * 1.05) * 1.1;
   else if (b.state === 'pass') h = Math.max(3.4, b.z + 1);
-  else if (b.state === 'shot' || b.state === 'rim') h = Math.max(.55, b.z);
+  else if (b.state === 'shot' || b.state === 'rim' || b.state === 'ftshot') h = Math.max(.55, b.z);
   else if (b.state === 'dead') h = G.phase === 'dead' ? (G.inbHold ? 3.4 : Math.max(.55, 9.6 - (1 - G.timer) * 22)) : .55;
   const owner = b.state === 'held' ? b.owner : null;
   // shadows + handler ring first (on the floor)
   for (const it of items) if (it.p) { const s = PX(it.p.x, it.p.y, 0); shadowAt(g, s[0], s[1], 7); }
   if (live) { const s = PX(b.x, b.y, 0); shadowAt(g, s[0], s[1], 2); }
   if (owner && G.phase === 'live') { const s = PX(owner.x, owner.y, 0); pring(g, s[0], s[1] + 1, 10, 5, owner.t === 0 ? '#ffc94d' : '#ffffff'); }
-  const ballAir = live && (b.state === 'shot' || b.state === 'rim' || b.state === 'pass' || h > 8);
+  const ballAir = live && (b.state === 'shot' || b.state === 'ftshot' || b.state === 'rim' || b.state === 'pass' || h > 8);
   if (live && !ballAir) items.push({y:b.y, bias:.4, f:() => { const s = PX(b.x, b.y, h); drawBall(g, s[0], s[1]); }});
   for (const it of items) it.d = depthOf(it.y) + (it.bias || 0);
   items.sort((p, q) => p.d - q.d);
@@ -4050,7 +4087,7 @@ function paintFloor(g, C, x0, y0, w, h, k) {
 // highlight plays back in slow motion with an INSTANT REPLAY banner; tap to skip.
 const RP = {buf:[], t:0, req:null, play:null};
 const RP_KEYS = ['x', 'y', 'vx', 'vy', 'yaw', 'ph', 'fall', 'stun', 'shootT', 'celebT', 'celebKind', 'gather', 'gv', 'lockT', 'burst', 'lift',
-  'runInPlace', 'fixYaw', 'spinDir', 'signal', 'mode', 'aimYaw', 'side', 'ballSide', 'contestT', 'fadeT'];
+  'runInPlace', 'fixYaw', 'spinDir', 'signal', 'mode', 'aimYaw', 'side', 'ballSide', 'contestT', 'fadeT', 'pokeT'];
 function rpSnapActor(a) {
   const o = {}; for (const k of RP_KEYS) o[k] = a[k];
   o.finish = a.finish ? Object.assign({}, a.finish) : null; o.move = a.move ? Object.assign({}, a.move) : null;
@@ -4230,7 +4267,7 @@ function renderPanel() {
   const head = t => `<div class="phead"><h2>${t}</h2><button class="xbtn" data-act="close" aria-label="Close">${XIC}</button></div>`;
   if (tab === 'team') panel.innerHTML = head('TEAM') + teamHTML();
   else if (tab === 'story') panel.innerHTML = head('STORY') + storyHTML();
-  else if (tab === 'pvp') panel.innerHTML = head('PVP') + `<div class="locked-panel"><span class="biglock">${PXI(PX_ICONS.lock, '')}</span><b>PVP IS LOCKED</b><p class="hint">Head-to-head games against other players aren't open yet. Build your squad in Story mode for now.</p></div>`;
+  else if (tab === 'pvp') panel.innerHTML = head('ONLINE') + `<div class="locked-panel"><span class="biglock">${PXI(PX_ICONS.lock, '')}</span><b>ONLINE IS LOCKED</b><p class="hint">Online games against other players aren't open yet. Build your squad in Story mode for now.</p></div>`;
   else if (tab === 'packs') panel.innerHTML = head('BANNERS') + packsHTML();
   else if (tab === 'shop') panel.innerHTML = head('SHOP') + shopHTML();
   else if (tab === 'road') panel.innerHTML = head('BALLER ROAD') + roadHTML();
@@ -4606,7 +4643,7 @@ function startStory() {
   G.score = [0, 0]; G.q = 0; G.firstPoss = Math.random() < .5 ? 0 : 1; G.done = false; G.paused = false; G.cheer = 0; G.auto = !!S.auto;
   for (const k in G.eff) G.eff[k] = 0;
   for (const pp of G.popups) pp.el.remove(); G.popups = [];
-  G.stam = 15; replayReset(); G.queue = []; G.stealCD = 0; G.subsLeft = 3; G.subMade = false; G.inbHold = false; G.ftWait = 0;
+  G.stam = 15; replayReset(); G.queue = []; G.stealCD = 0; G.subsLeft = 3; G.subMade = false; G.inbHold = false; G.ftWait = 0; G.inbReady = false; G.inbWait = 0; G.eight = 0; G.crossed = true;
   $('n0').textContent = G.T[0].short; $('n1').textContent = G.T[1].short;
   $('tA').style.setProperty('--tc', G.T[0].fr.c); $('tB').style.setProperty('--tc', G.T[1].fr.c);
   $('pause').hidden = true; $('result').hidden = true;
@@ -4649,7 +4686,7 @@ let rosterSig = '';
 function updateMatchHud() {
   hudExtras();
   const h = userHandler();
-  $('handhint').textContent = G.auto ? 'Autoplay is on. Your team plays itself.' : userFT() && !G.meter ? 'Your free throw. Hold SHOOT, let go on green.' : G.meter ? 'Let go on green!' : h ? 'Your ball. Drag to move, tap a teammate to pass.' : G.oppShot ? 'Hit CONTEST as he rises!' : G.poss === 1 && G.phase === 'live' ? 'On defense. Drag to guard, STEAL or CONTEST.' : 'Wait for the next play.';
+  $('handhint').textContent = G.auto ? 'Autoplay is on. Your team plays itself.' : userInbWaiting() ? 'Your ball. Tap a teammate to inbound it (5 seconds).' : userFT() && !G.meter ? 'Your free throw. Hold SHOOT, let go on green.' : G.meter ? 'Let go on green!' : h ? 'Your ball. Drag to move, tap a teammate to pass.' : G.oppShot ? 'Hit CONTEST as he rises!' : G.poss === 1 && G.phase === 'live' ? 'On defense. Drag to guard, STEAL or CONTEST.' : 'Wait for the next play.';
   $('s0').textContent = G.score[0]; $('s1').textContent = G.score[1];
   $('qtr').textContent = G.q > 4 ? (G.q === 5 ? 'OVERTIME' : `${G.q - 4}OT`) : (QNAMES[G.q - 1] || '');
   const c = G.clock; $('clock').textContent = c < 10 ? c.toFixed(1) : `${Math.floor(Math.ceil(c) / 60)}:${String(Math.ceil(c) % 60).padStart(2, '0')}`;
@@ -4689,14 +4726,19 @@ function hudExtras() {
   const live = G.game && !G.auto && G.phase === 'live' && !G.done, h = userHandler(), def = live && G.poss === 1, o = G.oppShot;
   let L, R;
   const ftMe = userFT();
-  if (ftMe) { L = ['drb', 'DRIBBLE', 'CROSS HIM UP', true]; R = ['sht' + (G.meter ? ' hot' : ''), 'FREE THROW', G.meter ? 'LET GO ON GREEN' : 'HOLD, LET GO ON GREEN', false]; }
+  const inbMe = userInbWaiting();
+  if (inbMe) { L = ['drb', 'DRIBBLE', 'CROSS HIM UP', true]; R = ['sht hot', 'PASS IN', `OR TAP A TEAMMATE · ${Math.max(0, Math.ceil(5 - (G.inbWait || 0)))}`, false]; }
+  else if (ftMe) { L = ['drb', 'DRIBBLE', 'CROSS HIM UP', true]; R = ['sht' + (G.meter ? ' hot' : ''), 'FREE THROW', G.meter ? 'LET GO ON GREEN' : 'HOLD, LET GO ON GREEN', false]; }
   else if (def) { L = ['stl', 'STEAL', 'REACH FOR IT', (G.stealCD || 0) > 0]; R = ['con' + (o ? ' hot' : ''), o && o.fin ? 'BLOCK' : 'CONTEST', o ? 'NOW! TIME IT' : 'HANDS UP', false]; }
   else {
     const fin = h && rimShot(h), three = h && isThree(h, 0);
     L = ['drb', 'DRIBBLE', 'CROSS HIM UP', !h || h.cool > 0 || h.gather || !!h.finish];
     R = ['sht' + (G.meter ? ' hot' : ''), fin === 'dunk' ? 'DUNK' : fin === 'layup' ? 'LAYUP' : fin ? 'FLOATER' : three ? 'SHOOT 3' : 'SHOOT', fin ? 'TAP TO ATTACK' : G.meter ? 'LET GO ON GREEN' : 'HOLD, LET GO ON GREEN', !h && !G.meter];
   }
-  if (!live && !ftMe) { L[3] = true; R[3] = true; }
+  if (!live && !ftMe && !inbMe) { L[3] = true; R[3] = true; }
+  // 8-second backcourt count for your team
+  const ec = $('eightc'), showE = live && G.poss === 0 && !G.crossed && (G.eight || 0) > 2.5;
+  ec.hidden = !showE; if (showE) { const n = Math.max(0, Math.ceil(8 - G.eight)); if (ec._n !== n) { ec._n = n; ec.innerHTML = `CROSS HALF COURT <b>${n}</b>`; ec.classList.toggle('low', n <= 3); } }
   for (const [el, v] of [[$('btnL'), L], [$('btnR'), R]]) {
     const sig = v.join('|'); if (el._s === sig) continue; el._s = sig;
     el.className = 'cbtn ' + v[0] + (v[3] ? ' off' : ''); el.querySelector('b').textContent = v[1]; el.querySelector('small').textContent = v[2];
@@ -4896,7 +4938,8 @@ cv.addEventListener('pointerup', e => {
   const dx = e.clientX - s0.x, dy = e.clientY - s0.y, h = userHandler();
   if (s0.moved || Math.hypot(dx, dy) > 16) { if (!s0.moved) steerFrom(dx, dy, false); endSteer(); return; }
   const r = wrap.getBoundingClientRect(), p = tapPlayer(e.clientX - r.left, e.clientY - r.top);
-  if (h && p && p.t === 0 && p !== h) { if (userPassTo(p)) buzz(10); }
+  if (userInbWaiting()) { if (p && p.t === 0 && p !== G.inbounder && userInbound(p)) buzz(10); }
+  else if (h && p && p.t === 0 && p !== h) { if (userPassTo(p)) buzz(10); }
   else if (G.poss === 1) userHandsUp();
 });
 cv.addEventListener('pointercancel', () => { swipe = null; endSteer(); });
